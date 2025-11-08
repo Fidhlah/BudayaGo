@@ -5,6 +5,9 @@
 	<key>NSCameraUsageDescription</key>
     <string>BudayaGo needs camera access to scan QR codes</string>
 
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>BudayaGo perlu akses lokasi untuk verifikasi check-in</string>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
