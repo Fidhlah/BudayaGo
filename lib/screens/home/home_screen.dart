@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../qr/qr_scanner_screen.dart'; // ✅ Import QR Scanner
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,7 +13,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('BudayaGo'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -25,6 +26,25 @@ class HomeScreen extends StatelessWidget {
                     content: Text('Logged out successfully'),
                     backgroundColor: Colors.orange,
                   ),
+                );
+              }
+            },
+          ),
+          // ✅ TAMBAH TOMBOL QR SCANNER DI SINI
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const QRScannerScreen(),
+                ),
+              );
+
+              // Handle hasil scan
+              if (result != null && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('QR Code: $result')),
                 );
               }
             },
@@ -83,6 +103,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      
     );
   }
 }
