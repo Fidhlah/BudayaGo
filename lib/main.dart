@@ -3,33 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'providers/auth_provider.dart';
+import 'providers/qr_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/auth/email_verification_screen.dart'; // ✅ TAMBAH INI
+import 'screens/auth/register_screen.dart';
+import 'screens/auth/email_verification_screen.dart';
 import 'screens/home/home_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'utils/qr_generator_helper.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load .env file
-  await dotenv.load(fileName: ".env");
-  
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: SupabaseConfig.supabaseUrl,
-    anonKey: SupabaseConfig.supabaseAnonKey,
-  );
-  
-  // Print QR codes untuk testing
-  QRGeneratorHelper.printAllTestQRCodes();
-  
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
-      child: const MyApp(),
-    ),
-  );
+  await SupabaseConfig.initialize();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -37,31 +20,77 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BudayaGo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: Consumer<AuthProvider>(
-        builder: (context, authProvider, _) {
-          // ✅ UBAH INI - 3 state logic
-          
-          // 1. Belum login
-          if (authProvider.user == null) {
-            return const LoginScreen();
-          }
-          
-          // 2. Login tapi email belum verified
-          if (!authProvider.isEmailConfirmed) {
-            return const EmailVerificationScreen();
-          }
-          
-          // 3. Login dan email sudah verified
-          return const HomeScreen();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => QrProvider()),
+      ],
+      child: MaterialApp(
+        title: 'BudayaGo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: const AuthGate(),
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/verify-email': (context) => const EmailVerificationScreen(),
+          '/home': (context) => const HomeScreen(),
         },
       ),
+    );
+  }
+}
+
+// ✅ FIXED: AuthGate - Reactive to provider changes only
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, _) {
+        // ✅ Debug logs
+        debugPrint('🔄 AuthGate - Building UI...');
+        debugPrint('   Loading: ${authProvider.isLoading}');
+        debugPrint('   User: ${authProvider.user?.email}');
+        debugPrint('   Email Confirmed: ${authProvider.isEmailConfirmed}');
+
+        // ✅ Loading state
+        if (authProvider.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading...'),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // ✅ Determine screen based on auth state
+        final user = authProvider.user;
+        
+        if (user == null) {
+          // Not logged in
+          debugPrint('→ Showing LoginScreen');
+          return const LoginScreen();
+        } else if (!authProvider.isEmailConfirmed) {
+          // Logged in but email not verified
+          debugPrint('→ Showing EmailVerificationScreen');
+          return const EmailVerificationScreen();
+        } else {
+          // Logged in & email verified
+          debugPrint('→ Showing HomeScreen');
+          return const HomeScreen();
+        }
+      },
     );
   }
 }

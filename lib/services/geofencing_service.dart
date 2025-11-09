@@ -1,6 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'dart:math';
-import '../utils/test_locations.dart';
+import '../config/test_locations.dart';
 import '../models/qr_code_model.dart';
 import '../config/qr_config.dart';
 
