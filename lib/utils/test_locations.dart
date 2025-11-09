@@ -1,9 +1,17 @@
 /// Test data untuk geofencing
 /// Digunakan untuk development/testing sebelum connect ke database
 class TestLocations {
-  // ✅ STRUKTUR BARU: Map UUID -> Location Data
-  static final Map<String, Map<String, dynamic>> locations = {
+  // STRUKTUR BARU: Map UUID -> Location Data
+  static Map<String, Map<String, dynamic>> locations = {
     // UUID dari Supabase (contoh)
+    '650d8400-e29b-41d4-a716-446655430001': {
+      'name': 'FPSD',
+      'lat': -6.85963446868329,   
+      'lng': 107.59305953158156,
+      'radius': 200,
+      'description': 'FPSDD',
+      // 'qrCode': 'fpmipa01', // Legacy support
+    },
     '650e8400-e29b-41d4-a716-446655430001': {
       'name': 'Daarut Tauhid',
       'lat': -6.863543801365466,  
@@ -30,9 +38,9 @@ class TestLocations {
     },
     '550e8400-e29b-41d4-a716-446655440002': {
       'name': 'Candi Borobudur',
-      'lat': -7.6079,
-      'lng': 110.2038,
-      'radius': 100,
+      'lat': -7.607721205015023, 
+      'lng': 110.20364620430824,
+      'radius': 1000,
       'description': 'Candi Buddha terbesar di dunia',
       'qrCode': 'borobudur001',
     },

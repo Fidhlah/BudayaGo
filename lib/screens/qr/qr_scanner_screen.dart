@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:permission_handler/permission_handler.dart'; // ✅ IMPORT INI
+import 'package:permission_handler/permission_handler.dart';
 import '../../services/geofencing_service.dart';
 
 class QRScannerScreen extends StatefulWidget {
@@ -16,7 +16,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   bool isScanned = false;
   bool isProcessing = false;
   
-  // ✅ PERMISSION STATES
   bool isCameraPermissionGranted = false;
   bool isLocationPermissionGranted = false;
   bool isCheckingPermission = true;
@@ -27,7 +26,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   void initState() {
     super.initState();
     _initCamera();
-    _checkAllPermissions(); // ✅ CEK SEMUA PERMISSIONS
+    _checkAllPermissions();
   }
 
   void _initCamera() {
@@ -35,10 +34,22 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
       torchEnabled: false,
+      // ✅ TAMBAH INI: Auto start false
+      autoStart: false,
     );
   }
 
-  // ✅ CEK SEMUA PERMISSIONS (CAMERA + LOCATION)
+  // ✅ START CAMERA SETELAH PERMISSION GRANTED
+  Future<void> _startCamera() async {
+    try {
+      print('📷 Starting camera...');
+      await cameraController.start();
+      print('✅ Camera started');
+    } catch (e) {
+      print('❌ Error starting camera: $e');
+    }
+  }
+
   Future<void> _checkAllPermissions() async {
     setState(() => isCheckingPermission = true);
 
@@ -122,6 +133,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       // 3. All permissions granted!
       setState(() => isCheckingPermission = false);
       print('🎉 All permissions granted!');
+      
+      // ✅ START CAMERA SETELAH PERMISSION GRANTED
+      await _startCamera();
 
     } catch (e) {
       print('❌ Error checking permissions: $e');
@@ -136,7 +150,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     }
   }
 
-  // ✅ PERMISSION DIALOG
   void _showPermissionDialog({
     required IconData icon,
     required String title,
@@ -187,8 +200,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           if (!canRetry)
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Back to home
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: const Text('Kembali'),
             ),
@@ -209,7 +222,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.pop(context); // Back to home
+                Navigator.pop(context);
               },
               child: const Text('Batal'),
             ),
@@ -380,8 +393,17 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
-                        await cameraController.stop();
-                        await cameraController.start();
+                        // ✅ FIX: Stop dulu sebelum restart
+                        try {
+                          await cameraController.stop();
+                          await Future.delayed(const Duration(milliseconds: 500));
+                          await cameraController.start();
+                        } catch (e) {
+                          print('❌ Error restarting camera: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Gagal restart kamera: $e')),
+                          );
+                        }
                       },
                       child: const Text('Coba Lagi'),
                     ),
@@ -471,9 +493,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         return;
       }
 
-      // ✅ Service sudah handle decode & validation otomatis!
       final result = await _geofencingService.validateQRCode(
-        qrString: qrCode, // ✅ Kirim raw QR string
+        qrString: qrCode,
         userPosition: position,
       );
 
@@ -483,7 +504,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       if (result['valid']) {
         _showSuccessDialog(result);
       } else {
-        // ✅ Handle berbagai error types
         String title;
         switch (result['error']) {
           case 'INVALID_PREFIX':
@@ -646,7 +666,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   ),
                   const Divider(height: 16),
                   Text(
-                    'QR Code: ${result['qrCode']}',
+                    'UUID: ${result['uuid']}',
                     style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                   ),
                   Text(
