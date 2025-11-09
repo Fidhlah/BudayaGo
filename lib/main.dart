@@ -7,6 +7,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/email_verification_screen.dart'; // ✅ TAMBAH INI
 import 'screens/home/home_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'utils/qr_generator_helper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,9 @@ Future<void> main() async {
     url: SupabaseConfig.supabaseUrl,
     anonKey: SupabaseConfig.supabaseAnonKey,
   );
+  
+  // Print QR codes untuk testing
+  QRGeneratorHelper.printAllTestQRCodes();
   
   runApp(
     ChangeNotifierProvider(

@@ -471,8 +471,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         return;
       }
 
+      // ✅ Service sudah handle decode & validation otomatis!
       final result = await _geofencingService.validateQRCode(
-        qrCode: qrCode,
+        qrString: qrCode, // ✅ Kirim raw QR string
         userPosition: position,
       );
 
@@ -482,15 +483,35 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       if (result['valid']) {
         _showSuccessDialog(result);
       } else {
+        // ✅ Handle berbagai error types
+        String title;
+        switch (result['error']) {
+          case 'INVALID_PREFIX':
+            title = '❌ QR Code Tidak Valid';
+            break;
+          case 'INVALID_FORMAT':
+            title = '❌ Format QR Rusak';
+            break;
+          case 'UNSUPPORTED_VERSION':
+            title = '⚠️ Versi Tidak Didukung';
+            break;
+          case 'LOCATION_NOT_FOUND':
+            title = '❌ Lokasi Tidak Ditemukan';
+            break;
+          case 'OUT_OF_RANGE':
+            title = '📍 Lokasi Terlalu Jauh';
+            break;
+          default:
+            title = '❌ Error';
+        }
+
         await _showErrorDialog(
-          result['error'] == 'QR_NOT_FOUND' 
-            ? '❌ QR Code Tidak Valid'
-            : '📍 Lokasi Tidak Valid',
+          title,
           result['message'],
           details: result['error'] == 'OUT_OF_RANGE'
-            ? 'Jarak Anda: ${result['distance'].toStringAsFixed(0)} meter\n'
-              'Maksimal: ${result['radius']} meter'
-            : null,
+              ? 'Jarak Anda: ${result['distance'].toStringAsFixed(0)} meter\n'
+                'Maksimal: ${result['radius']} meter'
+              : result['details'],
         );
         _resetScanState();
       }
