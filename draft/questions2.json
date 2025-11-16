@@ -1,0 +1,154 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Pagi itu di desa lereng gunung, seorang tetua memanggilmu. Ia berkata bahwa angin membawa kabar: kamu harus memulai perjalanan menemukan jati diri. Di persimpangan desa, seekor elang Jawa hinggap sambil menatapmu tajam, seolah menunggu sikapmu. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Menyambut dengan hormat, merasakan bahwa ini pertanda.", "weights": {"spirituality": 1} },
+        "B": { "text": "Mengambil napas dalam dan bersiap menghadapi apa pun.", "weights": {"courage": 1} },
+        "C": { "text": "Mengamati arah angin dan perilakunya sebelum bertindak.", "weights": {"logic": 1} },
+        "D": { "text": "Maju perlahan, mencoba berinteraksi dengannya.", "weights": {"creativity": 1} }
+      }
+    },
+    {
+      "id": 2,
+      "text": "Beberapa jam berjalan, kamu tiba di desa yang sedang mengadakan upacara awal musim tanam. Penduduk menawari makanan dan tempat beristirahat. Mereka tampak ramah namun asing. Bagaimana kamu menyikapi undangan mereka?",
+      "options": {
+        "A": { "text": "Membantu sambil berbincang ringan dengan warga.", "weights": {"social": 1} },
+        "B": { "text": "Mengamati ritual mereka terlebih dahulu.", "weights": {"logic": 1} },
+        "C": { "text": "Mengikuti tata cara agar tidak menyinggung siapa pun.", "weights": {"principle": 1} },
+        "D": { "text": "Mengusulkan cara kreatif untuk mempercepat kerja mereka.", "weights": {"creativity": 1} }
+      }
+    },
+    {
+      "id": 3,
+      "text": "Saat matahari condong, seorang dukun tua duduk di serambi rumah panggung sambil menumbuk rempah. Ia memanggilmu dan memberikan teka-teki tentang tujuan perjalananmu. Bagaimana kamu menanggapinya?",
+      "options": {
+        "A": { "text": "Memproses kata-katanya dalam diam.", "weights": {"logic": 1} },
+        "B": { "text": "Menjawab santai sambil tersenyum.", "weights": {"social": 1} },
+        "C": { "text": "Bertanya balik mengenai makna tersembunyi teka-tekinya.", "weights": {"creativity": 1} },
+        "D": { "text": "Mengikuti intuisi dan merasakan energinya.", "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 4,
+      "text": "Sebelum kamu melanjutkan perjalanan, dukun itu membuka peti kayu tua berisi empat benda sakral. Ia memintamu memilih satu sebagai bekal perjalanan. Apa yang kamu pilih?",
+      "options": {
+        "A": { "text": "Jarum bambu penumbuh hutan — katanya mampu memunculkan jalan baru.", "weights": {"creativity": 1} },
+        "B": { "text": "Garam laut selatan — pemberi ketenangan di tengah kekacauan.", "weights": {"empathy": 1} },
+        "C": { "text": "Daun sirih penyembuh — penanda hati yang lurus.", "weights": {"principle": 1} },
+        "D": { "text": "Batu api Merapi — simbol keberanian yang tak padam.", "weights": {"courage": 1} }
+      }
+    },
+    {
+      "id": 5,
+      "text": "Malam tiba saat kamu menyusuri danau keramat. Seekor naga air muncul dari permukaan, menawarkan kekuatan besar dengan syarat kamu tak boleh kembali ke rumah asal. Bagaimana jawabmu?",
+      "options": {
+        "A": { "text": "Menerimanya demi potensi besar yang bisa dilakukan.", "weights": {"courage": 1} },
+        "B": { "text": "Menolak dengan tegas, kampung halaman adalah akar kehidupanmu.", "weights": {"principle": 1} },
+        "C": { "text": "Meminta penjelasan detail tentang kekuatannya.", "weights": {"logic": 1} },
+        "D": { "text": "Meresapi tawaran itu dalam hening, menimbang takdir.", "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 6,
+      "text": "Di hutan Kalimantan yang lebat, seorang teman perjalananmu hilang ketika malam turun. Angin membawa suara-suara yang sulit dikenali. Bagaimana kamu bereaksi?",
+      "options": {
+        "A": { "text": "Langsung mencarinya meski berbahaya.", "weights": {"courage": 1} },
+        "B": { "text": "Menenangkan anggota kelompok lain yang panik.", "weights": {"empathy": 1} },
+        "C": { "text": "Berdoa meminta petunjuk arah.", "weights": {"spirituality": 1} },
+        "D": { "text": "Menganalisis jejak dan kondisi sekitar.", "weights": {"logic": 1} }
+      }
+    },
+    {
+      "id": 7,
+      "text": "Keesokan hari kamu tiba di bibir gua terang yang memantulkan suara lembut dari dalamnya. Gua itu disebut-sebut sebagai tempat ujian jiwa pertama. Apa langkahmu?",
+      "options": {
+        "A": { "text": "Masuk tanpa ragu, bersiap menghadapi apa pun.", "weights": {"courage": 1} },
+        "B": { "text": "Mendengarkan gema dan membaca energi tempat itu.", "weights": {"spirituality": 1} },
+        "C": { "text": "Mengujinya dengan melempar batu untuk melihat reaksi.", "weights": {"logic": 1} },
+        "D": { "text": "Mengajak teman berbagi rasa ingin tahu.", "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 8,
+      "text": "Awan gelap datang tiba-tiba saat kamu melintas pantai selatan. Sebuah badai ganas mendekat, dan kamu menemukan pondok rapuh sebagai satu-satunya perlindungan. Apa pilihanmu?",
+      "options": {
+        "A": { "text": "Memperkuat pondok seadanya dan bertahan.", "weights": {"principle": 1} },
+        "B": { "text": "Mencari lokasi lain yang lebih aman secara logis.", "weights": {"logic": 1} },
+        "C": { "text": "Menciptakan tempat berlindung baru dari rotan dan daun.", "weights": {"creativity": 1} },
+        "D": { "text": "Duduk diam menunggu badai berlalu.", "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 9,
+      "text": "Setelah badai mereda, kamu mendengar bisikan dari unsur alam. Salah satu unsur menawarkan diri untuk membimbing perjalananmu. Mana yang kamu pilih?",
+      "options": {
+        "A": { "text": "Angin gunung yang membawa inspirasi.", "weights": {"creativity": 1} },
+        "B": { "text": "Air lautan yang berbicara tentang kedalaman jiwa.", "weights": {"spirituality": 1} },
+        "C": { "text": "Api kawah yang memancarkan keberanian.", "weights": {"courage": 1} },
+        "D": { "text": "Tanah sawah yang mengajarkan empati dan kehidupan.", "weights": {"empathy": 1} }
+      }
+    },
+    {
+      "id": 10,
+      "text": "Dalam perjalanan ke puncak gunung keramat, kamu membayangkan kelak orang-orang mengenang kisahmu. Kamu ingin dikenal sebagai apa?",
+      "options": {
+        "A": { "text": "Sang pemberani yang melampaui batasnya.", "weights": {"courage": 1} },
+        "B": { "text": "Sang pemikir yang menyelamatkan banyak jiwa.", "weights": {"logic": 1} },
+        "C": { "text": "Sang peneduh yang membawa kedamaian.", "weights": {"empathy": 1} },
+        "D": { "text": "Sang bijak yang menjaga keseimbangan dunia.", "weights": {"principle": 1} }
+      }
+    },
+    {
+      "id": 11,
+      "text": "Di balai desa pegunungan yang kau singgahi, terjadi perselisihan tentang pembagian hasil panen. Warga meminta pendapatmu karena kamu adalah pengembara yang netral. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Berbicara lantang membela yang tertindas.", "weights": {"courage": 1} },
+        "B": { "text": "Bersikap tegas tetapi tetap menghargai semua pihak.", "weights": {"principle": 1} },
+        "C": { "text": "Mengupayakan jalan damai bagi semua.", "weights": {"empathy": 1} },
+        "D": { "text": "Mengambil jarak agar suasana mereda.", "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 12,
+      "text": "Saat pesta panen berlangsung malam harinya, gamelan berbunyi lembut. Suasana hangat, lentera-lentera bergoyang diterpa angin. Bagaimana kamu menikmatinya?",
+      "options": {
+        "A": { "text": "Ikut menari mengikuti ritme dan ekspresi seni.", "weights": {"creativity": 1} },
+        "B": { "text": "Mendengarkan musik sambil menganalisis polanya.", "weights": {"logic": 1} },
+        "C": { "text": "Menikmati dari jauh sambil merenung.", "weights": {"spirituality": 1} },
+        "D": { "text": "Bertanya pada warga tentang makna tiap nada.", "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 13,
+      "text": "Dalam meditasi di puncak bukit, kamu melihat sosok gaib yang ingin menjadi penjaga perjalananmu. Bentuk apa yang muncul di hadapanmu?",
+      "options": {
+        "A": { "text": "Garuda kecil — penjaga nilai dan kejujuran.", "weights": {"principle": 1} },
+        "B": { "text": "Naga Ranau — makhluk energi spiritual.", "weights": {"spirituality": 1} },
+        "C": { "text": "Penyu laut — simbol kelembutan dan empati.", "weights": {"empathy": 1} },
+        "D": { "text": "Macan kumbang — penjaga keberanian.", "weights": {"courage": 1} }
+      }
+    },
+    {
+      "id": 14,
+      "text": "Saat turun gunung, seseorang merasa tersinggung oleh ucapanmu dan menantangmu di alun-alun. Warga menonton dalam diam. Responsmu?",
+      "options": {
+        "A": { "text": "Menjawab dengan kata yang tegas dan kuat.", "weights": {"courage": 1} },
+        "B": { "text": "Menatapnya tenang tanpa terpancing.", "weights": {"principle": 1} },
+        "C": { "text": "Diam, membiarkan tindakan nanti yang berbicara.", "weights": {"spirituality": 1} },
+        "D": { "text": "Tertawa kecil dan meredakan suasana.", "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 15,
+      "text": "Di bawah beringin raksasa terakhir sebelum kembali ke desa asal, bayanganmu keluar dan berbicara kepadamu. Ia meminta satu pesan untuk mengakhiri perjalanan panjang ini. Apa pesanmu?",
+      "options": {
+        "A": { "text": "Terima kasih sudah bertahan sejauh ini.", "weights": {"empathy": 1} },
+        "B": { "text": "Kita belum selesai — masih banyak yang bisa diraih.", "weights": {"courage": 1} },
+        "C": { "text": "Damai adalah kekuatan sejati.", "weights": {"principle": 1} },
+        "D": { "text": "Akhirnya aku tahu siapa diriku.", "weights": {"spirituality": 1} }
+      }
+    }
+  ]
+}

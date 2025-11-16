@@ -1,0 +1,154 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Saat senja turun di tepi sawah, seekor elang Jawa hinggap dan menatapmu. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Menyapanya lembut — mungkin ia membawa pesan.",     "weights": {"spirituality": 1} },
+        "B": { "text": "Menegakkan tubuh, berjaga-jaga.",                   "weights": {"courage": 1} },
+        "C": { "text": "Diam mengamati, setiap gerak punya makna.",         "weights": {"logic": 1} },
+        "D": { "text": "Maju perlahan, rasa ingin tahu lebih kuat.",        "weights": {"creativity": 1} }
+      }
+    },
+    {
+      "id": 2,
+      "text": "Dalam perjalanan ke gunung keramat, kamu tiba di desa yang sedang upacara menanam padi. Bagaimana kamu berbaur?",
+      "options": {
+        "A": { "text": "Membantu sambil mendengar pantun mereka.",          "weights": {"social": 1} },
+        "B": { "text": "Mengamati dari jauh dulu.",                         "weights": {"logic": 1} },
+        "C": { "text": "Mengikuti adat agar tak menyinggung siapa pun.",    "weights": {"principle": 1} },
+        "D": { "text": "Memberi ide baru untuk membantu panen.",            "weights": {"creativity": 1} }
+      }
+    },
+    {
+      "id": 3,
+      "text": "Seorang dukun tua memberimu teka-teki sambil menumbuk rempah. Bagaimana kamu menanggapinya?",
+      "options": {
+        "A": { "text": "Berpikir dalam diam.",                              "weights": {"logic": 1} },
+        "B": { "text": "Menjawab spontan sambil tertawa.",                  "weights": {"social": 1} },
+        "C": { "text": "Bertanya balik, mengeksplorasi maknanya.",          "weights": {"creativity": 1} },
+        "D": { "text": "Mengikuti intuisi saja.",                           "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 4,
+      "text": "Penjaga hutan memberimu empat pusaka. Mana yang kamu bawa?",
+      "options": {
+        "A": { "text": "Jarum bambu penumbuh hutan.",                       "weights": {"creativity": 1} },
+        "B": { "text": "Garam laut selatan yang menenangkan ombak.",        "weights": {"empathy": 1} },
+        "C": { "text": "Daun sirih penyembuh luka batin.",                  "weights": {"principle": 1} },
+        "D": { "text": "Batu api Merapi yang menyala saat marah.",          "weights": {"courage": 1} }
+      }
+    },
+    {
+      "id": 5,
+      "text": "Naga danau menawarkan kekuatan besar jika kamu tak boleh kembali ke kampung. Pilihanmu?",
+      "options": {
+        "A": { "text": "Menerima demi kebaikan besar.",                     "weights": {"courage": 1} },
+        "B": { "text": "Menolak — tanah asal adalah jiwa.",                 "weights": {"principle": 1} },
+        "C": { "text": "Menanyakan makna kekuatannya dulu.",                "weights": {"logic": 1} },
+        "D": { "text": "Diam, mencoba memahami takdir.",                    "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 6,
+      "text": "Saat temanmu hilang di rimba Kalimantan, kamu…",
+      "options": {
+        "A": { "text": "Langsung mencari tanpa pikir panjang.",             "weights": {"courage": 1} },
+        "B": { "text": "Menenangkan yang lain dulu.",                       "weights": {"empathy": 1} },
+        "C": { "text": "Berdoa meminta petunjuk.",                          "weights": {"spirituality": 1} },
+        "D": { "text": "Mengingat jejak langkahnya dengan teliti.",         "weights": {"logic": 1} }
+      }
+    },
+    {
+      "id": 7,
+      "text": "Di pinggir Danau Toba kamu melihat gua bercahaya. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Masuk — mungkin itu peninggalan leluhur.",          "weights": {"courage": 1} },
+        "B": { "text": "Mendengarkan suara di dalamnya.",                   "weights": {"spirituality": 1} },
+        "C": { "text": "Melempar batu kecil untuk uji aman.",               "weights": {"logic": 1} },
+        "D": { "text": "Mengajak teman berbagi rasa ingin tahu.",           "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 8,
+      "text": "Saat badai datang di pantai selatan, kamu berlindung di pondok anyaman.",
+      "options": {
+        "A": { "text": "Bertahan dan memperbaikinya.",                      "weights": {"principle": 1} },
+        "B": { "text": "Mencari batu karang yang kuat.",                    "weights": {"logic": 1} },
+        "C": { "text": "Membuat tempat baru dari daun rotan.",              "weights": {"creativity": 1} },
+        "D": { "text": "Duduk diam menunggu badai berlalu.",                "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 9,
+      "text": "Jika kamu bisa berbicara dengan satu unsur alam, kamu memilih…",
+      "options": {
+        "A": { "text": "Angin gunung.",                                     "weights": {"creativity": 1} },
+        "B": { "text": "Air laut selatan.",                                 "weights": {"spirituality": 1} },
+        "C": { "text": "Api kawah.",                                        "weights": {"courage": 1} },
+        "D": { "text": "Tanah sawah.",                                      "weights": {"empathy": 1} }
+      }
+    },
+    {
+      "id": 10,
+      "text": "Dalam kisah yang akan dikenang, kamu ingin dikenal karena…",
+      "options": {
+        "A": { "text": "Keberanian menantang takdir.",                      "weights": {"courage": 1} },
+        "B": { "text": "Kecerdikan menyelamatkan banyak orang.",            "weights": {"logic": 1} },
+        "C": { "text": "Ketulusan membawa damai.",                          "weights": {"empathy": 1} },
+        "D": { "text": "Kebijaksanaan untuk generasi berikutnya.",          "weights": {"principle": 1} }
+      }
+    },
+    {
+      "id": 11,
+      "text": "Ketika melihat ketidakadilan di balai desa kamu cenderung…",
+      "options": {
+        "A": { "text": "Berbicara lantang.",                                "weights": {"courage": 1} },
+        "B": { "text": "Tegas tapi sopan.",                                 "weights": {"principle": 1} },
+        "C": { "text": "Mencari jalan damai.",                              "weights": {"empathy": 1} },
+        "D": { "text": "Menarik diri dan menenangkan suasana.",             "weights": {"spirituality": 1} }
+      }
+    },
+    {
+      "id": 12,
+      "text": "Musik gamelan berbunyi di pesta panen. Kamu…",
+      "options": {
+        "A": { "text": "Ikut menari mengikuti irama.",                      "weights": {"creativity": 1} },
+        "B": { "text": "Menyimak dulu baru ikut.",                          "weights": {"logic": 1} },
+        "C": { "text": "Menikmati dari pinggir.",                           "weights": {"spirituality": 1} },
+        "D": { "text": "Bertanya tentang makna lagunya.",                   "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 13,
+      "text": "Jika kamu punya sahabat gaib, ia berbentuk…",
+      "options": {
+        "A": { "text": "Garuda kecil.",                                     "weights": {"principle": 1} },
+        "B": { "text": "Naga dari Ranau.",                                  "weights": {"spirituality": 1} },
+        "C": { "text": "Penyu laut.",                                       "weights": {"empathy": 1} },
+        "D": { "text": "Macan kumbang.",                                    "weights": {"courage": 1} }
+      }
+    },
+    {
+      "id": 14,
+      "text": "Ketika seseorang menantangmu di alun-alun, kamu…",
+      "options": {
+        "A": { "text": "Menjawab dengan kata tajam.",                       "weights": {"courage": 1} },
+        "B": { "text": "Menatapnya tenang.",                                "weights": {"principle": 1} },
+        "C": { "text": "Diam, biar tindakan berbicara.",                    "weights": {"spirituality": 1} },
+        "D": { "text": "Tertawa santai.",                                   "weights": {"social": 1} }
+      }
+    },
+    {
+      "id": 15,
+      "text": "Di pohon beringin raksasa, bayanganmu berkata: “Apa yang ingin kamu katakan?”",
+      "options": {
+        "A": { "text": "Terima kasih sudah bertahan.",                      "weights": {"empathy": 1} },
+        "B": { "text": "Kita belum selesai.",                               "weights": {"courage": 1} },
+        "C": { "text": "Damai itu kekuatan.",                               "weights": {"principle": 1} },
+        "D": { "text": "Sekarang aku tahu siapa aku.",                      "weights": {"spirituality": 1} }
+      }
+    }
+  ]
+}
