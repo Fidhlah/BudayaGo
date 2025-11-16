@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -90,30 +93,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // Logo/Icon
                   Icon(
                     Icons.person_add,
-                    size: 100,
-                    color: Theme.of(context).primaryColor,
+                    size: AppDimensions.iconXL * 2,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spaceXL),
 
                   // Title
                   const Text(
                     'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.h2,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  const SizedBox(height: AppDimensions.spaceXS),
+                  Text(
                     'Sign up to get started',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spaceXL),
 
                   // Full Name Field
                   TextFormField(

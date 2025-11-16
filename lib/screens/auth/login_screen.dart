@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -80,30 +83,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Logo/Icon
                   Icon(
                     Icons.account_circle,
-                    size: 100,
-                    color: Theme.of(context).primaryColor,
+                    size: AppDimensions.iconXL * 2,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spaceXL),
 
                   // Title
                   const Text(
                     'Welcome Back!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.h2,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  const SizedBox(height: AppDimensions.spaceXS),
+                  Text(
                     'Login to continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spaceXL),
 
                   // Email Field
                   TextFormField(
@@ -125,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spaceM),
 
                   // Password Field
                   TextFormField(
@@ -159,13 +158,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spaceL),
 
                   // Login Button
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      minimumSize: const Size(double.infinity, AppDimensions.buttonHeightM),
+                      padding: EdgeInsets.zero,
                     ),
                     child: _isLoading
                         ? const SizedBox(
@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(fontSize: 16),
                           ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spaceM),
 
                   // Register Link
                   Row(

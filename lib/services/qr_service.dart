@@ -5,7 +5,7 @@ import '../models/qr_code_model.dart';
 class QrService {
   /// Parse scanned QR code
   QRCodeModel? parseQrCode(BarcodeCapture capture) {
-    // ✅ FIX: Use safe access instead of firstOrNull
+    // ✅ FIX: Use safe access instead of firs`tOrNull
     if (capture.barcodes.isEmpty) {
       print('⚠️ No barcodes detected');
       return null;

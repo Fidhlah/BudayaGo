@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/geofencing_service.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key});
@@ -163,9 +166,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(icon, color: Colors.orange, size: 28),
-            const SizedBox(width: 12),
-            Expanded(child: Text(title, style: const TextStyle(fontSize: 18))),
+            Icon(icon, color: AppColors.warning, size: AppDimensions.iconL),
+            SizedBox(width: AppDimensions.spaceS),
+            Expanded(child: Text(title, style: AppTextStyles.h6)),
           ],
         ),
         content: Column(
@@ -173,22 +176,22 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(message),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spaceM),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(AppDimensions.paddingS),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade200),
+                color: AppColors.info.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                border: Border.all(color: AppColors.info.withOpacity(0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                  SizedBox(width: 8),
+                  Icon(Icons.info_outline, color: AppColors.info, size: AppDimensions.iconS),
+                  SizedBox(width: AppDimensions.spaceXS),
                   Expanded(
                     child: Text(
                       'Fitur ini memastikan Anda berada di lokasi wisata yang benar sebelum melakukan check-in.',
-                      style: TextStyle(fontSize: 12),
+                      style: AppTextStyles.caption,
                     ),
                   ),
                 ],
@@ -214,7 +217,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               icon: const Icon(Icons.settings),
               label: const Text('Buka Pengaturan'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.warning,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -235,7 +238,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               icon: const Icon(Icons.refresh),
               label: const Text('Coba Lagi'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -281,7 +284,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(AppDimensions.paddingL),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -289,46 +292,42 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   !isCameraPermissionGranted 
                     ? Icons.camera_alt_outlined 
                     : Icons.location_off,
-                  size: 80,
-                  color: Colors.red.shade300,
+                  size: AppDimensions.iconXL * 1.67, // 80px
+                  color: AppColors.error.withOpacity(0.6),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppDimensions.spaceL),
                 Text(
                   !isCameraPermissionGranted 
                     ? 'Izin Kamera Diperlukan'
                     : 'Izin Lokasi Diperlukan',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h4,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spaceS),
                 Text(
                   !isCameraPermissionGranted
                     ? 'Aplikasi membutuhkan akses kamera untuk scan QR code.'
                     : 'Aplikasi membutuhkan akses lokasi untuk memverifikasi bahwa Anda berada di lokasi wisata yang benar.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: AppDimensions.spaceXL),
                 ElevatedButton.icon(
                   onPressed: _checkAllPermissions,
                   icon: const Icon(Icons.refresh),
                   label: const Text('Izinkan Akses'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                      vertical: AppDimensions.paddingS,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spaceS),
                 TextButton.icon(
                   onPressed: () async {
                     await openAppSettings();
@@ -336,7 +335,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   icon: const Icon(Icons.settings),
                   label: const Text('Buka Pengaturan'),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spaceS),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -379,18 +378,19 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 80, color: Colors.red),
-                    const SizedBox(height: 16),
-                    const Text(
+                    Icon(Icons.error_outline, size: AppDimensions.iconXL * 1.67, color: AppColors.error),
+                    SizedBox(height: AppDimensions.spaceM),
+                    Text(
                       'Error Kamera',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: AppTextStyles.h5,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: AppDimensions.spaceXS),
                     Text(
                       error.errorDetails?.message ?? 'Gagal membuka kamera',
                       textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyMedium,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppDimensions.spaceM),
                     ElevatedButton(
                       onPressed: () async {
                         // ✅ FIX: Stop dulu sebelum restart
@@ -444,20 +444,17 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingL,
+                  vertical: AppDimensions.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.overlay,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusS),
                 ),
-                child: const Text(
+                child: Text(
                   'Arahkan kamera ke QR Code',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
                 ),
               ),
             ),
@@ -559,8 +556,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 32),
-            const SizedBox(width: 12),
+            Icon(Icons.error_outline, color: AppColors.error, size: AppDimensions.iconL),
+            SizedBox(width: AppDimensions.spaceS),
             Expanded(child: Text(title)),
           ],
         ),
@@ -570,18 +567,17 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           children: [
             Text(message),
             if (details != null) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: AppDimensions.spaceS),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(AppDimensions.paddingXS),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(4),
+                  color: AppColors.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXS),
                 ),
                 child: Text(
                   details,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.red.shade900,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.error,
                   ),
                 ),
               ),
@@ -594,7 +590,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
             child: const Text('OK'),
@@ -611,71 +607,74 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 32),
-            SizedBox(width: 12),
-            Text('Berhasil!'),
+            Icon(Icons.check_circle, color: AppColors.success, size: AppDimensions.iconL),
+            SizedBox(width: AppDimensions.spaceS),
+            const Text('Berhasil!'),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '✅ QR Code Valid!',
-              style: TextStyle(
-                fontSize: 16,
+              style: AppTextStyles.bodyLarge.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: AppColors.success,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spaceM),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(AppDimensions.paddingS),
               decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade200),
+                color: AppColors.success.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                border: Border.all(color: AppColors.success.withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 20, color: Colors.green),
-                      const SizedBox(width: 8),
+                      Icon(Icons.location_on, size: AppDimensions.iconS, color: AppColors.success),
+                      SizedBox(width: AppDimensions.spaceXS),
                       Expanded(
                         child: Text(
                           result['locationName'],
-                          style: const TextStyle(
+                          style: AppTextStyles.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: AppDimensions.spaceXS),
                   Text(
                     result['description'] ?? '',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 13,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   const Divider(height: 16),
                   Text(
                     'UUID: ${result['uuid']}',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   Text(
                     'Jarak Anda: ${result['distance'].toStringAsFixed(1)} m',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   Text(
                     'Radius: ${result['radius']} m',
-                    style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -696,7 +695,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               Navigator.pop(context, result);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
               foregroundColor: Colors.white,
             ),
             child: const Text('OK'),
@@ -725,13 +724,13 @@ class ScannerOverlay extends CustomPainter {
     final cutOutPath = Path.combine(
       PathOperation.difference,
       Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
-      Path()..addRRect(RRect.fromRectAndRadius(scanArea, const Radius.circular(12))),
+      Path()..addRRect(RRect.fromRectAndRadius(scanArea, Radius.circular(AppDimensions.radiusM))),
     );
 
-    canvas.drawPath(cutOutPath, Paint()..color = Colors.black54);
+    canvas.drawPath(cutOutPath, Paint()..color = AppColors.overlay);
 
     final paint = Paint()
-      ..color = Colors.white
+      ..color = AppColors.secondary
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
 

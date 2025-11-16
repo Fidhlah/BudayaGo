@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
 import '../qr/qr_scanner_screen.dart'; // ✅ Import QR Scanner
 
 class HomeScreen extends StatelessWidget {
@@ -22,9 +25,9 @@ class HomeScreen extends StatelessWidget {
               await authProvider.signOut();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Logged out successfully'),
-                    backgroundColor: Colors.orange,
+                  SnackBar(
+                    content: const Text('Logged out successfully'),
+                    backgroundColor: AppColors.warning,
                   ),
                 );
               }
@@ -53,36 +56,35 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(AppDimensions.paddingL),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle,
-                size: 80,
-                color: Colors.green,
+                size: AppDimensions.iconXL * 1.67, // 80px
+                color: AppColors.success,
               ),
-              const SizedBox(height: 24),
-              const Text(
+              SizedBox(height: AppDimensions.spaceL),
+              Text(
                 'Welcome to BudayaGo!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.h3,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppDimensions.spaceM),
               Text(
                 'Email: ${user?.email ?? "Unknown"}',
-                style: const TextStyle(fontSize: 16),
+                style: AppTextStyles.bodyMedium,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: AppDimensions.spaceXS),
               Text(
                 'User ID: ${user?.id ?? "Unknown"}',
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
-              const SizedBox(height: 48),
+              SizedBox(height: AppDimensions.spaceXXL),
 
-              const SizedBox(height: 16),
+              SizedBox(height: AppDimensions.spaceM),
 
               ElevatedButton.icon(
                 onPressed: () async {
@@ -91,11 +93,11 @@ class HomeScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.error,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingXL,
+                    vertical: AppDimensions.paddingM,
                   ),
                 ),
               ),

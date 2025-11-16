@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -169,60 +172,55 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(AppDimensions.paddingL),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Icon
-                const Icon(
+                Icon(
                   Icons.mark_email_read,
-                  size: 100,
-                  color: Colors.blue,
+                  size: AppDimensions.iconXL,
+                  color: AppColors.primary,
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: AppDimensions.spaceXL),
 
                 // Title
-                const Text(
+                Text(
                   'Verify Your Email',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimensions.spaceM),
 
                 // Description
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, _) {
                     return Text(
                       'We sent a verification link to:\n${authProvider.user?.email ?? "your email"}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     );
                   },
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: AppDimensions.spaceXS),
+                Text(
                   'Please click the link in the email to verify your account.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: AppDimensions.spaceXL),
 
                 // Check verification button
                 ElevatedButton.icon(
                   onPressed: _isChecking ? null : _checkVerification,
                   icon: _isChecking
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
+                      ? SizedBox(
+                          width: AppDimensions.iconS,
+                          height: AppDimensions.iconS,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -231,13 +229,13 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       : const Icon(Icons.refresh),
                   label: Text(_isChecking ? 'Checking...' : 'I\'ve Verified'),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingXL,
+                      vertical: AppDimensions.paddingM,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppDimensions.spaceS),
 
                 // Resend email button
                 OutlinedButton.icon(
@@ -245,37 +243,35 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   icon: const Icon(Icons.email),
                   label: const Text('Resend Email'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingXL,
+                      vertical: AppDimensions.paddingM,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppDimensions.spaceM),
 
                 // Instructions
                 const Divider(),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: AppDimensions.spaceM),
+                Text(
                   'Instructions:',
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: AppDimensions.spaceXS),
+                Text(
                   '1. Check your email inbox (including spam folder)\n'
                   '2. Open the verification email from BudayaGo\n'
                   '3. Click the verification link\n'
                   '4. App will automatically redirect',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppDimensions.spaceL),
 
                 // Sign out option
                 TextButton(
