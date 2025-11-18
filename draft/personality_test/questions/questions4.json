@@ -1,0 +1,167 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Saat malam tiba dan kabut menutupi bumi, seorang tetua menyalakan obor dari daun kelapa kering. Api menyala sebagai simbol perlindungan dan doa turun-temurun. Asapnya berputar, membawa aroma cendana, membentuk bayangan burung raksasa di langit malam. Apa yang muncul dalam hatimu?",
+      "options": {
+        "A": { "text": "Percaya bahwa roh leluhur membukakan jalan suci, dan melangkah mengikuti tanda itu.", "weights": {"spirituality": 1} },
+        "B": { "text": "Merasa berani dan siap menghadapi perjalanan meski takut.", "weights": {"courage": 1, "empathy": 1} },
+        "C": { "text": "Menganalisis fenomena alam dan memperhatikan detail asap dan bayangan.", "weights": {"logic": 1} },
+        "D": { "text": "Terinspirasi untuk mencatat kisah dan bayangan burung itu sebagai awal perjalanan kreatif.", "weights": {"creativity": 1} }
+      }
+    },
+
+    {
+      "id": 2,
+      "text": "Di lembah berkabut, rombongan penabuh gendang melakukan ritual panen. Udara dipenuhi aroma dupa dan gema gamelan yang lembut. Apa yang akan kamu lakukan?",
+      "options": {
+        "A": { "text": "Menyapa ramah dan ikut larut dalam lingkaran mereka.", "weights": {"social": 1} },
+        "B": { "text": "Mengamati pola tabuhan dan gerakan mereka sebelum ikut menari.", "weights": {"logic": 1, "creativity": 1} },
+        "C": { "text": "Mengikuti tata cara adat agar tidak menyinggung roh penjaga.", "weights": {"principle": 1} },
+        "D": { "text": "Mencoba menawarkan irama baru sebagai penghormatan, menyeimbangkan harmoni.", "weights": {"creativity": 1, "social": 1} }
+      }
+    },
+    {
+      "id": 3,
+      "text": "Di gerbang hutan purba, seorang nenek penunggu memegang lesung batu yang bergetar pelan. Suara gemericik air menambah rasa misteri. Bagaimana kamu menanggapinya?",
+      "options": {
+        "A": { "text": "Menganalisis teka-teki dengan cermat.", "weights": {"logic": 1} },
+        "B": { "text": "Menjawab sambil tersenyum, mencoba mencairkan suasana.", "weights": {"social": 1} },
+        "C": { "text": "Menggali makna terdalam dari petuahnya, meresapi setiap kata dan bayangan.", "weights": {"creativity": 1, "spirituality": 1} },
+        "D": { "text": "Percaya pada intuisi dan makna spiritualnya.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 4,
+      "text": "Di tengah hutan, pohon sakti membuka rongganya dan menampilkan empat pusaka yang berdenyut, diselimuti aroma tanah basah dan cahaya bulan. Jika hanya satu yang bisa dipilih, apa yang kamu ambil?",
+      "options": {
+        "A": { "text": "Benang emas penghubung mimpi untuk merangkai ide baru.", "weights": {"creativity": 1} },
+        "B": { "text": "Tetesan embun penyembuh luka batin, menenangkan jiwa yang sakit.", "weights": {"empathy": 1} },
+        "C": { "text": "Daun lontar berisi hukum leluhur, menuntun keputusan dengan bijaksana.", "weights": {"principle": 1} },
+        "D": { "text": "Batu obsidian yang membara jika bahaya mendekat, memacu keberanian.", "weights": {"courage": 1} }
+      }
+    },
+
+    {
+      "id": 5,
+      "text": "Di tepi danau berkabut, naga air menawarkan kekuatan besar, namun kamu tak boleh kembali ke kampung asal. Apa pilihanmu?",
+      "options": {
+        "A": { "text": "Menerima demi melindungi banyak jiwa.", "weights": {"courage": 1} },
+        "B": { "text": "Menolak — kampung halamanku adalah rohku, tapi tetap peduli pada yang lain.", "weights": {"principle": 1, "empathy": 1} },
+        "C": { "text": "Menanyakan akibat jangka panjangnya sambil merenung.", "weights": {"logic": 1} },
+        "D": { "text": "Membiarkan naluri batin memutuskan, meresapi kabut dan angin.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 6,
+      "text": "Kabar datang bahwa kawan seperjalananmu hilang di rimba Kalimantan. Kabut tebal menyelimuti langkahmu. Apa langkahmu berikutnya?",
+      "options": {
+        "A": { "text": "Masuk rimba tanpa ragu, sambil menenangkan penduduk yang panik.", "weights": {"courage": 1, "empathy": 1} },
+        "B": { "text": "Menenangkan penduduk dulu, memastikan semua aman.", "weights": {"empathy": 1} },
+        "C": { "text": "Meminta petunjuk pada roh penjaga tanah, mendengar bisikan angin.", "weights": {"spirituality": 1} },
+        "D": { "text": "Mengamati jejak dan tanda-tanda alam sebelum bertindak.", "weights": {"logic": 1} }
+      }
+    },
+
+    {
+      "id": 7,
+      "text": "Di kaki gunung, gua bercahaya biru memanggilmu. Suara gemericik air dan udara dingin menambah rasa misteri. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Masuk tanpa menunggu, menghadapi ujian keberanian.", "weights": {"courage": 1} },
+        "B": { "text": "Mendengarkan bisikan energi dalam gua sambil merencanakan langkah.", "weights": {"spirituality": 1, "logic": 1} },
+        "C": { "text": "Menguji keamanan dengan melempar kerikil.", "weights": {"logic": 1} },
+        "D": { "text": "Mengajak orang lain mengeksplorasi bersama, menjaga keharmonisan.", "weights": {"social": 1} }
+      }
+    },
+
+    {
+      "id": 8,
+      "text": "Badai besar menggulung dari lautan selatan. Kamu berteduh di pondok nelayan diterpa kilatan petir. Apa yang akan kamu lakukan?",
+      "options": {
+        "A": { "text": "Memperkuat pondok sesuai ajaran tetua, sambil menenangkan teman.", "weights": {"principle": 1, "empathy": 1} },
+        "B": { "text": "Mencari struktur alam lebih kokoh untuk berteduh.", "weights": {"logic": 1} },
+        "C": { "text": "Membuat tempat berlindung baru dari bahan sekitar.", "weights": {"creativity": 1} },
+        "D": { "text": "Berserah pada angin dan menunggu dengan tenang.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 9,
+      "text": "Jika satu unsur alam bersedia berbicara malam ini, unsur mana yang kamu biarkan masuk ke dalam jiwamu?",
+      "options": {
+        "A": { "text": "Angin gunung yang membawa inspirasi.", "weights": {"creativity": 1} },
+        "B": { "text": "Air laut selatan yang menenangkan hati.", "weights": {"spirituality": 1, "empathy": 1} },
+        "C": { "text": "Api kawah yang membara memberi keberanian.", "weights": {"courage": 1} },
+        "D": { "text": "Tanah sawah yang lembut, memberi keteduhan.", "weights": {"empathy": 1} }
+      }
+    },
+
+    {
+      "id": 10,
+      "text": "Kisah perjalananmu akan diceritakan dalang di balai desa. Apa yang ingin dikenang?",
+      "options": {
+        "A": { "text": "Keberanian menembus batas takdir, tetap peduli orang lain.", "weights": {"courage": 1, "empathy": 1} },
+        "B": { "text": "Kecerdikan yang menyelamatkan banyak jiwa.", "weights": {"logic": 1} },
+        "C": { "text": "Ketulusan yang meredakan luka hati orang lain.", "weights": {"empathy": 1} },
+        "D": { "text": "Kearifan yang diwariskan turun-temurun.", "weights": {"principle": 1} }
+      }
+    },
+
+    {
+      "id": 11,
+      "text": "Di balai desa, ketidakadilan dilakukan bangsawan. Orang-orang menatapmu seakan menggantungkan harapan. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Bersuara lantang menentang.", "weights": {"courage": 1} },
+        "B": { "text": "Membela kebenaran sambil menenangkan orang sekitar.", "weights": {"principle": 1, "empathy": 1} },
+        "C": { "text": "Menengahi agar semua pihak tenang, menjaga harmoni.", "weights": {"empathy": 1, "social": 1} },
+        "D": { "text": "Mengundurkan diri sejenak untuk merenung dan memikirkan strategi.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 12,
+      "text": "Di pesta panen, gema gamelan mengisi udara. Para penari membentuk pola sakral seolah membangunkan roh bumi. Apa reaksimu?",
+      "options": {
+        "A": { "text": "Ikut menari mengikuti aliran jiwa dan ritme alam.", "weights": {"creativity": 1, "spirituality": 1} },
+        "B": { "text": "Mengamati pola dan ritmenya dengan teliti.", "weights": {"logic": 1} },
+        "C": { "text": "Menikmati dari pinggir sambil meresapi makna.", "weights": {"spirituality": 1} },
+        "D": { "text": "Bertanya pada penabuh tentang cerita lagunya.", "weights": {"social": 1} }
+      }
+    },
+
+    {
+      "id": 13,
+      "text": "Roh penjaga menampakkan wujudnya dalam cahaya rembulan. Suara daun bergesek dan aroma tanah basah terasa nyata. Apa yang kamu pilih?",
+      "options": {
+        "A": { "text": "Garuda kecil yang menjaga arah hidup.", "weights": {"principle": 1} },
+        "B": { "text": "Naga air yang membawa ketenangan sekaligus keberanian.", "weights": {"spirituality": 1, "courage": 1} },
+        "C": { "text": "Penyu laut yang penuh kelembutan.", "weights": {"empathy": 1} },
+        "D": { "text": "Macan kumbang yang tegas dan berani.", "weights": {"courage": 1} }
+      }
+    },
+
+    {
+      "id": 14,
+      "text": "Di alun-alun kerajaan, seseorang menantangmu di hadapan banyak orang. Sorot mata mereka menguji jiwamu, aroma dupa tipis menguar. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Menjawab kata yang tajam seperti keris, sambil tetap menenangkan suasana.", "weights": {"courage": 1, "social": 1} },
+        "B": { "text": "Menatapnya tenang tanpa amarah.", "weights": {"principle": 1} },
+        "C": { "text": "Diam, membiarkan energimu bicara dan batin menenangkan diri.", "weights": {"spirituality": 1} },
+        "D": { "text": "Tersenyum santai, meredakan tegangnya suasana.", "weights": {"social": 1} }
+      }
+    },
+
+    {
+      "id": 15,
+      "text": "Di bawah beringin raksasa, bayanganmu bicara kepadamu. Udara hangat dan aroma tanah basah membuat momen itu sakral. Apa yang ingin kamu akui pada dirimu?",
+      "options": {
+        "A": { "text": "Bahwa aku ingin membawa kedamaian dan keseimbangan bagi semua.", "weights": {"empathy": 1, "spirituality": 1} },
+        "B": { "text": "Bahwa aku siap menantang takdir dan menjaga prinsipku.", "weights": {"courage": 1, "principle": 1} },
+        "C": { "text": "Bahwa kebenaran adalah pelita jalanku.", "weights": {"principle": 1} },
+        "D": { "text": "Bahwa jiwaku kini mengenal kedalaman batin dan imajinasi.", "weights": {"spirituality": 1, "creativity": 1} }
+      }
+    }
+  ]
+}

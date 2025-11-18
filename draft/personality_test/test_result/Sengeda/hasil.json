@@ -1,0 +1,41 @@
+{
+  "nama": "Sengeda",
+  "timestamp": "2025-11-18 15:36:27",
+  "dimensi": {
+    "spirituality": {
+      "score": 4,
+      "max_score": 10,
+      "percentage": 40.0
+    },
+    "courage": {
+      "score": 2,
+      "max_score": 11,
+      "percentage": 18.18
+    },
+    "empathy": {
+      "score": 7,
+      "max_score": 16,
+      "percentage": 43.75
+    },
+    "logic": {
+      "score": 2,
+      "max_score": 10,
+      "percentage": 20.0
+    },
+    "creativity": {
+      "score": 1,
+      "max_score": 8,
+      "percentage": 12.5
+    },
+    "social": {
+      "score": 2,
+      "max_score": 9,
+      "percentage": 22.22
+    },
+    "principle": {
+      "score": 3,
+      "max_score": 12,
+      "percentage": 25.0
+    }
+  }
+}

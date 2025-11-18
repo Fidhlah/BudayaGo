@@ -1,0 +1,157 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Saat malam tiba dan kabut menutupi bumi, seorang tetua menyalakan obor dari daun kelapa kering. Api menyala sebagai simbol perlindungan dan doa turun-temurun. Asapnya berputar, membawa aroma cendana, membentuk bayangan burung raksasa di langit malam. Apa yang muncul dalam hatimu?",
+      "options": {
+        "A": { "text": "Aku memperhatikan bayangan burung itu sambil menarik napas pelan, mencoba memahami suasana malam." },
+        "B": { "text": "Aku melangkah sedikit mendekat, ingin tahu dari mana bayangan itu berasal." },
+        "C": { "text": "Aku mengambil waktu sejenak untuk merasakan aroma cendana dan ketenangan yang datang bersamanya." },
+        "D": { "text": "Aku mengamati bentuk bayangannya sambil membayangkan cerita yang mungkin tersembunyi di baliknya." }
+      }
+    },
+
+    {
+      "id": 2,
+      "text": "Di lembah berkabut, rombongan penabuh gendang sedang melakukan ritual panen. Salah satu dari mereka melihatmu dan memberi isyarat agar mendekat. Aroma dupa dan gema gamelan menyelimuti udara. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Aku mendekat dan membalas isyaratnya, lalu bergabung di pinggir lingkaran." },
+        "B": { "text": "Aku memperhatikan cara mereka menabuh dan gerakannya dulu sebelum ikut masuk." },
+        "C": { "text": "Aku mengikuti langkah mereka perlahan, mencoba menyesuaikan diri dengan ritme ritualnya." },
+        "D": { "text": "Aku mengetuk pelan ritme dengan tangan atau benda kecil, memberi warna tanpa mengganggu harmoni." }
+      }
+    },
+    {
+      "id": 3,
+      "text": "Di batas hutan tua yang sepi, seorang nenek penjaga berdiri memegang lesung batu yang bergetar pelan. Suara gemericik air dari dalam hutan membuat suasananya terasa asing namun memikat. Ketika ia menatapmu seolah menilai hatimu, bagaimana kamu menanggapinya?",
+      "options": {
+        "A": { "text": "Aku memperhatikan getaran lesung dan gerak nenek itu, mencoba membaca pola atau maksud di baliknya." },
+        "B": { "text": "Aku mendekat dengan lembut dan menawarkan bantuan, menunjukkan rasa hormat." },
+        "C": { "text": "Aku menjaga jarak dengan sopan karena menghormati ruang keramat, lalu mundur perlahan sambil mencari jalur aman." },
+        "D": { "text": "Aku menahan gerakanku dan menunjukkan kehati-hatian, takut tanpa sengaja melanggar sesuatu yang mungkin dianggap sakral olehnya." }
+      }
+    },
+
+    {
+      "id": 4,
+      "text": "Dalam perjalanan melewati hutan pada masa lampau, kamu bertemu seorang pengembara tua yang tampak kelelahan dan meminta bantuan. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Memberi penjelasan arah dengan cara yang mudah ia pahami, memakai contoh-contoh dari alam sekitar." },
+        "B": { "text": "Menemaninya sampai ke titik aman terdekat sebelum melanjutkan perjalananmu." },
+        "C": { "text": "Menggambar jalur di tanah menggunakan ranting, memastikan dia mengikuti rute yang benar." },
+        "D": { "text": "Mengantar dia melewati jalur lebih cepat meski sedikit berisiko." }
+      }
+    },
+    {
+      "id": 5,
+      "text": "Di sebuah persimpangan sunyi pada akhir perjalananmu, seorang penjaga hutan menawarkan kemampuan langka yang dapat menolong banyak orang. Namun, jika menerimanya, kamu harus meninggalkan satu hal berharga dari hidupmu. Apa yang kamu pilih?",
+      "options": {
+        "A": { "text": "Menerima tawarannya demi membawa manfaat yang lebih besar." },
+        "B": { "text": "Menolak dengan hormat dan memilih menghadapi tantangan dengan kemampuan yang kumiliki, tanpa meninggalkan nilai yang kujaga." },
+        "C": { "text": "Bertanya dengan rinci tentang konsekuensinya sebelum mengambil keputusan." },
+        "D": { "text": "Memohon doa restu pada alam sekitar sebelum menetapkan pilihan." }
+      }
+    },
+    {
+      "id": 6,
+      "text": "Menjelang senja, seorang pembawa pesan datang tergesa-gesa: kawan seperjalananmu tak kembali setelah memasuki rimba Kalimantan. Kabut turun lebih cepat dari biasanya, menelan suara hutan hingga nyaris sunyi. Penduduk desa mulai gelisah, sebagian bahkan ketakutan. Dalam suasana tegang itu, apa langkahmu berikutnya?",
+      "options": {
+        "A": { "text": "Masuk ke rimba tanpa ragu, sambil menenangkan penduduk yang panik." },
+        "B": { "text": "Menenangkan penduduk terlebih dahulu, memastikan mereka aman sebelum bergerak." },
+        "C": { "text": "Mengikuti firasat yang muncul dari ketenangan, membiarkan intuisi menuntun arah pencarian." },
+        "D": { "text": "Mengamati jejak, suara, dan pola kabut sebelum menentukan arah pencarian." }
+      }
+    },
+    {
+      "id": 7,
+      "text": "Di sebuah persinggahan, sekelompok pelancong sedang berdebat tentang arah perjalanan. Mereka meminta pandanganmu sebagai orang luar. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Memberi jawaban tegas berdasarkan apa yang kamu yakini, meski berbeda dari pendapat mereka." },
+        "B": { "text": "Mencoba meredakan suasana dan membantu mereka memahami satu sama lain." },
+        "C": { "text": "Mengumpulkan informasi dari semua pihak, lalu memberi saran berdasarkan fakta paling kuat." },
+        "D": { "text": "Aku menyampaikan bahwa aku tak bisa mendukung keputusan yang bisa merugikan orang lain tanpa alasan yang benar-benar jelas." }
+      }
+    },
+    {
+      "id": 8,
+      "text": "Badai besar menggulung dari lautan selatan. Kamu berteduh di pondok nelayan diterpa kilatan petir. Apa yang akan kamu lakukan?",
+      "options": {
+        "A": { "text": "Memperkuat pondok sesuai ajaran tetua, sambil menenangkan teman." },
+        "B": { "text": "Mencari struktur alam lebih kokoh untuk berteduh." },
+        "C": { "text": "Membuat tempat berlindung baru dari bahan sekitar." },
+        "D": { "text": "Berserah pada angin dan menunggu dengan tenang." }
+      }
+    },
+
+    {
+      "id": 9,
+      "text": "Dalam perjalanan di pegunungan, kamu menemukan sungai deras, jalan berbatu, hutan rapat, dan lembah luas. Jalur mana yang akan kamu ambil?",
+      "options": {
+        "A": { "text": "Menyebrang sungai deras, menghadapi risiko dan tantangan." },
+        "B": { "text": "Memasuki hutan rapat dengan hati-hati, memperhatikan kehidupan sekitar." },
+        "C": { "text": "Melalui lembah luas, mencari inspirasi untuk langkah selanjutnya." },
+        "D": { "text": "Menapaki jalan berbatu dengan teratur dan terencana." }
+      }
+    },
+    {
+      "id": 10,
+      "text": "Setelah perjalananmu berakhir, warga desa berkumpul di balai untuk mengenangmu. Cerita tentangmu akan diteruskan dari mulut ke mulut. Apa yang ingin mereka ingat dari dirimu?",
+      "options": {
+        "A": { "text": "Bagaimana kamu menghadapi situasi sulit tanpa ragu dan tetap menolong orang lain." },
+        "B": { "text": "Cara kamu menemukan solusi ketika masalah terasa buntu." },
+        "C": { "text": "Bagaimana kamu menenangkan orang-orang di sekitarmu ketika mereka panik atau sedih." },
+        "D": { "text": "Keputusan dan tindakanmu yang selalu adil dan konsisten." }
+      }
+    },
+    {
+      "id": 11,
+      "text": "Di balai desa, seorang bangsawan mengambil keputusan yang merugikan rakyat. Warga menatapmu dengan harap, seolah kamu satu-satunya yang bisa menolong mereka. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Bersuara lantang menentang keputusan itu, menegakkan kebenaran di hadapan semua orang." },
+        "B": { "text": "Mendekati warga yang dirugikan sambil membela kebenaran, menenangkan mereka agar tidak panik." },
+        "C": { "text": "Mencoba menengahi kedua pihak, menjaga agar ketegangan tidak berubah menjadi konflik terbuka." },
+        "D": { "text": "Mengambil waktu sejenak untuk merenung dan merencanakan langkah terbaik sebelum bertindak." }
+      }
+    },
+    {
+      "id": 12,
+      "text": "Kamu sedang menghadiri perayaan di desa asing. Suasana meriah dengan musik tradisional, tarian, dan keramaian warga. Hal apa yang paling membuatmu penasaran?",
+      "options": {
+        "A": { "text": "Ritme dan gerakan tarian yang rumit, ingin menirunya." },
+        "B": { "text": "Cerita dan legenda di balik lagu-lagu tradisional." },
+        "C": { "text": "Perasaan dan energi yang muncul saat semua warga bersatu merayakan." },
+        "D": { "text": "Menyapa dan mengenal warga lebih dekat, memahami mereka." }
+      }
+    },
+    {
+      "id": 13,
+      "text": "Saat kamu hendak meninggalkan desa, seorang tetua menghampirimu dan menawarkan empat benda untuk perjalananmu. Mana yang kamu pilih?",
+      "options": {
+        "A": { "text": "Kompas kayu tua." },
+        "B": { "text": "Botol air dari tempurung kelapa." },
+        "C": { "text": "Lampu minyak tradisional." },
+        "D": { "text": "Pisau kecil berukir sederhana." }
+      }
+    },
+    {
+      "id": 14,
+      "text": "Di alun-alun kerajaan, seorang bangsawan maju ke hadapanmu dan dengan lantang menantang kemampuanmu, membuat semua mata tertuju padamu. Aroma dupa menyelimuti udara, dan lantai batu terasa dingin di bawah kakimu. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Membalas tantangannya dengan kata-kata tegas, sambil tetap menenangkan orang-orang di sekitarmu." },
+        "B": { "text": "Menatapnya tenang tanpa amarah, menegaskan prinsipmu." },
+        "C": { "text": "Diam sejenak, menenangkan diri sebelum merespons." },
+        "D": { "text": "Tersenyum ringan dan bersikap santai, meredakan ketegangan." }
+      }
+    },
+    {
+      "id": 15,
+      "text": "Setelah beberapa hari belajar dari tetua setempat, kamu duduk di tepi sungai sebelum meninggalkan desa. Angin membawa aroma tanah basah, dan suasana tenang membuatmu merenung. Apa yang paling ingin kamu sadari tentang dirimu sebelum pergi?",
+      "options": {
+        "A": { "text": "Aku ingin meninggalkan jejak kebaikan bagi orang-orang yang kutemui." },
+        "B": { "text": "Aku merasa siap menghadapi tantangan yang menanti, tanpa meninggalkan prinsipku." },
+        "C": { "text": "Aku menyadari pentingnya belajar dari setiap pengalaman dan memperhatikan setiap detail." },
+        "D": { "text": "Aku merasa lebih tenang dan memahami diriku sendiri, menerima perjalanan ini apa adanya." }
+      }
+    }
+  ]
+}

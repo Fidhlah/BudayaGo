@@ -1,0 +1,41 @@
+{
+  "nama": "Sawerigading",
+  "timestamp": "2025-11-18 15:15:41",
+  "dimensi": {
+    "spirituality": {
+      "score": 1,
+      "max_score": 10,
+      "percentage": 10.0
+    },
+    "courage": {
+      "score": 9,
+      "max_score": 11,
+      "percentage": 81.82
+    },
+    "empathy": {
+      "score": 4,
+      "max_score": 16,
+      "percentage": 25.0
+    },
+    "logic": {
+      "score": 1,
+      "max_score": 10,
+      "percentage": 10.0
+    },
+    "creativity": {
+      "score": 0,
+      "max_score": 8,
+      "percentage": 0.0
+    },
+    "social": {
+      "score": 2,
+      "max_score": 9,
+      "percentage": 22.22
+    },
+    "principle": {
+      "score": 3,
+      "max_score": 12,
+      "percentage": 25.0
+    }
+  }
+}

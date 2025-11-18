@@ -1,0 +1,67 @@
+{
+  "archetypes": [
+    {
+      "name": "Jiwa Waja",
+      "meaning": "Waja berarti baja; jiwa yang kuat, kukuh, dan tak mudah goyah.",
+      "description": "Kepribadian yang teguh seperti baja, berjalan mantap tanpa kehilangan keluhuran budi. Ia menghadapi gelombang hidup dengan ketegasan yang tidak membentak, tapi menguatkan.",
+      "dimensions": ["courage"]
+    },
+    {
+      "name": "Rasa Santun",
+      "meaning": "Rasa berarti kepekaan; santun adalah budi pekerti halus.",
+      "description": "Hati yang lembut, peka, dan penuh tenggang rasa. Ia hadir membawa keteduhan, memahami sebelum berbicara, dan mengangkat martabat orang lain melalui sikapnya.",
+      "dimensions": ["empathy"]
+    },
+    {
+      "name": "Batin Laras",
+      "meaning": "Laras berarti selaras; gambaran jiwa yang seimbang dengan alam dan diri.",
+      "description": "Jiwa yang selaras dengan alam dan dirinya sendiri. Ia membaca tanda-tanda kehidupan dengan keheningan batin, membawa kedalaman yang tidak mencolok namun terasa.",
+      "dimensions": ["spirituality"]
+    },
+    {
+      "name": "Nalar Rinci",
+      "meaning": "Nalar adalah akal budi; rinci berarti teliti dan terperinci.",
+      "description": "Pikiran yang teratur dan cermat. Ia melihat pola, menimbang fakta, dan menjahit keputusan dengan ketelitian yang tenang seperti tangan pengukir.",
+      "dimensions": ["logic"]
+    },
+    {
+      "name": "Laku Adi",
+      "meaning": "Laku adalah tindakan hidup; adi bermakna utama, mulia, atau luhur.",
+      "description": "Pemegang nilai dan laku utama. Ia menjaga prinsip seperti menjaga amanah, memegang teguh apa yang benar meski dunia berubah arah.",
+      "dimensions": ["principle"]
+    },
+    {
+      "name": "Rupa Cipta",
+      "meaning": "Rupa berarti bentuk atau wujud; cipta adalah daya kreasi dan imajinasi.",
+      "description": "Pencipta gagasan dan bentuk-bentuk baru. Imajinasi mengalir seperti aliran sungai, membawa warna, makna, dan cara pandang segar.",
+      "dimensions": ["creativity"]
+    },
+    {
+      "name": "Suara Madya",
+      "meaning": "Suara adalah ungkapan diri; madya berarti tengah, penyeimbang.",
+      "description": "Penghubung yang menata harmoni di tengah manusia. Ia membangun jembatan, menjernihkan suasana, dan membuat ruang agar semua suara dapat hidup berdampingan.",
+      "dimensions": ["social"]
+    },
+
+    {
+      "name": "Wani Rancak",
+      "meaning": "Wani berarti berani; rancak bermakna teratur, baik, dan tertata.",
+      "description": "Keberanian yang jernih oleh pertimbangan. Ia melangkah mantap, namun selalu membaca tanda, arah, dan akibat; keberaniannya tidak gegabah, melainkan terarah.",
+      "dimensions": ["courage", "logic"]
+    },
+
+    {
+      "name": "Rasa Tata",
+      "meaning": "Rasa adalah kepekaan; tata berarti adat, tatanan, atau aturan hidup.",
+      "description": "Hati yang lembut namun teguh memegang adat. Ia menenangkan sengketa dengan empati, tetapi tetap menjunjung tatanan dan nilai luhur yang diwariskan.",
+      "dimensions": ["empathy", "principle"]
+    },
+
+    {
+      "name": "Laras Cipta",
+      "meaning": "Laras berarti harmoni (sering dipakai dalam gamelan); cipta ialah imajinasi dan ilham.",
+      "description": "Jiwa yang mengembara antara ilham dan keheningan. Ia mencipta dari intuisi, membiarkan batin dan imajinasi menuntun langkahnya melampaui batas-batas biasa.",
+      "dimensions": ["spirituality", "creativity"]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "archetypes": [
+    {
+      "name": "Penjaga Bara",
+      "meaning": "Julukan bagi mereka yang menjaga keberanian laksana bara yang tak padam.",
+      "description": "Warga kerajaan mengenalnya sebagai sosok yang maju ketika yang lain ragu, melindungi gerbang desa dari apa pun yang mengusik.",
+      "dimensions": ["courage"]
+    },
+    {
+      "name": "Penawar Lara",
+      "meaning": "Julukan bagi hati yang ringan tangan dan menyejukkan banyak jiwa.",
+      "description": "Ia sering terlihat di balai penyembuhan, mengusap lara orang lain dengan tutur lembut dan rasa empati yang dalam.",
+      "dimensions": ["empathy"]
+    },
+    {
+      "name": "Sri Niskala",
+      "meaning": "Julukan bagi mereka yang mampu membaca tanda halus dan pesan dari alam tak kasat.",
+      "description": "Penduduk percaya ia kerap mendengar suara lembut leluhur yang menuntun langkahnya.",
+      "dimensions": ["spirituality"]
+    },
+    {
+      "name": "Penenung Akar",
+      "meaning": "Julukan bagi pemikir yang menyelami persoalan hingga ke akar-akarnya.",
+      "description": "Ia menjadi rujukan ketika kerajaan kecil perlu menimbang keputusan tanpa tergesa.",
+      "dimensions": ["logic"]
+    },
+    {
+      "name": "Lintang Luhur",
+      "meaning": "Julukan bagi mereka yang menjunjung aturan dan tata krama kerajaan kecil.",
+      "description": "Ia sering dipanggil oleh para tetua saat adat perlu ditegakkan dengan wibawa yang anggun.",
+      "dimensions": ["principle"]
+    },
+    {
+      "name": "Pewarna Kata",
+      "meaning": "Julukan bagi sosok yang menghidupkan hal-hal sederhana menjadi gagasan baru.",
+      "description": "Ia membuat banyak warga terinspirasi, seakan setiap idenya menambah warna pada hari-hari desa.",
+      "dimensions": ["creativity"]
+    },
+    {
+      "name": "Perekat Balai",
+      "meaning": "Julukan bagi mereka yang menjaga rukun dan hubungan antarwarga.",
+      "description": "Setiap perselisihan kecil di balai desa biasanya reda setelah ia datang membawa kata penenang.",
+      "dimensions": ["social"]
+    },
+    {
+      "name": "Bara Santun",
+      "meaning": "Julukan bagi sosok yang keberaniannya dibingkai oleh kesantunan kerajaan kecil.",
+      "description": "Ia berani bersuara untuk rakyat, namun tetap menjaga tutur dan hormat pada adat.",
+      "dimensions": ["courage", "principle"]
+    },
+    {
+      "name": "Cipta Kendaga",
+      "meaning": "Julukan bagi pemikir kreatif yang pandai merangkai strategi rapi seperti anyaman kendaga.",
+      "description": "Ia menjadi pembuat siasat ketika desa menghadapi musim sulit atau hajatan besar.",
+      "dimensions": ["creativity", "logic"]
+    },
+    {
+      "name": "Laras Wargi",
+      "meaning": "Julukan bagi penjaga harmoni keluarga besar kerajaan kecil.",
+      "description": "Ketika ada ketegangan antarwarga, ia hadir membawa sejuk, membuat semua kembali laras.",
+      "dimensions": ["empathy", "social"]
+    }
+  ]
+}

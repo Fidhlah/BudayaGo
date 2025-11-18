@@ -1,0 +1,41 @@
+{
+  "nama": "Lutung Kasarung",
+  "timestamp": "2025-11-18 14:39:02",
+  "dimensi": {
+    "spirituality": {
+      "score": 2,
+      "max_score": 10,
+      "percentage": 20.0
+    },
+    "courage": {
+      "score": 2,
+      "max_score": 11,
+      "percentage": 18.18
+    },
+    "empathy": {
+      "score": 9,
+      "max_score": 16,
+      "percentage": 56.25
+    },
+    "logic": {
+      "score": 1,
+      "max_score": 10,
+      "percentage": 10.0
+    },
+    "creativity": {
+      "score": 0,
+      "max_score": 8,
+      "percentage": 0.0
+    },
+    "social": {
+      "score": 4,
+      "max_score": 9,
+      "percentage": 44.44
+    },
+    "principle": {
+      "score": 3,
+      "max_score": 12,
+      "percentage": 25.0
+    }
+  }
+}

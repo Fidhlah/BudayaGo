@@ -1,0 +1,54 @@
+{
+  "archetypes": [
+    {
+      "name": "Jiwa Waja",
+      "description": "Kepribadian yang teguh seperti baja, berjalan mantap tanpa kehilangan keluhuran budi. Ia menghadapi gelombang hidup dengan ketegasan yang tidak membentak, tapi menguatkan.",
+      "dimensions": ["courage"]
+    },
+    {
+      "name": "Rasa Santun",
+      "description": "Hati yang lembut, peka, dan penuh tenggang rasa. Ia hadir membawa keteduhan, memahami sebelum berbicara, dan mengangkat martabat orang lain melalui sikapnya.",
+      "dimensions": ["empathy"]
+    },
+    {
+      "name": "Batin Laras",
+      "description": "Jiwa yang selaras dengan alam dan dirinya sendiri. Ia membaca tanda-tanda kehidupan dengan keheningan batin, membawa kedalaman yang tidak mencolok namun terasa.",
+      "dimensions": ["spirituality"]
+    },
+    {
+      "name": "Nalar Rinci",
+      "description": "Pikiran yang teratur dan cermat. Ia melihat pola, menimbang fakta, dan menjahit keputusan dengan ketelitian yang tenang seperti tangan pengukir.",
+      "dimensions": ["logic"]
+    },
+    {
+      "name": "Laku Adi",
+      "description": "Pemegang nilai dan laku utama. Ia menjaga prinsip seperti menjaga amanah, memegang teguh apa yang benar meski dunia berubah arah.",
+      "dimensions": ["principle"]
+    },
+    {
+      "name": "Rupa Cipta",
+      "description": "Pencipta gagasan dan bentuk-bentuk baru. Imajinasi mengalir seperti aliran sungai, membawa warna, makna, dan cara pandang segar.",
+      "dimensions": ["creativity"]
+    },
+    {
+      "name": "Suara Madya",
+      "description": "Penghubung yang menata harmoni di tengah manusia. Ia membangun jembatan, menjernihkan suasana, dan membuat ruang agar semua suara dapat hidup berdampingan.",
+      "dimensions": ["social"]
+    },
+    {
+      "name": "Waja Wirama",
+      "description": "Keberanian yang tidak meledak-ledak, tetapi teratur dan berirama. Ia melangkah tegas tanpa kehilangan ketajaman nurani, memadukan keberanian dengan laku yang tertata.",
+      "dimensions": ["courage", "principle"]
+    },
+    {
+      "name": "Cipta Nalar",
+      "description": "Pemikir kreatif yang tetap membumi. Ia menyalakan imajinasi namun menuntunnya dengan logika, mencipta yang indah tanpa lepas dari akal sehat.",
+      "dimensions": ["creativity", "logic"]
+    },
+    {
+      "name": "Rasa Jembar",
+      "description": "Hati yang lapang dan merangkul. Ia memahami manusia, menjaga hubungan, dan membawa suasana damai melalui empati yang luas dan kehadiran yang hangat.",
+      "dimensions": ["empathy", "social"]
+    }
+  ]
+}

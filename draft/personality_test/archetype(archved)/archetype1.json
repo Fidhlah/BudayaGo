@@ -1,0 +1,64 @@
+{
+  "archetypes": [
+    {
+      "name": "Waja Pranata",
+      "meaning": "Waja = baja/keteguhan; Pranata = tatanan/aturan yang ditegakkan.",
+      "description": "Pembawa tekad yang tak mudah goyah, seperti baja yang ditempa dalam bara adat. Langkahnya tegas, menjaga kehormatan sambil menembus rintangan.",
+      "dimensions": ["courage"]
+    },
+    {
+      "name": "Rasa Piwulang",
+      "meaning": "Rasa = perasaan; Piwulang = ajaran/nasihat leluhur.",
+      "description": "Hati yang dituntun oleh welas asih. Setiap tindakannya lembut, menjadi ajaran hidup yang menenangkan siapa pun yang berada di dekatnya.",
+      "dimensions": ["empathy"]
+    },
+    {
+      "name": "Sujana Batin",
+      "meaning": "Sujana = bijaksana; Batin = jiwa terdalam.",
+      "description": "Jiwa bening seperti telaga keramat. Ia membaca halusnya tanda kehidupan dan menemukan makna dalam keheningan.",
+      "dimensions": ["spirituality"]
+    },
+    {
+      "name": "Nalar Gatra",
+      "meaning": "Nalar = penalaran; Gatra = bentuk/struktur yang tertata.",
+      "description": "Pikiran yang tertib seperti ukiran bermotif pakem. Keputusannya lahir dari ketelitian dan pertimbangan yang matang.",
+      "dimensions": ["logic"]
+    },
+    {
+      "name": "Laku Pramana",
+      "meaning": "Laku = jalan/perilaku; Pramana = kebenaran/otoritas utama.",
+      "description": "Penjaga nilai utama yang berjalan lurus dalam tradisi. Ia setia pada kebenaran dan tak tergoyahkan oleh godaan masa.",
+      "dimensions": ["principle"]
+    },
+    {
+      "name": "Cipta Rawi",
+      "meaning": "Cipta = daya kreasi; Rawi = penutur/penyampai kisah.",
+      "description": "Pewujud gagasan yang menenun realita dari imajinasi. Setiap karya lahir dari rasa, lalu tumbuh menjadi kisah yang bernyawa.",
+      "dimensions": ["creativity"]
+    },
+    {
+      "name": "Madya Wirasa",
+      "meaning": "Madya = penengah; Wirasa = rasa yang mendalam.",
+      "description": "Penjaga harmoni yang menjahit hubungan antarmanusia. Kehadirannya membawa keseimbangan dan keteduhan dalam banyak pertemuan.",
+      "dimensions": ["social"]
+    },
+    {
+      "name": "Waja Santika",
+      "meaning": "Waja = kekuatan baja; Santika = kedamaian/ketenteraman.",
+      "description": "Keberanian yang tetap teduh, seperti api yang dijaga dalam tungku adat. Ia berani bersikap tanpa kehilangan keluhuran.",
+      "dimensions": ["courage", "principle"]
+    },
+    {
+      "name": "Cipta Naya",
+      "meaning": "Cipta = kreasi; Naya = cara/jalan/strategi.",
+      "description": "Pemikir yang meracik imajinasi dengan ketajaman nalar. Ia menenun gagasan yang indah namun tetap berpijak pada kejelasan pikir.",
+      "dimensions": ["creativity", "logic"]
+    },
+    {
+      "name": "Rasa Wirang",
+      "meaning": "Rasa = perasaan; Wirang = kehalusan budi / rasa malu bermartabat.",
+      "description": "Hati jembar yang menjaga hubungan dengan kelembutan dan rasa hormat. Ia merawat keharmonisan dan menyembuhkan retak antar sesama.",
+      "dimensions": ["empathy", "social"]
+    }
+  ]
+}
