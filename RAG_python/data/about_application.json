@@ -1,0 +1,16 @@
+{
+    "application_name": "Budaya Nusantara Explorer",
+    "description": "suatu aplikasi yang dirancang untuk mengeksplorasi dan mempelajari berbagai budaya di Nusantara melalui teks, gambar, dan video.",
+    "locations": {
+        "/": "Home",
+        "/about": "About the Application",
+        "/explore": "Explore Cultures",
+        "/contact": "Contact Us"
+    },
+    "features": [
+        "QR Code Scanning untuk akses cepat ke konten budaya.",
+        "Pencarian berbasis teks untuk menemukan informasi budaya tertentu.",
+        "Chatbot interaktif untuk menjawab pertanyaan tentang budaya Nusantara.",
+        "Galeri multimedia yang menampilkan gambar dan video budaya."
+    ]
+}
