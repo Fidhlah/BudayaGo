@@ -4,7 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'providers/auth_provider.dart';
 import 'providers/qr_provider.dart';
-import 'theme/app_theme.dart'; // ✅ Import single theme
+import 'providers/character-matcher_provider.dart';
+import 'theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/email_verification_screen.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => QrProvider()),
+        ChangeNotifierProvider(create: (_) => PersonalityTestProvider()), // Add this
       ],
       child: MaterialApp(
         title: 'BudayaGo',
