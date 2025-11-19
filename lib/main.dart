@@ -9,7 +9,7 @@ import 'theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/email_verification_screen.dart';
-import 'screens/home/home_screen.dart';
+import 'screens/main/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,21 +26,23 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => QrProvider()),
-        ChangeNotifierProvider(create: (_) => PersonalityTestProvider()), // Add this
+        ChangeNotifierProvider(
+          create: (_) => PersonalityTestProvider(),
+        ), // Add this
       ],
       child: MaterialApp(
         title: 'BudayaGo',
         debugShowCheckedModeBanner: false,
-        
+
         // ✅ USE SINGLE THEME
         theme: AppTheme.theme,
-        
+
         home: const AuthGate(),
         routes: {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/verify-email': (context) => const EmailVerificationScreen(),
-          '/home': (context) => const HomeScreen(),
+          '/home': (context) => const MainScreen(),
         },
       ),
     );
@@ -79,7 +81,7 @@ class AuthGate extends StatelessWidget {
 
         // ✅ Determine screen based on auth state
         final user = authProvider.user;
-        
+
         if (user == null) {
           // Not logged in
           debugPrint('→ Showing LoginScreen');
@@ -90,8 +92,8 @@ class AuthGate extends StatelessWidget {
           return const EmailVerificationScreen();
         } else {
           // Logged in & email verified
-          debugPrint('→ Showing HomeScreen');
-          return const HomeScreen();
+          debugPrint('→ Showing MainScreen');
+          return const MainScreen();
         }
       },
     );

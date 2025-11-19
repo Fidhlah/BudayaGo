@@ -10,7 +10,7 @@ class AppTheme {
       // ========== BRIGHTNESS ==========
       brightness: Brightness.light,
       useMaterial3: true,
-      
+
       // ========== COLOR SCHEME ==========
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
@@ -22,10 +22,10 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         onError: Colors.white,
       ),
-      
+
       // ========== SCAFFOLD ==========
       scaffoldBackgroundColor: AppColors.background,
-      
+
       // ========== APP BAR ==========
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.batikGold,
@@ -42,7 +42,7 @@ class AppTheme {
           size: AppDimensions.iconM,
         ),
       ),
-      
+
       // ========== BUTTON THEMES ==========
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -56,7 +56,7 @@ class AppTheme {
           textStyle: AppTextStyles.button,
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -68,14 +68,14 @@ class AppTheme {
           textStyle: AppTextStyles.button,
         ),
       ),
-      
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
           textStyle: AppTextStyles.button,
         ),
       ),
-      
+
       // ========== INPUT DECORATION ==========
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -101,13 +101,11 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.error),
         ),
         labelStyle: AppTextStyles.labelMedium,
-        hintStyle: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textHint,
-        ),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
       ),
-      
+
       // ========== CARD THEME ==========
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: AppDimensions.cardElevation,
         shape: RoundedRectangleBorder(
@@ -115,20 +113,20 @@ class AppTheme {
         ),
         margin: const EdgeInsets.all(AppDimensions.spaceS),
       ),
-      
+
       // ========== DIVIDER THEME ==========
       dividerTheme: const DividerThemeData(
         color: AppColors.divider,
         thickness: AppDimensions.dividerThickness,
         space: AppDimensions.spaceM,
       ),
-      
+
       // ========== ICON THEME ==========
       iconTheme: const IconThemeData(
         color: AppColors.textPrimary,
         size: AppDimensions.iconM,
       ),
-      
+
       // ========== BOTTOM NAVIGATION BAR ==========
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -139,9 +137,9 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: AppDimensions.bottomNavElevation,
       ),
-      
+
       // ========== DIALOG THEME ==========
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusL),
@@ -149,7 +147,7 @@ class AppTheme {
         titleTextStyle: AppTextStyles.h4,
         contentTextStyle: AppTextStyles.bodyMedium,
       ),
-      
+
       // ========== SNACKBAR THEME ==========
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
@@ -161,14 +159,14 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      
+
       // ========== FLOATING ACTION BUTTON ==========
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 4,
       ),
-      
+
       // ========== CHIP THEME ==========
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surface,
@@ -186,7 +184,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppDimensions.radiusS),
         ),
       ),
-      
+
       // ========== TEXT THEME ==========
       textTheme: const TextTheme(
         displayLarge: AppTextStyles.h1,
@@ -204,12 +202,12 @@ class AppTheme {
       ),
     );
   }
-  
+
   // ========== HELPER METHODS ==========
   static ColorScheme colorScheme(BuildContext context) {
     return Theme.of(context).colorScheme;
   }
-  
+
   static TextTheme textTheme(BuildContext context) {
     return Theme.of(context).textTheme;
   }
