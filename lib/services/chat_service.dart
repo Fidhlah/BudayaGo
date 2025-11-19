@@ -1,0 +1,72 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart'; // Import for debugPrint
+
+/// A service class to handle all communication with the customized
+/// Gemini RAG API endpoint (your Cloudflare Worker).
+class ChatService {
+  static const String workerUrl = 'https://budayago.kiyahh.workers.dev/';
+
+  /// Sends a user message to the custom RAG endpoint and awaits the LLM response.
+  Future<String> sendMessage(String userMessage) async {
+    // 1. Prepare the URI
+    final uri = Uri.parse(workerUrl);
+
+    // 2. Prepare the JSON body
+    final bodyJson = jsonEncode(<String, String>{
+      // The Worker expects a JSON object with the key 'message'
+      'message': userMessage,
+    });
+
+    try {
+      // 3. Make the POST request
+      final response = await http.post(
+        uri,
+        headers: <String, String>{
+          // Ensure the request headers specify JSON content
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: bodyJson,
+      );
+
+      // 4. Check for success status code
+      if (response.statusCode == 200) {
+        // Successful response from your Worker
+
+        // Decode the JSON response body
+        final jsonResponse = jsonDecode(response.body);
+
+        // Ensure the key 'response' matches what the Worker sends back: { "response": "..." }
+        final llmResponse = jsonResponse['response'] as String?;
+
+        if (llmResponse != null) {
+          return llmResponse;
+        } else {
+          // Handle case where 'response' field is missing or null
+          return 'Server response was malformed. The chat service did not return the expected field.';
+        }
+      } else {
+        // Handle non-200 status codes (e.g., 400 Bad Request, 500 Server Error)
+        // Log the error body for debugging
+        debugPrint('API Error ${response.statusCode}: ${response.body}');
+
+        // Try to return a friendly error message
+        try {
+          final errorJson = jsonDecode(response.body);
+          final errorMessage = errorJson['error'] ?? 'Unknown server error.';
+          return 'Sorry, a server error occurred (Code: ${response.statusCode}). Details: $errorMessage';
+        } catch (_) {
+          return 'Sorry, a server error occurred (Code: ${response.statusCode}).';
+        }
+      }
+    } on http.ClientException catch (e) {
+      // Handle HTTP-specific errors like connection timeout, host lookup failure, or CORS
+      debugPrint('Network/Client Error: $e');
+      return 'Network Error: Could not connect to the chat service. Please check your network connection.';
+    } catch (e) {
+      // Catch all other exceptions (e.g., Json decoding error if response is invalid)
+      debugPrint('General Exception: $e');
+      return 'An unexpected error occurred during processing.';
+    }
+  }
+}
