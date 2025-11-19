@@ -4,7 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'providers/auth_provider.dart';
 import 'providers/qr_provider.dart';
-import 'providers/character-matcher_provider.dart';
+import 'providers/character-matcher_provider.dart' as character_matcher;
+import 'providers/home_provider.dart';
+import 'providers/profile_provider.dart';
+import 'providers/chatbot_provider.dart';
 import 'theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -27,8 +30,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => QrProvider()),
         ChangeNotifierProvider(
-          create: (_) => PersonalityTestProvider(),
-        ), // Add this
+          create: (_) => character_matcher.PersonalityTestProvider(),
+        ),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => ChatbotProvider()),
       ],
       child: MaterialApp(
         title: 'BudayaGo',

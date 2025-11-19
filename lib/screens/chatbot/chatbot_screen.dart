@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/chatbot_provider.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final String mascot;
@@ -11,55 +13,50 @@ class ChatbotScreen extends StatefulWidget {
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, String>> _messages = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Pesan sambutan
-    _messages.add({
-      'sender': 'bot',
-      'message':
-          'Halo! Aku ${widget.mascot}, pemandu budayamu. Ada yang ingin kamu tanyakan tentang budaya Indonesia?',
+    // Initialize ChatbotProvider with mascot
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final chatbotProvider = Provider.of<ChatbotProvider>(
+        context,
+        listen: false,
+      );
+      chatbotProvider.initialize(widget.mascot);
     });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
 
-    setState(() {
-      _messages.add({'sender': 'user', 'message': _messageController.text});
-
-      // Simulasi respons bot
-      Future.delayed(const Duration(milliseconds: 800), () {
-        setState(() {
-          _messages.add({
-            'sender': 'bot',
-            'message': _getBotResponse(_messageController.text),
-          });
-        });
-      });
-    });
-
+    final message = _messageController.text;
     _messageController.clear();
-  }
 
-  String _getBotResponse(String userMessage) {
-    final lowerMessage = userMessage.toLowerCase();
+    final chatbotProvider = Provider.of<ChatbotProvider>(
+      context,
+      listen: false,
+    );
+    chatbotProvider.sendMessage(message);
 
-    if (lowerMessage.contains('batik')) {
-      return 'Batik adalah warisan budaya Indonesia yang telah diakui UNESCO! Batik dibuat dengan teknik pewarnaan kain menggunakan malam (lilin). Ada batik tulis dan batik cap. Setiap motif batik punya makna tersendiri, lho!';
-    } else if (lowerMessage.contains('tari') ||
-        lowerMessage.contains('tarian')) {
-      return 'Indonesia punya banyak tarian tradisional yang indah! Ada Tari Saman dari Aceh, Tari Pendet dari Bali, Tari Kecak, dan masih banyak lagi. Setiap tarian punya filosofi dan cerita di baliknya.';
-    } else if (lowerMessage.contains('makanan') ||
-        lowerMessage.contains('kuliner')) {
-      return 'Kuliner Indonesia sangat beragam! Rendang dari Sumatra Barat bahkan pernah dinobatkan sebagai makanan terenak di dunia. Ada juga Gudeg, Soto, Gado-gado, dan ribuan makanan tradisional lainnya!';
-    } else if (lowerMessage.contains('rumah adat')) {
-      return 'Setiap daerah di Indonesia punya rumah adat dengan arsitektur unik! Contohnya Rumah Gadang dari Minangkabau, Tongkonan dari Toraja, dan Rumah Joglo dari Jawa. Arsitekturnya mencerminkan filosofi hidup masyarakat setempat.';
-    } else {
-      return 'Pertanyaan menarik! Budaya Indonesia sangat kaya dan beragam. Coba eksplorasi kategori-kategori di beranda untuk belajar lebih banyak, ya! 😊';
-    }
+    // Scroll to bottom after sending
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -75,52 +72,101 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               child: Icon(Icons.smart_toy, color: Colors.orange.shade600),
             ),
             const SizedBox(width: 12),
-            Text('Chat dengan ${widget.mascot}'),
+            Text('Chat dengan \${widget.mascot}'),
           ],
         ),
+        actions: [
+          Consumer<ChatbotProvider>(
+            builder: (context, chatbotProvider, _) {
+              if (chatbotProvider.hasMessages) {
+                return IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) => AlertDialog(
+                            title: const Text('Hapus Chat'),
+                            content: const Text(
+                              'Yakin ingin menghapus semua chat?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Batal'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  chatbotProvider.clearChat();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Hapus'),
+                              ),
+                            ],
+                          ),
+                    );
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isBot = message['sender'] == 'bot';
+            child: Consumer<ChatbotProvider>(
+              builder: (context, chatbotProvider, _) {
+                if (chatbotProvider.isLoading &&
+                    chatbotProvider.messages.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                return Align(
-                  alignment:
-                      isBot ? Alignment.centerLeft : Alignment.centerRight,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.7,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isBot
-                              ? Colors.orange.shade50
-                              : Colors.orange.shade600,
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(16),
-                        topRight: const Radius.circular(16),
-                        bottomLeft: Radius.circular(isBot ? 0 : 16),
-                        bottomRight: Radius.circular(isBot ? 16 : 0),
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: chatbotProvider.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = chatbotProvider.messages[index];
+                    final isBot =
+                        message.role == MessageRole.assistant ||
+                        message.role == MessageRole.system;
+
+                    return Align(
+                      alignment:
+                          isBot ? Alignment.centerLeft : Alignment.centerRight,
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.7,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              isBot
+                                  ? Colors.orange.shade50
+                                  : Colors.orange.shade600,
+                          borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(16),
+                            topRight: const Radius.circular(16),
+                            bottomLeft: Radius.circular(isBot ? 0 : 16),
+                            bottomRight: Radius.circular(isBot ? 16 : 0),
+                          ),
+                        ),
+                        child: Text(
+                          message.content,
+                          style: TextStyle(
+                            color: isBot ? Colors.black87 : Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      message['message']!,
-                      style: TextStyle(
-                        color: isBot ? Colors.black87 : Colors.white,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
+                    );
+                  },
                 );
               },
             ),

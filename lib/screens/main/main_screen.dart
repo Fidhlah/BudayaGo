@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/home_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
 import '../chatbot/chatbot_screen.dart';
@@ -14,15 +17,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  int userXP = 150;
-  int userLevel = 5;
 
-  void _onXPGained(int xp) {
-    setState(() {
-      userXP += xp;
-      if (userXP >= 100) {
-        userLevel++;
-        userXP = userXP % 100;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize providers if needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
+
+      // Initialize if not already initialized
+      if (homeProvider.userXP == 0 && homeProvider.userLevel == 1) {
+        homeProvider.initializeUserData();
+      }
+
+      // Load profile if not loaded
+      if (!profileProvider.hasProfile) {
+        // Will use AuthProvider userId in future
+        profileProvider.loadProfile('default-user');
       }
     });
   }
@@ -30,17 +45,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(
-        mascot: widget.mascot ?? 'default',
-        userXP: userXP,
-        userLevel: userLevel,
-        onXPGained: _onXPGained,
-      ),
-      ProfileScreen(
-        mascot: widget.mascot ?? 'default',
-        userXP: userXP,
-        userLevel: userLevel,
-      ),
+      const HomeScreen(),
+      ProfileScreen(mascot: widget.mascot ?? 'default'),
     ];
 
     return Scaffold(

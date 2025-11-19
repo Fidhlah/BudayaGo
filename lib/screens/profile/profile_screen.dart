@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/home_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../onboarding/onboarding_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String mascot;
-  final int userXP;
-  final int userLevel;
 
-  const ProfileScreen({
-    Key? key,
-    required this.mascot,
-    required this.userXP,
-    required this.userLevel,
-  }) : super(key: key);
+  const ProfileScreen({Key? key, required this.mascot}) : super(key: key);
 
   IconData _getMascotIcon() {
     switch (mascot) {
@@ -73,12 +69,16 @@ class ProfileScreen extends StatelessWidget {
                 child: Icon(_getMascotIcon(), size: 60, color: Colors.white),
               ),
               const SizedBox(height: 16),
-              Text(
-                mascot,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              Consumer<ProfileProvider>(
+                builder: (context, profileProvider, _) {
+                  return Text(
+                    profileProvider.profile?.mascot ?? mascot,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               const Text(
@@ -103,28 +103,37 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem(
-                          'Total XP',
-                          userXP.toString(),
-                          Icons.star,
-                          Colors.amber,
-                        ),
-                        _buildStatItem(
-                          'Level',
-                          userLevel.toString(),
-                          Icons.trending_up,
-                          Colors.blue,
-                        ),
-                        _buildStatItem(
+                    Consumer<HomeProvider>(
+                      builder: (context, homeProvider, _) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatItem(
+                              'Total XP',
+                              homeProvider.userXP.toString(),
+                              Icons.star,
+                              Colors.amber,
+                            ),
+                            _buildStatItem(
+                              'Level',
+                              homeProvider.userLevel.toString(),
+                              Icons.trending_up,
+                              Colors.blue,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Consumer<ProfileProvider>(
+                      builder: (context, profileProvider, _) {
+                        return _buildStatItem(
                           'Koleksi',
-                          collectibles.length.toString(),
+                          profileProvider.totalCollectibles.toString(),
                           Icons.collections,
                           Colors.purple,
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ],
                 ),

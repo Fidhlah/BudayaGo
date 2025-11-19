@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/profile_provider.dart';
 import '../main/main_screen.dart';
 
-class MascotResultScreen extends StatelessWidget {
+class MascotResultScreen extends StatefulWidget {
   final String mascot;
 
   const MascotResultScreen({Key? key, required this.mascot}) : super(key: key);
+
+  @override
+  State<MascotResultScreen> createState() => _MascotResultScreenState();
+}
+
+class _MascotResultScreenState extends State<MascotResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Save mascot to profile when result screen is shown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveMascotToProfile();
+    });
+  }
+
+  Future<void> _saveMascotToProfile() async {
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
+
+    // TODO: Get actual user ID from AuthProvider
+    // For now, just update the mascot
+    await profileProvider.updateProfile(mascot: widget.mascot);
+  }
 
   Map<String, dynamic> getMascotInfo() {
     final mascots = {
@@ -33,7 +60,7 @@ class MascotResultScreen extends StatelessWidget {
         'icon': Icons.music_note,
       },
     };
-    return mascots[mascot] ?? mascots['Wayang']!;
+    return mascots[widget.mascot] ?? mascots['Wayang']!;
   }
 
   @override
@@ -127,7 +154,8 @@ class MascotResultScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MainScreen(mascot: mascot),
+                          builder:
+                              (context) => MainScreen(mascot: widget.mascot),
                         ),
                       );
                     },

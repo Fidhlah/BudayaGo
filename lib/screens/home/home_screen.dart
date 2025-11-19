@@ -1,20 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/home_provider.dart';
 import 'category_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String? mascot;
-  final int? userXP;
-  final int? userLevel;
-  final Function(int)? onXPGained;
-
-  const HomeScreen({
-    Key? key,
-    this.mascot,
-    this.userXP,
-    this.userLevel,
-    this.onXPGained,
-  }) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,6 +20,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _startAutoScroll();
+
+    // Initialize HomeProvider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+      homeProvider.initializeUserData();
+    });
   }
 
   @override
@@ -89,12 +86,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          'Level ${widget.userLevel} | ${widget.userXP} XP',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
+                        Consumer<HomeProvider>(
+                          builder: (context, homeProvider, _) {
+                            return Text(
+                              'Level \${homeProvider.userLevel} | \${homeProvider.userXP} XP',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -225,7 +226,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 builder:
                                     (context) => CategoryListScreen(
                                       category: category['name'] as String,
-                                      onXPGained: widget.onXPGained ?? (_) {},
+                                      onXPGained: (xp) {
+                                        Provider.of<HomeProvider>(
+                                          context,
+                                          listen: false,
+                                        ).claimXP(xp);
+                                      },
                                     ),
                               ),
                             );
