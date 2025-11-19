@@ -1,0 +1,159 @@
+{
+  "characters": [
+    {
+      "id": 1,
+      "name": "Timun Mas",
+      "collectibles": [
+        {
+          "id": 1,
+          "name": "Biji Timun Emas",
+          "description": "Biji ajaib yang dapat tumbuh menjadi perisai pelindung"
+        },
+        {
+          "id": 2,
+          "name": "Garam Laut Selatan",
+          "description": "Garam yang dapat berubah menjadi lautan asin"
+        },
+        {
+          "id": 3,
+          "name": "Cabai Merah Api",
+          "description": "Cabai yang menghasilkan api pembara saat dilempar"
+        },
+        {
+          "id": 4,
+          "name": "Terasi Bau Menyengat",
+          "description": "Terasi yang menghasilkan bau mengusir roh jahat"
+        },
+        {
+          "id": 5,
+          "name": "Keris Pusaka Mbok Srini",
+          "description": "Keris warisan yang melindungi dari bahaya"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Sangkuriang",
+      "collectibles": [
+        {
+          "id": 1,
+          "name": "Dayung Perahu Terbalik",
+          "description": "Dayung yang dapat memanggil badai"
+        },
+        {
+          "id": 2,
+          "name": "Batu Tangkuban Perahu",
+          "description": "Batu pertama yang menandai awal gunung"
+        },
+        {
+          "id": 3,
+          "name": "Tanduk Rusa Ajaib",
+          "description": "Tanduk pemberian ibu yang memberi kekuatan"
+        },
+        {
+          "id": 4,
+          "name": "Palu Pembuat Bendungan",
+          "description": "Palu yang dapat membangun struktur besar"
+        },
+        {
+          "id": 5,
+          "name": "Kain Tenun Dayang Sumbi",
+          "description": "Kain yang tak pernah sobek dan melindungi pemakainya"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Malin Kundang",
+      "collectibles": [
+        {
+          "id": 1,
+          "name": "Kompas Pelaut",
+          "description": "Kompas yang selalu menunjuk arah pulang"
+        },
+        {
+          "id": 2,
+          "name": "Kalung Kayu Ibunda",
+          "description": "Kalung sederhana pemberian ibu sebelum berlayar"
+        },
+        {
+          "id": 3,
+          "name": "Layar Perahu Tua",
+          "description": "Layar pertama yang membawa menuju kejayaan"
+        },
+        {
+          "id": 4,
+          "name": "Batu Kutukan",
+          "description": "Batu yang mengingatkan akan kesombongan"
+        },
+        {
+          "id": 5,
+          "name": "Cincin Pedagang",
+          "description": "Cincin simbol kekayaan yang diraih"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Roro Jonggrang",
+      "collectibles": [
+        {
+          "id": 1,
+          "name": "Mahkota Candi",
+          "description": "Mahkota yang bersinar di puncak candi"
+        },
+        {
+          "id": 2,
+          "name": "Lesung Batu Keramat",
+          "description": "Lesung yang dipukul untuk memanggil fajar"
+        },
+        {
+          "id": 3,
+          "name": "Selendang Sutra Emas",
+          "description": "Selendang yang melambangkan kecantikan dan keanggunan"
+        },
+        {
+          "id": 4,
+          "name": "Arca Dewi",
+          "description": "Arca terakhir yang melengkapi seribu candi"
+        },
+        {
+          "id": 5,
+          "name": "Bunga Kamboja Putih",
+          "description": "Bunga kesayangan yang tumbuh di halaman candi"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Lutung Kasarung",
+      "collectibles": [
+        {
+          "id": 1,
+          "name": "Bulu Lutung Sakti",
+          "description": "Bulu yang dapat berubah menjadi apa saja"
+        },
+        {
+          "id": 2,
+          "name": "Sisir Emas Purbasari",
+          "description": "Sisir yang menyembuhkan penyakit kulit"
+        },
+        {
+          "id": 3,
+          "name": "Tongkat Bambu Ajaib",
+          "description": "Tongkat yang dapat memanggil hewan hutan"
+        },
+        {
+          "id": 4,
+          "name": "Air Mata Kesabaran",
+          "description": "Tetesan air mata yang menyucikan jiwa"
+        },
+        {
+          "id": 5,
+          "name": "Mahkota Daun Beringin",
+          "description": "Mahkota alami yang melambangkan kesederhanaan"
+        }
+      ]
+    }
+  ]
+}
