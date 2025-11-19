@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
 import 'category_list_screen.dart';
+import '../qr/qr_scanner_screen.dart'; // ✅ Add import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -137,17 +138,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Tombol Scan QR
+                // Tombol Scan QR - ✅ FIXED NAVIGATION
                 Material(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   child: InkWell(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Fitur Scan QR akan segera hadir!'),
+                    onTap: () async {
+                      // ✅ Navigate to QR Scanner Screen
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const QRScannerScreen(),
                         ),
                       );
+                      
+                      // ✅ Handle result after scan (if needed)
+                      if (result != null && mounted) {
+                        // Optional: Show success message or give XP
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '✅ Check-in berhasil di ${result['locationName']}!',
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        
+                        // Optional: Give XP bonus
+                        if (widget.onXPGained != null) {
+                          widget.onXPGained!(50); // Give 50 XP for scanning
+                        }
+                      }
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
@@ -174,18 +195,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Scan QR di Museum',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Text(
+                                const Text(
                                   'Dapatkan bonus XP besar!',
                                   style: TextStyle(
                                     fontSize: 12,

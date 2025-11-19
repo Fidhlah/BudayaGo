@@ -5,6 +5,7 @@ import '../../providers/profile_provider.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
 import '../chatbot/chatbot_screen.dart';
+import '../chat/chat_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final String? mascot;
@@ -74,7 +75,7 @@ class _MainScreenState extends State<MainScreen> {
               MaterialPageRoute(
                 builder:
                     (context) =>
-                        ChatbotScreen(mascot: widget.mascot ?? 'default'),
+                        ChatScreen(),
               ),
             );
           },
