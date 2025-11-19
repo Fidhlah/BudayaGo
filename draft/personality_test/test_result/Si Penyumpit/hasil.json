@@ -1,0 +1,41 @@
+{
+  "nama": "Si Penyumpit",
+  "timestamp": "2025-11-18 16:12:23",
+  "dimensi": {
+    "spirituality": {
+      "score": 1,
+      "max_score": 10,
+      "percentage": 10.0
+    },
+    "courage": {
+      "score": 4,
+      "max_score": 11,
+      "percentage": 36.36
+    },
+    "empathy": {
+      "score": 5,
+      "max_score": 16,
+      "percentage": 31.25
+    },
+    "logic": {
+      "score": 3,
+      "max_score": 10,
+      "percentage": 30.0
+    },
+    "creativity": {
+      "score": 1,
+      "max_score": 8,
+      "percentage": 12.5
+    },
+    "social": {
+      "score": 1,
+      "max_score": 9,
+      "percentage": 11.11
+    },
+    "principle": {
+      "score": 5,
+      "max_score": 12,
+      "percentage": 41.67
+    }
+  }
+}

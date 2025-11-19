@@ -1,0 +1,142 @@
+================================================================================
+HASIL PERHITUNGAN EUCLIDEAN DISTANCE
+================================================================================
+
+Subjek: L
+Total dibandingkan: 11 profil
+
+================================================================================
+RANKING KEMIRIPAN (dari paling dekat ke paling jauh)
+================================================================================
+
+1. Timun Mas
+   Euclidean Distance: 52.0410
+   Dimensi:
+      - Logic          :  40.00%
+      - Empathy        :  31.25%
+      - Spirituality   :  30.00%
+      - Courage        :  27.27%
+      - Creativity     :  25.00%
+      - Principle      :  16.67%
+      - Social         :  11.11%
+
+2. hafidh
+   Euclidean Distance: 53.7344
+   Dimensi:
+      - Social         :  44.44%
+      - Logic          :  40.00%
+      - Empathy        :  25.00%
+      - Principle      :  25.00%
+      - Creativity     :  12.50%
+      - Courage        :   9.09%
+      - Spirituality   :   0.00%
+
+3. Si Penyumpit
+   Euclidean Distance: 54.7986
+   Dimensi:
+      - Principle      :  41.67%
+      - Courage        :  36.36%
+      - Empathy        :  31.25%
+      - Logic          :  30.00%
+      - Creativity     :  12.50%
+      - Social         :  11.11%
+      - Spirituality   :  10.00%
+
+4. Sultan Domas
+   Euclidean Distance: 55.3946
+   Dimensi:
+      - Empathy        :  37.50%
+      - Logic          :  30.00%
+      - Courage        :  27.27%
+      - Creativity     :  25.00%
+      - Principle      :  25.00%
+      - Spirituality   :  20.00%
+      - Social         :  11.11%
+
+5. Ciung wanara
+   Euclidean Distance: 59.0015
+   Dimensi:
+      - Principle      :  58.33%
+      - Courage        :  36.36%
+      - Logic          :  30.00%
+      - Empathy        :  18.75%
+      - Creativity     :  12.50%
+      - Spirituality   :   0.00%
+      - Social         :   0.00%
+
+6. Sengeda
+   Euclidean Distance: 77.9075
+   Dimensi:
+      - Empathy        :  43.75%
+      - Spirituality   :  40.00%
+      - Principle      :  25.00%
+      - Social         :  22.22%
+      - Logic          :  20.00%
+      - Courage        :  18.18%
+      - Creativity     :  12.50%
+
+7. Sawerigading
+   Euclidean Distance: 81.8405
+   Dimensi:
+      - Courage        :  81.82%
+      - Empathy        :  25.00%
+      - Principle      :  25.00%
+      - Social         :  22.22%
+      - Spirituality   :  10.00%
+      - Logic          :  10.00%
+      - Creativity     :   0.00%
+
+8. Putri Mandalika
+   Euclidean Distance: 84.9258
+   Dimensi:
+      - Empathy        :  56.25%
+      - Social         :  33.33%
+      - Principle      :  33.33%
+      - Spirituality   :  20.00%
+      - Courage        :  18.18%
+      - Creativity     :  12.50%
+      - Logic          :  10.00%
+
+9. Tuan Tapa
+   Euclidean Distance: 88.5418
+   Dimensi:
+      - Spirituality   :  60.00%
+      - Empathy        :  37.50%
+      - Social         :  22.22%
+      - Logic          :  20.00%
+      - Courage        :  18.18%
+      - Creativity     :  12.50%
+      - Principle      :   8.33%
+
+10. Lutung Kasarung
+   Euclidean Distance: 91.0744
+   Dimensi:
+      - Empathy        :  56.25%
+      - Social         :  44.44%
+      - Principle      :  25.00%
+      - Spirituality   :  20.00%
+      - Courage        :  18.18%
+      - Logic          :  10.00%
+      - Creativity     :   0.00%
+
+11. Purbasari
+   Euclidean Distance: 93.6794
+   Dimensi:
+      - Principle      :  50.00%
+      - Empathy        :  43.75%
+      - Spirituality   :  30.00%
+      - Social         :  22.22%
+      - Courage        :  18.18%
+      - Logic          :   0.00%
+      - Creativity     :   0.00%
+
+================================================================================
+KETERANGAN
+================================================================================
+
+Euclidean Distance:
+- Semakin kecil nilainya = semakin mirip kepribadiannya
+- Nilai 0 = identik sempurna
+- Nilai besar = perbedaan kepribadian signifikan
+
+Formula: sqrt(sum((p1 - p2)^2)) untuk semua dimensi

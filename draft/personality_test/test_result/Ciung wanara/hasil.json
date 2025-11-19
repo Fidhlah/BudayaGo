@@ -1,0 +1,41 @@
+{
+  "nama": "Ciung wanara",
+  "timestamp": "2025-11-18 16:40:52",
+  "dimensi": {
+    "spirituality": {
+      "score": 0,
+      "max_score": 10,
+      "percentage": 0.0
+    },
+    "courage": {
+      "score": 4,
+      "max_score": 11,
+      "percentage": 36.36
+    },
+    "empathy": {
+      "score": 3,
+      "max_score": 16,
+      "percentage": 18.75
+    },
+    "logic": {
+      "score": 3,
+      "max_score": 10,
+      "percentage": 30.0
+    },
+    "creativity": {
+      "score": 1,
+      "max_score": 8,
+      "percentage": 12.5
+    },
+    "social": {
+      "score": 0,
+      "max_score": 9,
+      "percentage": 0.0
+    },
+    "principle": {
+      "score": 7,
+      "max_score": 12,
+      "percentage": 58.33
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "nama": "Purbasari",
+  "timestamp": "2025-11-18 22:58:35",
+  "dimensi": {
+    "spirituality": {
+      "score": 3,
+      "max_score": 10,
+      "percentage": 30.0
+    },
+    "courage": {
+      "score": 2,
+      "max_score": 11,
+      "percentage": 18.18
+    },
+    "empathy": {
+      "score": 7,
+      "max_score": 16,
+      "percentage": 43.75
+    },
+    "logic": {
+      "score": 0,
+      "max_score": 10,
+      "percentage": 0.0
+    },
+    "creativity": {
+      "score": 0,
+      "max_score": 8,
+      "percentage": 0.0
+    },
+    "social": {
+      "score": 2,
+      "max_score": 9,
+      "percentage": 22.22
+    },
+    "principle": {
+      "score": 6,
+      "max_score": 12,
+      "percentage": 50.0
+    }
+  }
+}
