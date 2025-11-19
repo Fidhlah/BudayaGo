@@ -151,10 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => const QRScannerScreen(),
                         ),
                       );
-                      
+
                       // ✅ Handle result after scan (if needed)
                       if (result != null && mounted) {
-                        // Optional: Show success message or give XP
+                        // Show success message
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -163,11 +163,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        
-                        // Optional: Give XP bonus
-                        if (widget.onXPGained != null) {
-                          widget.onXPGained!(50); // Give 50 XP for scanning
-                        }
+
+                        // Give XP bonus using HomeProvider
+                        final homeProvider = Provider.of<HomeProvider>(
+                          context,
+                          listen: false,
+                        );
+                        homeProvider.claimXP(50); // Give 50 XP for scanning
                       }
                     },
                     borderRadius: BorderRadius.circular(16),
