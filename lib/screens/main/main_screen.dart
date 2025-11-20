@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../widgets/custom_bottom_navbar.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
 import '../chatbot/chatbot_screen.dart';
@@ -72,11 +73,7 @@ class _MainScreenState extends State<MainScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder:
-                    (context) =>
-                        ChatScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => ChatScreen()),
             );
           },
           icon: const Icon(
@@ -87,31 +84,9 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color:
-                    _currentIndex == 0 ? Colors.orange.shade700 : Colors.grey,
-              ),
-              onPressed: () => setState(() => _currentIndex = 0),
-            ),
-            const SizedBox(width: 40),
-            IconButton(
-              icon: Icon(
-                Icons.person,
-                color:
-                    _currentIndex == 1 ? Colors.orange.shade700 : Colors.grey,
-              ),
-              onPressed: () => setState(() => _currentIndex = 1),
-            ),
-          ],
-        ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
       ),
     );
   }
