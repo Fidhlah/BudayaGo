@@ -9,6 +9,9 @@ class UserProfile {
   final int level;
   final DateTime createdAt;
   final DateTime? lastActive;
+  final bool isPelakuBudaya;
+  final bool hideProgress;
+  final List<String> uploadedKaryaIds;
 
   UserProfile({
     required this.id,
@@ -19,6 +22,9 @@ class UserProfile {
     required this.level,
     required this.createdAt,
     this.lastActive,
+    this.isPelakuBudaya = false,
+    this.hideProgress = false,
+    this.uploadedKaryaIds = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -31,6 +37,9 @@ class UserProfile {
       'level': level,
       'created_at': createdAt.toIso8601String(),
       'last_active': lastActive?.toIso8601String(),
+      'is_pelaku_budaya': isPelakuBudaya,
+      'hide_progress': hideProgress,
+      'uploaded_karya_ids': uploadedKaryaIds,
     };
   }
 
@@ -47,6 +56,13 @@ class UserProfile {
           json['last_active'] != null
               ? DateTime.parse(json['last_active'] as String)
               : null,
+      isPelakuBudaya: json['is_pelaku_budaya'] as bool? ?? false,
+      hideProgress: json['hide_progress'] as bool? ?? false,
+      uploadedKaryaIds:
+          (json['uploaded_karya_ids'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
     );
   }
 
@@ -59,6 +75,9 @@ class UserProfile {
     int? level,
     DateTime? createdAt,
     DateTime? lastActive,
+    bool? isPelakuBudaya,
+    bool? hideProgress,
+    List<String>? uploadedKaryaIds,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -69,6 +88,9 @@ class UserProfile {
       level: level ?? this.level,
       createdAt: createdAt ?? this.createdAt,
       lastActive: lastActive ?? this.lastActive,
+      isPelakuBudaya: isPelakuBudaya ?? this.isPelakuBudaya,
+      hideProgress: hideProgress ?? this.hideProgress,
+      uploadedKaryaIds: uploadedKaryaIds ?? this.uploadedKaryaIds,
     );
   }
 }
@@ -151,6 +173,9 @@ class ProfileProvider extends ChangeNotifier {
         level: 1,
         createdAt: DateTime.now(),
         lastActive: DateTime.now(),
+        isPelakuBudaya: false,
+        hideProgress: false,
+        uploadedKaryaIds: [],
       );
 
       debugPrint('✅ Profile loaded: ${_profile?.email}');
@@ -164,7 +189,12 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   /// Update user profile
-  Future<void> updateProfile({String? displayName, String? mascot}) async {
+  Future<void> updateProfile({
+    String? displayName,
+    String? mascot,
+    bool? isPelakuBudaya,
+    bool? hideProgress,
+  }) async {
     if (_profile == null) {
       _error = 'No profile to update';
       notifyListeners();
@@ -182,6 +212,8 @@ class ProfileProvider extends ChangeNotifier {
       _profile = _profile!.copyWith(
         displayName: displayName ?? _profile!.displayName,
         mascot: mascot ?? _profile!.mascot,
+        isPelakuBudaya: isPelakuBudaya ?? _profile!.isPelakuBudaya,
+        hideProgress: hideProgress ?? _profile!.hideProgress,
         lastActive: DateTime.now(),
       );
 
@@ -251,6 +283,50 @@ class ProfileProvider extends ChangeNotifier {
       debugPrint('❌ ProfileProvider.addCollectible error: $e');
       notifyListeners();
     }
+  }
+
+  /// Upgrade user to Pelaku Budaya
+  Future<void> upgradeToPelakuBudaya() async {
+    if (_profile == null) {
+      _error = 'No profile loaded';
+      notifyListeners();
+      return;
+    }
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      // TODO: Update in Supabase
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      _profile = _profile!.copyWith(
+        isPelakuBudaya: true,
+        lastActive: DateTime.now(),
+      );
+
+      debugPrint('✅ User upgraded to Pelaku Budaya');
+    } catch (e) {
+      _error = 'Failed to upgrade: $e';
+      debugPrint('❌ ProfileProvider.upgradeToPelakuBudaya error: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Add uploaded karya ID
+  void addUploadedKarya(String karyaId) {
+    if (_profile == null) return;
+
+    final updatedIds = List<String>.from(_profile!.uploadedKaryaIds)
+      ..add(karyaId);
+    _profile = _profile!.copyWith(uploadedKaryaIds: updatedIds);
+    notifyListeners();
+
+    // TODO: Sync to Supabase
+    debugPrint('✅ Added karya: $karyaId');
   }
 
   /// Clear all data (for logout)

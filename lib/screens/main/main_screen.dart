@@ -6,7 +6,7 @@ import '../../widgets/custom_bottom_navbar.dart';
 import '../home/home_screen.dart';
 import '../eksplorasi/eksplorasi_screen.dart';
 import '../karya/karya_screen.dart';
-import '../profile/profile_screen.dart';
+import '../profile/new_profile_screen.dart';
 import '../chat/chat_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
       HomeScreen(onNavigateToTab: _navigateToTab),
       const EksplorasiScreen(),
       const KaryaScreen(),
-      ProfileScreen(mascot: widget.mascot ?? 'default'),
+      NewProfileScreen(mascot: widget.mascot ?? 'default'),
     ];
 
     return Scaffold(
