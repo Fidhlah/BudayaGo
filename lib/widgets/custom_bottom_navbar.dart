@@ -18,22 +18,40 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconButton(
-            icon: Icon(
-              Icons.home,
-              color: currentIndex == 0 ? Colors.orange.shade700 : Colors.grey,
-            ),
-            onPressed: () => onTap(0),
-          ),
-          const SizedBox(width: 40),
-          IconButton(
-            icon: Icon(
-              Icons.person,
-              color: currentIndex == 1 ? Colors.orange.shade700 : Colors.grey,
-            ),
-            onPressed: () => onTap(1),
-          ),
+          _buildNavItem(Icons.home, 0, 'Home'),
+          _buildNavItem(Icons.explore, 1, 'Eksplorasi'),
+          const SizedBox(width: 40), // Space for FAB
+          _buildNavItem(Icons.shopping_bag, 2, 'Karya'),
+          _buildNavItem(Icons.person, 3, 'Profile'),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index, String label) {
+    final isActive = currentIndex == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () => onTap(index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? Colors.orange.shade700 : Colors.grey,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isActive ? Colors.orange.shade700 : Colors.grey,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

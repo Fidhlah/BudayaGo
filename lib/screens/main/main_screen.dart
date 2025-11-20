@@ -4,8 +4,9 @@ import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../widgets/custom_bottom_navbar.dart';
 import '../home/home_screen.dart';
+import '../eksplorasi/eksplorasi_screen.dart';
+import '../karya/karya_screen.dart';
 import '../profile/profile_screen.dart';
-import '../chatbot/chatbot_screen.dart';
 import '../chat/chat_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -48,6 +49,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final screens = [
       const HomeScreen(),
+      const EksplorasiScreen(),
+      const KaryaScreen(),
       ProfileScreen(mascot: widget.mascot ?? 'default'),
     ];
 
