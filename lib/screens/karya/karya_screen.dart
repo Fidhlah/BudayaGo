@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_dimensions.dart';
+import '../../theme/app_text_styles.dart';
 import 'umkm_detail_screen.dart';
 
 class KaryaScreen extends StatefulWidget {
@@ -21,7 +24,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Ibu Siti - Solo',
       'tag': 'Batik',
       'umkm': 'Batik Nusantara',
-      'color': Colors.blue.shade300,
+      'color': AppColors.blueLight,
       'height': 200.0,
       'icon': Icons.auto_awesome,
     },
@@ -30,7 +33,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Pak Budi - Jepara',
       'tag': 'Furniture',
       'umkm': 'Kerajinan Kayu',
-      'color': Colors.brown.shade300,
+      'color': AppColors.brownLight,
       'height': 280.0,
       'icon': Icons.table_restaurant,
     },
@@ -39,7 +42,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Pak Wawan - Yogyakarta',
       'tag': 'Keramik',
       'umkm': 'Gerabah Tradisional',
-      'color': Colors.orange.shade300,
+      'color': AppColors.orange300,
       'height': 160.0,
       'icon': Icons.local_florist,
     },
@@ -48,7 +51,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Ibu Ani - Tasikmalaya',
       'tag': 'Anyaman',
       'umkm': 'Anyaman Bambu',
-      'color': Colors.green.shade300,
+      'color': AppColors.greenLight,
       'height': 220.0,
       'icon': Icons.shopping_bag,
     },
@@ -57,7 +60,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Ibu Maria - NTT',
       'tag': 'Tenun',
       'umkm': 'Tenun Ikat',
-      'color': Colors.purple.shade300,
+      'color': AppColors.purpleLight,
       'height': 190.0,
       'icon': Icons.texture,
     },
@@ -66,7 +69,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Pak Dalang - Solo',
       'tag': 'Wayang',
       'umkm': 'Wayang Kulit',
-      'color': Colors.red.shade300,
+      'color': AppColors.redLight,
       'height': 240.0,
       'icon': Icons.person,
     },
@@ -75,7 +78,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Ibu Ratna - Pekalongan',
       'tag': 'Batik',
       'umkm': 'Batik Nusantara',
-      'color': Colors.indigo.shade300,
+      'color': AppColors.indigoLight,
       'height': 170.0,
       'icon': Icons.auto_awesome,
     },
@@ -84,7 +87,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
       'creator': 'Pak Joko - Jepara',
       'tag': 'Furniture',
       'umkm': 'Kerajinan Kayu',
-      'color': Colors.brown.shade400,
+      'color': AppColors.brownDark,
       'height': 210.0,
       'icon': Icons.chair,
     },
@@ -112,15 +115,13 @@ class _KaryaScreenState extends State<KaryaScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Karya Pelaku Budaya'),
-        backgroundColor: Colors.orange.shade700,
-        elevation: 0,
       ),
       body: Column(
         children: [
           // Search bar
           Container(
-            padding: const EdgeInsets.all(16.0),
-            color: Colors.orange.shade50,
+            padding: const EdgeInsets.all(AppDimensions.paddingM),
+            color: AppColors.orange50,
             child: Column(
               children: [
                 TextField(
@@ -128,13 +129,13 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Cari karya, pelaku, atau tag...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                    prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                     suffixIcon:
                         _searchQuery.isNotEmpty
                             ? IconButton(
                               icon: const Icon(
                                 Icons.clear,
-                                color: Colors.orange,
+                                color: AppColors.primary,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -145,7 +146,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                             )
                             : null,
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.background,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
@@ -164,11 +165,11 @@ class _KaryaScreenState extends State<KaryaScreen> {
                 // Tag suggestions
                 if (_showSuggestions && _searchQuery.isEmpty)
                   Container(
-                    margin: const EdgeInsets.only(top: 12),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(top: AppDimensions.spaceS),
+                    padding: const EdgeInsets.all(AppDimensions.paddingS),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.05),
@@ -185,15 +186,13 @@ class _KaryaScreenState extends State<KaryaScreen> {
                             Icon(
                               Icons.local_offer,
                               size: 16,
-                              color: Colors.orange.shade700,
+                              color: AppColors.orange700,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppDimensions.spaceXS),
                             Text(
                               'Cari berdasarkan tag',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade700,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ],
@@ -203,12 +202,12 @@ class _KaryaScreenState extends State<KaryaScreen> {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            _buildTagChip('Batik', Colors.blue),
-                            _buildTagChip('Furniture', Colors.brown),
-                            _buildTagChip('Keramik', Colors.orange),
-                            _buildTagChip('Anyaman', Colors.green),
-                            _buildTagChip('Tenun', Colors.purple),
-                            _buildTagChip('Wayang', Colors.red),
+                            _buildTagChip('Batik', AppColors.blue),
+                            _buildTagChip('Furniture', AppColors.brown),
+                            _buildTagChip('Keramik', AppColors.orange),
+                            _buildTagChip('Anyaman', AppColors.green),
+                            _buildTagChip('Tenun', AppColors.purple),
+                            _buildTagChip('Wayang', AppColors.red),
                           ],
                         ),
                       ],
@@ -227,23 +226,21 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         children: [
                           Icon(
                             Icons.search_off,
-                            size: 64,
-                            color: Colors.grey.shade400,
+                            size: AppDimensions.iconXL,
+                            color: AppColors.grey400,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spaceM),
                           Text(
                             'Tidak ada karya yang ditemukan',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey.shade600,
+                            style: AppTextStyles.h6.copyWith(
+                              color: AppColors.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppDimensions.spaceXS),
                           Text(
                             'Coba kata kunci lain',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade500,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textTertiary,
                             ),
                           ),
                         ],
@@ -374,31 +371,31 @@ class _KaryaScreenState extends State<KaryaScreen> {
           // Map ke data UMKM yang sesuai
           switch (umkmName) {
             case 'Batik Nusantara':
-              accentColor = Colors.blue;
+              accentColor = AppColors.blue;
               category = 'Kain & Tekstil';
               break;
             case 'Kerajinan Kayu':
-              accentColor = Colors.brown;
+              accentColor = AppColors.brown;
               category = 'Furniture & Dekorasi';
               break;
             case 'Gerabah Tradisional':
-              accentColor = Colors.orange;
+              accentColor = AppColors.orange;
               category = 'Keramik & Tembikar';
               break;
             case 'Anyaman Bambu':
-              accentColor = Colors.green;
+              accentColor = AppColors.green;
               category = 'Kerajinan Tangan';
               break;
             case 'Tenun Ikat':
-              accentColor = Colors.purple;
+              accentColor = AppColors.purple;
               category = 'Kain & Tekstil';
               break;
             case 'Wayang Kulit':
-              accentColor = Colors.red;
+              accentColor = AppColors.red;
               category = 'Seni & Budaya';
               break;
             default:
-              accentColor = Colors.grey;
+              accentColor = AppColors.grey500;
               category = 'Kerajinan';
           }
 
@@ -489,7 +486,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   const SizedBox(height: 6),
                   Text(
                     item['creator'] as String,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

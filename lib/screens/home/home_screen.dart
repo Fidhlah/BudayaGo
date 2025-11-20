@@ -2,8 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_dimensions.dart';
+import '../../theme/app_text_styles.dart';
 import 'category_list_screen.dart';
-import '../qr/qr_scanner_screen.dart'; // ✅ Add import
+import '../qr/qr_scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateToTab;
@@ -26,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Ibu Siti - Solo',
       'tag': 'Batik',
       'umkm': 'Batik Nusantara',
-      'color': Colors.blue.shade300,
+      'color': AppColors.blueLight,
       'icon': Icons.auto_awesome,
     },
     {
@@ -34,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Pak Budi - Jepara',
       'tag': 'Furniture',
       'umkm': 'Kerajinan Kayu',
-      'color': Colors.brown.shade300,
+      'color': AppColors.brownLight,
       'icon': Icons.table_restaurant,
     },
     {
@@ -42,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Pak Wawan - Yogyakarta',
       'tag': 'Keramik',
       'umkm': 'Gerabah Tradisional',
-      'color': Colors.orange.shade300,
+      'color': AppColors.orange300,
       'icon': Icons.local_florist,
     },
     {
@@ -50,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Ibu Ani - Tasikmalaya',
       'tag': 'Anyaman',
       'umkm': 'Anyaman Bambu',
-      'color': Colors.green.shade300,
+      'color': AppColors.greenLight,
       'icon': Icons.shopping_bag,
     },
     {
@@ -58,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Ibu Maria - NTT',
       'tag': 'Tenun',
       'umkm': 'Tenun Ikat',
-      'color': Colors.purple.shade300,
+      'color': AppColors.purpleLight,
       'icon': Icons.texture,
     },
     {
@@ -66,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'creator': 'Pak Dalang - Solo',
       'tag': 'Wayang',
       'umkm': 'Wayang Kulit',
-      'color': Colors.red.shade300,
+      'color': AppColors.redLight,
       'icon': Icons.person,
     },
   ];
@@ -136,19 +139,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Text(
                             'Halo, Penjelajah!',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTextStyles.h3,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppDimensions.spaceXS),
                           Consumer<HomeProvider>(
                             builder: (context, homeProvider, _) {
                               return Text(
                                 'Level ${homeProvider.userLevel} | ${homeProvider.userXP} XP',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade600,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.textSecondary,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               );
@@ -180,19 +179,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Museum Nasional Indonesia',
                         'Jelajahi koleksi budaya dari seluruh Nusantara',
                         Icons.museum,
-                        [Colors.purple.shade400, Colors.blue.shade300],
+                        AppColors.purpleBlueGradient,
                       ),
                       _buildAdCard(
                         'Sanggar Seni Budaya',
                         'Pelajari tari dan musik tradisional Indonesia',
                         Icons.theater_comedy,
-                        [Colors.orange.shade400, Colors.pink.shade300],
+                        AppColors.orangePinkGradient,
                       ),
                       _buildAdCard(
                         'Galeri Batik Nusantara',
                         'Temukan keindahan motif batik dari berbagai daerah',
                         Icons.palette,
-                        [Colors.teal.shade400, Colors.green.shade300],
+                        [AppColors.greenLight, AppColors.green],
                       ),
                     ],
                   ),
@@ -221,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             content: Text(
                               '✅ Check-in berhasil di ${result['locationName']}!',
                             ),
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppColors.success,
                           ),
                         );
 
@@ -238,22 +237,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Colors.orange.shade200,
+                          color: AppColors.orange200,
                           width: 2,
                         ),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(AppDimensions.paddingS),
                             decoration: BoxDecoration(
-                              color: Colors.orange.shade50,
-                              borderRadius: BorderRadius.circular(12),
+                              color: AppColors.orange50,
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                             ),
                             child: Icon(
                               Icons.qr_code_scanner,
-                              color: Colors.orange.shade700,
+                              color: AppColors.orange700,
                               size: 32,
                             ),
                           ),
@@ -264,16 +263,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 const Text(
                                   'Scan QR di Museum',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: AppTextStyles.h6,
                                 ),
-                                const Text(
+                                Text(
                                   'Dapatkan bonus XP besar!',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -293,10 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const Text(
                       'Eksplorasi Pengetahuan',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyles.h4,
                     ),
                     TextButton(
                       onPressed: () {
@@ -305,10 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Text(
                         'Lihat Semua',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.orange.shade700,
-                          fontWeight: FontWeight.w600,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.orange700,
                         ),
                       ),
                     ),
@@ -362,12 +352,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: Colors.orange.shade50,
+                                    color: AppColors.orange50,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
                                     category['icon'] as IconData,
-                                    color: Colors.orange.shade700,
+                                    color: AppColors.orange700,
                                     size: 28,
                                   ),
                                 ),
@@ -396,10 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const Text(
                       'Karya Pelaku Budaya',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyles.h4,
                     ),
                     TextButton(
                       onPressed: () {
@@ -408,10 +395,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Text(
                         'Lihat Semua',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.orange.shade700,
-                          fontWeight: FontWeight.w600,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.orange700,
                         ),
                       ),
                     ),
@@ -527,9 +512,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         item['creator'] as String,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade600,
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          color: AppColors.textSecondary,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -582,18 +566,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: AppTextStyles.h5.copyWith(color: Colors.white),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spaceXS),
                 Text(
                   description,
-                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -626,9 +606,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             width: 60,
             height: 60,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.orange.shade50,
+              color: AppColors.orange50,
             ),
           ),
           // Progress indicator
@@ -638,17 +618,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CircularProgressIndicator(
               value: progress,
               strokeWidth: 4,
-              backgroundColor: Colors.orange.shade100,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange.shade600),
+              backgroundColor: AppColors.orange100,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.orange600),
             ),
           ),
           // Level number in center
           Text(
             '$level',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.orange.shade700,
+            style: AppTextStyles.h4.copyWith(
+              color: AppColors.orange700,
             ),
           ),
         ],

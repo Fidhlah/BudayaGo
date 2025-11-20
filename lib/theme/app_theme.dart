@@ -28,7 +28,7 @@ class AppTheme {
 
       // ========== APP BAR ==========
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.batikGold,
+        backgroundColor: AppColors.orange700,
         foregroundColor: Colors.white,
         elevation: AppDimensions.appBarElevation,
         centerTitle: true,
