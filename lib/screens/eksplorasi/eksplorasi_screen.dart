@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'category_detail_screen.dart';
 
 class EksplorasiScreen extends StatelessWidget {
   const EksplorasiScreen({Key? key}) : super(key: key);
@@ -43,11 +44,15 @@ class EksplorasiScreen extends StatelessWidget {
             final category = categories[index];
             return GestureDetector(
               onTap: () {
-                // TODO: Navigate to category detail
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${category['name']} - Coming Soon!'),
-                    duration: const Duration(seconds: 2),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CategoryDetailScreen(
+                          categoryName: category['name'] as String,
+                          categoryColor: category['color'] as Color,
+                          categoryIcon: category['icon'] as IconData,
+                        ),
                   ),
                 );
               },

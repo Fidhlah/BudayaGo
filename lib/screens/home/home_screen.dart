@@ -76,30 +76,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Halo, Penjelajah!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Halo, Penjelajah!',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Consumer<HomeProvider>(
-                          builder: (context, homeProvider, _) {
-                            return Text(
-                              'Level \${homeProvider.userLevel} | \${homeProvider.userXP} XP',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Consumer<HomeProvider>(
+                            builder: (context, homeProvider, _) {
+                              return Text(
+                                'Level ${homeProvider.userLevel} | ${homeProvider.userXP} XP',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 12),
                     Consumer<HomeProvider>(
                       builder: (context, homeProvider, _) {
                         return _buildLevelProgress(
