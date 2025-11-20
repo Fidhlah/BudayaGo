@@ -100,10 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.orange.shade100,
-                      child: Icon(Icons.person, color: Colors.orange.shade700),
+                    Consumer<HomeProvider>(
+                      builder: (context, homeProvider, _) {
+                        return _buildLevelProgress(
+                          homeProvider.userLevel,
+                          homeProvider.progressToNextLevel,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -447,6 +450,47 @@ class _HomeScreenState extends State<HomeScreen> {
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 35, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLevelProgress(int level, double progress) {
+    return SizedBox(
+      width: 60,
+      height: 60,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Background circle
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.orange.shade50,
+            ),
+          ),
+          // Progress indicator
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 4,
+              backgroundColor: Colors.orange.shade100,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange.shade600),
+            ),
+          ),
+          // Level number in center
+          Text(
+            '$level',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.orange.shade700,
+            ),
           ),
         ],
       ),
