@@ -45,10 +45,16 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void _navigateToTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screens = [
-      const HomeScreen(),
+      HomeScreen(onNavigateToTab: _navigateToTab),
       const EksplorasiScreen(),
       const KaryaScreen(),
       ProfileScreen(mascot: widget.mascot ?? 'default'),

@@ -6,7 +6,9 @@ import 'category_list_screen.dart';
 import '../qr/qr_scanner_screen.dart'; // ✅ Add import
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final Function(int)? onNavigateToTab;
+
+  const HomeScreen({Key? key, this.onNavigateToTab}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -16,6 +18,58 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
   Timer? _timer;
   int _currentPage = 0;
+
+  // Karya items data (getter to avoid Flutter Web issues)
+  List<Map<String, dynamic>> get _karyaItems => [
+    {
+      'name': 'Batik Tulis Parang',
+      'creator': 'Ibu Siti - Solo',
+      'tag': 'Batik',
+      'umkm': 'Batik Nusantara',
+      'color': Colors.blue.shade300,
+      'icon': Icons.auto_awesome,
+    },
+    {
+      'name': 'Meja Kayu Jati Ukir',
+      'creator': 'Pak Budi - Jepara',
+      'tag': 'Furniture',
+      'umkm': 'Kerajinan Kayu',
+      'color': Colors.brown.shade300,
+      'icon': Icons.table_restaurant,
+    },
+    {
+      'name': 'Guci Kasongan',
+      'creator': 'Pak Wawan - Yogyakarta',
+      'tag': 'Keramik',
+      'umkm': 'Gerabah Tradisional',
+      'color': Colors.orange.shade300,
+      'icon': Icons.local_florist,
+    },
+    {
+      'name': 'Tas Anyaman Premium',
+      'creator': 'Ibu Ani - Tasikmalaya',
+      'tag': 'Anyaman',
+      'umkm': 'Anyaman Bambu',
+      'color': Colors.green.shade300,
+      'icon': Icons.shopping_bag,
+    },
+    {
+      'name': 'Kain Tenun Flores',
+      'creator': 'Ibu Maria - NTT',
+      'tag': 'Tenun',
+      'umkm': 'Tenun Ikat',
+      'color': Colors.purple.shade300,
+      'icon': Icons.texture,
+    },
+    {
+      'name': 'Wayang Arjuna',
+      'creator': 'Pak Dalang - Solo',
+      'tag': 'Wayang',
+      'umkm': 'Wayang Kulit',
+      'color': Colors.red.shade300,
+      'icon': Icons.person,
+    },
+  ];
 
   @override
   void initState() {
@@ -234,9 +288,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 32),
 
                 // Section: Eksplorasi Pengetahuan
-                const Text(
-                  'Eksplorasi Pengetahuan',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Eksplorasi Pengetahuan',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to Eksplorasi tab (index 1)
+                        widget.onNavigateToTab?.call(1);
+                      },
+                      child: Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.orange.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -315,75 +391,154 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 32),
 
                 // Section: Karya Pelaku Budaya (Mockup UMKM)
-                const Text(
-                  'Karya Pelaku Budaya',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Karya Pelaku Budaya',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to Karya tab (index 2)
+                        widget.onNavigateToTab?.call(2);
+                      },
+                      child: Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.orange.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
-                  height: 180,
+                  height: 220,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: 3,
+                    itemCount: _karyaItems.length,
                     itemBuilder: (context, index) {
+                      final item = _karyaItems[index];
                       return Padding(
                         padding: const EdgeInsets.only(right: 16),
-                        child: Container(
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade100,
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16),
+                        child: GestureDetector(
+                          onTap: () {
+                            // Navigate to Karya tab when tapped
+                            widget.onNavigateToTab?.call(2);
+                          },
+                          child: Container(
+                            width: 160,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Image with gradient
+                                Container(
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        (item['color'] as Color).withOpacity(
+                                          0.8,
+                                        ),
+                                        (item['color'] as Color).withOpacity(
+                                          0.4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Decorative icon
+                                      Center(
+                                        child: Icon(
+                                          item['icon'] as IconData,
+                                          size: 50,
+                                          color: Colors.white.withOpacity(0.4),
+                                        ),
+                                      ),
+                                      // Tag at bottom
+                                      Positioned(
+                                        bottom: 8,
+                                        left: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(
+                                              0.9,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            item['tag'] as String,
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              color: item['color'] as Color,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.shopping_bag,
-                                    size: 40,
-                                    color: Colors.orange.shade300,
+                                // Content
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['name'] as String,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        item['creator'] as String,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'UMKM ${index + 1}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Kerajinan Lokal',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       );
