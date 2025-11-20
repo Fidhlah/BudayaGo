@@ -113,9 +113,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Karya Pelaku Budaya'),
-      ),
+      appBar: AppBar(title: const Text('Karya Pelaku Budaya')),
       body: Column(
         children: [
           // Search bar
@@ -129,7 +127,10 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Cari karya, pelaku, atau tag...',
-                    prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppColors.primary,
+                    ),
                     suffixIcon:
                         _searchQuery.isNotEmpty
                             ? IconButton(
@@ -169,7 +170,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
                     padding: const EdgeInsets.all(AppDimensions.paddingS),
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.05),

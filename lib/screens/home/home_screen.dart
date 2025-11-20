@@ -240,15 +240,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppColors.orange200,
                           width: 2,
                         ),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(AppDimensions.paddingS),
+                            padding: const EdgeInsets.all(
+                              AppDimensions.paddingS,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.orange50,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusM,
+                              ),
                             ),
                             child: Icon(
                               Icons.qr_code_scanner,
@@ -384,10 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Karya Pelaku Budaya',
-                      style: AppTextStyles.h4,
-                    ),
+                    const Text('Karya Pelaku Budaya', style: AppTextStyles.h4),
                     TextButton(
                       onPressed: () {
                         // Navigate to Karya tab (index 2)
@@ -619,15 +622,15 @@ class _HomeScreenState extends State<HomeScreen> {
               value: progress,
               strokeWidth: 4,
               backgroundColor: AppColors.orange100,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.orange600),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.orange600,
+              ),
             ),
           ),
           // Level number in center
           Text(
             '$level',
-            style: AppTextStyles.h4.copyWith(
-              color: AppColors.orange700,
-            ),
+            style: AppTextStyles.h4.copyWith(color: AppColors.orange700),
           ),
         ],
       ),
