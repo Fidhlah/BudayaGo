@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'umkm_detail_screen.dart';
 
-class KaryaScreen extends StatelessWidget {
+class KaryaScreen extends StatefulWidget {
   const KaryaScreen({Key? key}) : super(key: key);
+
+  @override
+  State<KaryaScreen> createState() => _KaryaScreenState();
+}
+
+class _KaryaScreenState extends State<KaryaScreen> {
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +102,112 @@ class KaryaScreen extends StatelessWidget {
         backgroundColor: Colors.orange.shade700,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _buildMasonryLayout(context, karyaItems),
-        ),
+      body: Column(
+        children: [
+          // Search bar
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            color: Colors.orange.shade50,
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Cari karya, pelaku, atau tag...',
+                prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                suffixIcon:
+                    _searchQuery.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.orange),
+                          onPressed: () {
+                            setState(() {
+                              _searchController.clear();
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                        : null,
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+            ),
+          ),
+          // Content
+          Expanded(
+            child:
+                _getFilteredItems(karyaItems).isEmpty
+                    ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Tidak ada karya yang ditemukan',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Coba kata kunci lain',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    : SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _buildMasonryLayout(
+                          context,
+                          _getFilteredItems(karyaItems),
+                        ),
+                      ),
+                    ),
+          ),
+        ],
       ),
     );
+  }
+
+  List<Map<String, dynamic>> _getFilteredItems(
+    List<Map<String, dynamic>> items,
+  ) {
+    if (_searchQuery.isEmpty) {
+      return items;
+    }
+
+    return items.where((item) {
+      final name = (item['name'] as String).toLowerCase();
+      final creator = (item['creator'] as String).toLowerCase();
+      final tag = (item['tag'] as String).toLowerCase();
+      final umkm = (item['umkm'] as String).toLowerCase();
+
+      return name.contains(_searchQuery) ||
+          creator.contains(_searchQuery) ||
+          tag.contains(_searchQuery) ||
+          umkm.contains(_searchQuery);
+    }).toList();
   }
 
   Widget _buildMasonryLayout(
