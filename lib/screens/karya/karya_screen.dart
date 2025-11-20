@@ -11,91 +11,104 @@ class KaryaScreen extends StatefulWidget {
 class _KaryaScreenState extends State<KaryaScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _showSuggestions = false;
+
+  // Mock data karya dengan variasi ukuran
+  List<Map<String, dynamic>> get karyaItems => [
+    {
+      'name': 'Batik Tulis Parang',
+      'creator': 'Ibu Siti - Solo',
+      'tag': 'Batik',
+      'umkm': 'Batik Nusantara',
+      'color': Colors.blue.shade300,
+      'height': 200.0,
+      'icon': Icons.auto_awesome,
+    },
+    {
+      'name': 'Meja Kayu Jati Ukir',
+      'creator': 'Pak Budi - Jepara',
+      'tag': 'Furniture',
+      'umkm': 'Kerajinan Kayu',
+      'color': Colors.brown.shade300,
+      'height': 280.0,
+      'icon': Icons.table_restaurant,
+    },
+    {
+      'name': 'Guci Kasongan',
+      'creator': 'Pak Wawan - Yogyakarta',
+      'tag': 'Keramik',
+      'umkm': 'Gerabah Tradisional',
+      'color': Colors.orange.shade300,
+      'height': 160.0,
+      'icon': Icons.local_florist,
+    },
+    {
+      'name': 'Tas Anyaman Premium',
+      'creator': 'Ibu Ani - Tasikmalaya',
+      'tag': 'Anyaman',
+      'umkm': 'Anyaman Bambu',
+      'color': Colors.green.shade300,
+      'height': 220.0,
+      'icon': Icons.shopping_bag,
+    },
+    {
+      'name': 'Kain Tenun Flores',
+      'creator': 'Ibu Maria - NTT',
+      'tag': 'Tenun',
+      'umkm': 'Tenun Ikat',
+      'color': Colors.purple.shade300,
+      'height': 190.0,
+      'icon': Icons.texture,
+    },
+    {
+      'name': 'Wayang Arjuna',
+      'creator': 'Pak Dalang - Solo',
+      'tag': 'Wayang',
+      'umkm': 'Wayang Kulit',
+      'color': Colors.red.shade300,
+      'height': 240.0,
+      'icon': Icons.person,
+    },
+    {
+      'name': 'Batik Cap Kawung',
+      'creator': 'Ibu Ratna - Pekalongan',
+      'tag': 'Batik',
+      'umkm': 'Batik Nusantara',
+      'color': Colors.indigo.shade300,
+      'height': 170.0,
+      'icon': Icons.auto_awesome,
+    },
+    {
+      'name': 'Kursi Tamu Ukir',
+      'creator': 'Pak Joko - Jepara',
+      'tag': 'Furniture',
+      'umkm': 'Kerajinan Kayu',
+      'color': Colors.brown.shade400,
+      'height': 210.0,
+      'icon': Icons.chair,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocusNode.addListener(() {
+      setState(() {
+        _showSuggestions = _searchFocusNode.hasFocus;
+      });
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Mock data karya dengan variasi ukuran
-    final karyaItems = [
-      {
-        'name': 'Batik Tulis Parang',
-        'creator': 'Ibu Siti - Solo',
-        'tag': 'Batik',
-        'umkm': 'Batik Nusantara',
-        'color': Colors.blue.shade300,
-        'height': 200.0,
-        'icon': Icons.auto_awesome,
-      },
-      {
-        'name': 'Meja Kayu Jati Ukir',
-        'creator': 'Pak Budi - Jepara',
-        'tag': 'Furniture',
-        'umkm': 'Kerajinan Kayu',
-        'color': Colors.brown.shade300,
-        'height': 280.0,
-        'icon': Icons.table_restaurant,
-      },
-      {
-        'name': 'Guci Kasongan',
-        'creator': 'Pak Wawan - Yogyakarta',
-        'tag': 'Keramik',
-        'umkm': 'Gerabah Tradisional',
-        'color': Colors.orange.shade300,
-        'height': 160.0,
-        'icon': Icons.local_florist,
-      },
-      {
-        'name': 'Tas Anyaman Premium',
-        'creator': 'Ibu Ani - Tasikmalaya',
-        'tag': 'Anyaman',
-        'umkm': 'Anyaman Bambu',
-        'color': Colors.green.shade300,
-        'height': 220.0,
-        'icon': Icons.shopping_bag,
-      },
-      {
-        'name': 'Kain Tenun Flores',
-        'creator': 'Ibu Maria - NTT',
-        'tag': 'Tenun',
-        'umkm': 'Tenun Ikat',
-        'color': Colors.purple.shade300,
-        'height': 190.0,
-        'icon': Icons.texture,
-      },
-      {
-        'name': 'Wayang Arjuna',
-        'creator': 'Pak Dalang - Solo',
-        'tag': 'Wayang',
-        'umkm': 'Wayang Kulit',
-        'color': Colors.red.shade300,
-        'height': 240.0,
-        'icon': Icons.person,
-      },
-      {
-        'name': 'Batik Cap Kawung',
-        'creator': 'Ibu Ratna - Pekalongan',
-        'tag': 'Batik',
-        'umkm': 'Batik Nusantara',
-        'color': Colors.indigo.shade300,
-        'height': 170.0,
-        'icon': Icons.auto_awesome,
-      },
-      {
-        'name': 'Kursi Tamu Ukir',
-        'creator': 'Pak Joko - Jepara',
-        'tag': 'Furniture',
-        'umkm': 'Kerajinan Kayu',
-        'color': Colors.brown.shade400,
-        'height': 210.0,
-        'icon': Icons.chair,
-      },
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Karya Pelaku Budaya'),
@@ -108,39 +121,100 @@ class _KaryaScreenState extends State<KaryaScreen> {
           Container(
             padding: const EdgeInsets.all(16.0),
             color: Colors.orange.shade50,
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Cari karya, pelaku, atau tag...',
-                prefixIcon: const Icon(Icons.search, color: Colors.orange),
-                suffixIcon:
-                    _searchQuery.isNotEmpty
-                        ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.orange),
-                          onPressed: () {
-                            setState(() {
-                              _searchController.clear();
-                              _searchQuery = '';
-                            });
-                          },
-                        )
-                        : null,
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  decoration: InputDecoration(
+                    hintText: 'Cari karya, pelaku, atau tag...',
+                    prefixIcon: const Icon(Icons.search, color: Colors.orange),
+                    suffixIcon:
+                        _searchQuery.isNotEmpty
+                            ? IconButton(
+                              icon: const Icon(
+                                Icons.clear,
+                                color: Colors.orange,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                            : null,
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value.toLowerCase();
+                    });
+                  },
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
+                // Tag suggestions
+                if (_showSuggestions && _searchQuery.isEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.local_offer,
+                              size: 16,
+                              color: Colors.orange.shade700,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Cari berdasarkan tag',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _buildTagChip('Batik', Colors.blue),
+                            _buildTagChip('Furniture', Colors.brown),
+                            _buildTagChip('Keramik', Colors.orange),
+                            _buildTagChip('Anyaman', Colors.green),
+                            _buildTagChip('Tenun', Colors.purple),
+                            _buildTagChip('Wayang', Colors.red),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
           ),
           // Content
@@ -186,6 +260,41 @@ class _KaryaScreenState extends State<KaryaScreen> {
                     ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTagChip(String tag, Color color) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _searchController.text = tag;
+          _searchQuery = tag.toLowerCase();
+          _searchFocusNode.unfocus();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.local_offer, size: 14, color: color),
+            const SizedBox(width: 6),
+            Text(
+              tag,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
