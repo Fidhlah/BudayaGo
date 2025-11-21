@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../config/supabase_config.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
@@ -21,12 +22,52 @@ class NewProfileScreen extends StatefulWidget {
 class _NewProfileScreenState extends State<NewProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Map<String, dynamic>> _collectibles = [];
+  bool _isLoadingCollectibles = true;
 
   @override
   void initState() {
     super.initState();
     // Always create 2 tabs: Progress & Karya
     _tabController = TabController(length: 2, vsync: this);
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final userId = SupabaseConfig.currentUser?.id;
+    if (userId == null) return;
+
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
+
+    // Load profile if not already loaded
+    if (!profileProvider.hasProfile) {
+      await profileProvider.loadProfile(userId);
+    }
+
+    // Load collectibles
+    await profileProvider.loadCollectibles();
+
+    if (mounted) {
+      setState(() {
+        _collectibles =
+            profileProvider.collectibles
+                .map(
+                  (c) => {
+                    'id': c.id,
+                    'name': c.name,
+                    'category': c.category,
+                    'imageUrl': c.imageUrl,
+                    'xpEarned': c.xpEarned,
+                    'unlocked': true,
+                  },
+                )
+                .toList();
+        _isLoadingCollectibles = false;
+      });
+    }
   }
 
   @override
@@ -309,7 +350,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildProgressTab() {
-    // Combine collections and achievements in one scrollable tab
+    // Achievements hardcoded (bisa diintegrasikan dengan database nanti)
     final achievements = [
       {
         'name': 'Penjelajah Pemula',
@@ -321,7 +362,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         'name': 'Kolektor Budaya',
         'desc': 'Kumpulkan 3 artifact',
         'icon': Icons.collections,
-        'unlocked': true,
+        'unlocked': _collectibles.length >= 3,
       },
       {
         'name': 'Master Budaya',
@@ -348,50 +389,74 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
           ),
           SizedBox(height: AppDimensions.spaceM),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              final locked = index >= 2;
-              return Container(
-                decoration: BoxDecoration(
-                  color: locked ? AppColors.grey100 : AppColors.batik50,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  border: Border.all(
-                    color: locked ? AppColors.grey300 : AppColors.batik300,
-                  ),
+          _isLoadingCollectibles
+              ? const Center(child: CircularProgressIndicator())
+              : GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 0.8,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      locked ? Icons.lock : Icons.star,
-                      size: 40,
-                      color: locked ? AppColors.grey400 : AppColors.batik700,
-                    ),
-                    SizedBox(height: AppDimensions.spaceXS),
-                    Text(
-                      'Artifact ${index + 1}',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color:
-                            locked
-                                ? AppColors.textTertiary
-                                : AppColors.textPrimary,
+                itemCount: _collectibles.isEmpty ? 5 : _collectibles.length,
+                itemBuilder: (context, index) {
+                  if (_collectibles.isEmpty || index >= _collectibles.length) {
+                    // Show locked placeholders
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.grey100,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                        border: Border.all(color: AppColors.grey300),
                       ),
-                      textAlign: TextAlign.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.lock, size: 40, color: AppColors.grey400),
+                          SizedBox(height: AppDimensions.spaceXS),
+                          Text(
+                            'Locked',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final collectible = _collectibles[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.batik50,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                      border: Border.all(color: AppColors.batik300),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.star, size: 40, color: AppColors.batik700),
+                        SizedBox(height: AppDimensions.spaceXS),
+                        Text(
+                          collectible['name'],
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
           SizedBox(height: AppDimensions.spaceXL),
 
           // Achievements Section
