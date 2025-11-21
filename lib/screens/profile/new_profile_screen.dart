@@ -69,6 +69,13 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             title: const Text('Profil Saya'),
             actions: [
               IconButton(
+                icon: const Icon(Icons.badge),
+                tooltip: 'Lihat Kartu',
+                onPressed: () {
+                  _showCharacterCard(context);
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () {
                   showDialog(
@@ -352,7 +359,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+              crossAxisCount: 5,
               childAspectRatio: 0.8,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
@@ -531,6 +538,170 @@ class _NewProfileScreenState extends State<NewProfileScreen>
           ),
         );
       },
+    );
+  }
+
+  void _showCharacterCard(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AppColors.orangePinkGradient,
+                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Consumer<ProfileProvider>(
+                builder: (context, profileProvider, _) {
+                  final profile = profileProvider.profile;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Close button
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+
+                      // Character Icon
+                      Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.background,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          _getMascotIcon(),
+                          size: 80,
+                          color: AppColors.batik700,
+                        ),
+                      ),
+                      SizedBox(height: AppDimensions.spaceL),
+
+                      // Character Name
+                      Text(
+                        widget.mascot,
+                        style: AppTextStyles.h3.copyWith(
+                          color: AppColors.background,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: AppDimensions.spaceS),
+
+                      // Display Name
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppDimensions.paddingM,
+                          vertical: AppDimensions.paddingXS,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.background.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusL,
+                          ),
+                        ),
+                        child: Text(
+                          profile?.displayName ?? 'Penjelajah Budaya',
+                          style: AppTextStyles.h5.copyWith(
+                            color: AppColors.background,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: AppDimensions.spaceXL),
+
+                      // Stats
+                      Consumer<HomeProvider>(
+                        builder: (context, homeProvider, _) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.paddingXL,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildStatItem(
+                                  'Level',
+                                  '${homeProvider.userLevel}',
+                                  Icons.stars,
+                                ),
+                                _buildStatItem(
+                                  'XP',
+                                  '${homeProvider.userXP}',
+                                  Icons.bolt,
+                                ),
+                                _buildStatItem(
+                                  'Artifacts',
+                                  '2/5',
+                                  Icons.inventory_2,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: AppDimensions.spaceXL),
+
+                      // Footer
+                      Text(
+                        'BudayaGo Explorer Card',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.background.withOpacity(0.7),
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      SizedBox(height: AppDimensions.paddingL),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: AppColors.background, size: 32),
+        SizedBox(height: AppDimensions.spaceXS),
+        Text(
+          value,
+          style: AppTextStyles.h4.copyWith(
+            color: AppColors.background,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.background.withOpacity(0.8),
+          ),
+        ),
+      ],
     );
   }
 
