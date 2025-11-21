@@ -3,7 +3,6 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/karya_service.dart';
-import 'karya_detail_screen.dart';
 
 class KaryaScreen extends StatefulWidget {
   const KaryaScreen({Key? key}) : super(key: key);
@@ -277,11 +276,16 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         ],
                       ),
                     )
-                    : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: _buildMasonryLayout(context, _karyaItems),
-                      ),
+                    : ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: _karyaItems.length,
+                      itemBuilder: (context, index) {
+                        return _buildKaryaFeedCard(
+                          context,
+                          _karyaItems[index],
+                          index,
+                        );
+                      },
                     ),
           ),
         ],
@@ -324,147 +328,663 @@ class _KaryaScreenState extends State<KaryaScreen> {
     );
   }
 
-  Widget _buildMasonryLayout(
+  Widget _buildKaryaFeedCard(
     BuildContext context,
-    List<Map<String, dynamic>> items,
+    Map<String, dynamic> item,
+    int index,
   ) {
-    // Split items into 2 columns
-    final leftColumn = <Map<String, dynamic>>[];
-    final rightColumn = <Map<String, dynamic>>[];
-
-    for (int i = 0; i < items.length; i++) {
-      if (i % 2 == 0) {
-        leftColumn.add(items[i]);
-      } else {
-        rightColumn.add(items[i]);
-      }
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            children:
-                leftColumn
-                    .map((item) => _buildKaryaCard(context, item))
-                    .toList(),
+    return Card(
+      margin: EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingM,
+        vertical: AppDimensions.spaceS,
+      ),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: User Info
+          Padding(
+            padding: EdgeInsets.all(AppDimensions.paddingM),
+            child: Row(
+              children: [
+                // Avatar
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        (item['color'] as Color).withOpacity(0.7),
+                        (item['color'] as Color),
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: AppColors.background,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: AppDimensions.spaceS),
+                // Creator name
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['creatorName'] as String,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (item['location'] != null)
+                        Text(
+                          item['location'] as String,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                // Tag chip
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (item['color'] as Color).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (item['color'] as Color).withOpacity(0.3),
+                    ),
+                  ),
+                  child: Text(
+                    item['tag'] as String,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: item['color'] as Color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            children:
-                rightColumn
-                    .map((item) => _buildKaryaCard(context, item))
-                    .toList(),
+
+          // Photo Grid (1-4 photos like Twitter/X)
+          _buildPhotoGrid(context, item),
+
+          // Content (nama + deskripsi)
+          Padding(
+            padding: EdgeInsets.all(AppDimensions.paddingM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Karya name and description in Instagram style
+                RichText(
+                  text: TextSpan(
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '${item['creatorName']} ',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      TextSpan(
+                        text: item['name'] as String,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (item['description'] != null &&
+                    (item['description'] as String).isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      item['description'] as String,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+
+          // Actions & Info
+          Padding(
+            padding: EdgeInsets.all(AppDimensions.paddingM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Karya name and description in Instagram style
+                RichText(
+                  text: TextSpan(
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '${item['creatorName']} ',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      TextSpan(
+                        text: item['name'] as String,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (item['description'] != null &&
+                    (item['description'] as String).isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      item['description'] as String,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildKaryaCard(BuildContext context, Map<String, dynamic> item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () {
-          // Navigate ke detail screen karya spesifik
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => KaryaDetailScreen(karya: item),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image area with gradient
-            Container(
-              height: item['height'] as double,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
+  // Build photo grid (1-4 photos like Twitter/X)
+  Widget _buildPhotoGrid(BuildContext context, Map<String, dynamic> item) {
+    // Generate different number of photos based on item index for variation
+    // Get a pseudo-random number of photos (1-4) based on item properties
+    final int photoCount =
+        ((item['name'] as String).length + (item['tag'] as String).length) % 4 +
+        1;
+
+    // Create photo list with variations
+    final List<Map<String, dynamic>> photos = [];
+    final List<IconData> iconVariations = [
+      Icons.photo,
+      Icons.image,
+      Icons.collections,
+      Icons.wallpaper,
+    ];
+
+    for (int i = 0; i < photoCount; i++) {
+      photos.add({
+        'color': item['color'],
+        'icon':
+            i == 0 ? item['icon'] : iconVariations[i % iconVariations.length],
+      });
+    }
+
+    if (photoCount == 1) {
+      return _buildSinglePhoto(context, photos[0], 0, photos);
+    } else if (photoCount == 2) {
+      return _buildTwoPhotos(context, photos);
+    } else if (photoCount == 3) {
+      return _buildThreePhotos(context, photos);
+    } else {
+      return _buildFourPhotos(context, photos);
+    }
+  }
+
+  // Single photo layout
+  Widget _buildSinglePhoto(
+    BuildContext context,
+    Map<String, dynamic> photo,
+    int index,
+    List<Map<String, dynamic>> allPhotos,
+  ) {
+    return GestureDetector(
+      onTap: () => _showFullscreenPhoto(context, index, allPhotos),
+      child: Container(
+        width: double.infinity,
+        height: 400,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              (photo['color'] as Color).withOpacity(0.8),
+              (photo['color'] as Color).withOpacity(0.4),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Icon(
+            photo['icon'] as IconData,
+            size: 120,
+            color: Colors.white.withOpacity(0.5),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Two photos layout (side by side)
+  Widget _buildTwoPhotos(
+    BuildContext context,
+    List<Map<String, dynamic>> photos,
+  ) {
+    return SizedBox(
+      height: 300,
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showFullscreenPhoto(context, 0, photos),
+              child: Container(
+                margin: const EdgeInsets.only(right: 1),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      (photos[0]['color'] as Color).withOpacity(0.8),
+                      (photos[0]['color'] as Color).withOpacity(0.4),
+                    ],
+                  ),
                 ),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    (item['color'] as Color).withOpacity(0.8),
-                    (item['color'] as Color).withOpacity(0.4),
-                  ],
+                child: Center(
+                  child: Icon(
+                    photos[0]['icon'] as IconData,
+                    size: 80,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
                 ),
               ),
-              child: Stack(
-                children: [
-                  // Decorative icon
-                  Center(
-                    child: Icon(
-                      item['icon'] as IconData,
-                      size: 60,
-                      color: Colors.white.withOpacity(0.4),
-                    ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showFullscreenPhoto(context, 1, photos),
+              child: Container(
+                margin: const EdgeInsets.only(left: 1),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      (photos[1]['color'] as Color).withOpacity(0.8),
+                      (photos[1]['color'] as Color).withOpacity(0.4),
+                    ],
                   ),
-                  // Tag at bottom
-                  Positioned(
-                    bottom: 12,
-                    left: 12,
+                ),
+                child: Center(
+                  child: Icon(
+                    photos[1]['icon'] as IconData,
+                    size: 80,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Three photos layout (left big, right 2 stacked)
+  Widget _buildThreePhotos(
+    BuildContext context,
+    List<Map<String, dynamic>> photos,
+  ) {
+    return SizedBox(
+      height: 300,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: GestureDetector(
+              onTap: () => _showFullscreenPhoto(context, 0, photos),
+              child: Container(
+                margin: const EdgeInsets.only(right: 1),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      (photos[0]['color'] as Color).withOpacity(0.8),
+                      (photos[0]['color'] as Color).withOpacity(0.4),
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    photos[0]['icon'] as IconData,
+                    size: 80,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 1, photos),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
+                      margin: const EdgeInsets.only(left: 1, bottom: 1),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[1]['color'] as Color).withOpacity(0.8),
+                            (photos[1]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
                       ),
-                      child: Text(
-                        item['tag'] as String,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: item['color'] as Color,
+                      child: Center(
+                        child: Icon(
+                          photos[1]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 2, photos),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 1, top: 1),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[2]['color'] as Color).withOpacity(0.8),
+                            (photos[2]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          photos[2]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['name'] as String,
+  // Four photos layout (2x2 grid)
+  Widget _buildFourPhotos(
+    BuildContext context,
+    List<Map<String, dynamic>> photos,
+  ) {
+    return SizedBox(
+      height: 300,
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 0, photos),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 1, bottom: 1),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[0]['color'] as Color).withOpacity(0.8),
+                            (photos[0]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          photos[0]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 1, photos),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 1, bottom: 1),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[1]['color'] as Color).withOpacity(0.8),
+                            (photos[1]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          photos[1]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 2, photos),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 1, top: 1),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[2]['color'] as Color).withOpacity(0.8),
+                            (photos[2]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          photos[2]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showFullscreenPhoto(context, 3, photos),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 1, top: 1),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (photos[3]['color'] as Color).withOpacity(0.8),
+                            (photos[3]['color'] as Color).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          photos[3]['icon'] as IconData,
+                          size: 60,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show fullscreen photo viewer
+  void _showFullscreenPhoto(
+    BuildContext context,
+    int initialIndex,
+    List<Map<String, dynamic>> photos,
+  ) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black,
+      builder:
+          (context) => _FullscreenPhotoViewer(
+            photos: photos,
+            initialIndex: initialIndex,
+          ),
+    );
+  }
+}
+
+// Fullscreen photo viewer widget
+class _FullscreenPhotoViewer extends StatefulWidget {
+  final List<Map<String, dynamic>> photos;
+  final int initialIndex;
+
+  const _FullscreenPhotoViewer({
+    required this.photos,
+    required this.initialIndex,
+  });
+
+  @override
+  State<_FullscreenPhotoViewer> createState() => _FullscreenPhotoViewerState();
+}
+
+class _FullscreenPhotoViewerState extends State<_FullscreenPhotoViewer> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Photo viewer with swipe
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemCount: widget.photos.length,
+            itemBuilder: (context, index) {
+              final photo = widget.photos[index];
+              return Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        (photo['color'] as Color).withOpacity(0.8),
+                        (photo['color'] as Color).withOpacity(0.4),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      photo['icon'] as IconData,
+                      size: 200,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Close button (X)
+          Positioned(
+            top: 40,
+            right: 16,
+            child: IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.close, color: Colors.white, size: 32),
+            ),
+          ),
+
+          // Photo counter
+          if (widget.photos.length > 1)
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${_currentIndex + 1} / ${widget.photos.length}',
                     style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    item['creator'] as String,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

@@ -347,94 +347,105 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   final displayCount =
                       collectibleCount > 0 ? collectibleCount : 5;
 
-                  return SizedBox(
-                    height: 80,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: displayCount,
-                      itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingM,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(displayCount, (index) {
                         final hasCollectible =
                             collectibleCount > 0 && index < collectibleCount;
 
                         if (!hasCollectible) {
-                          return Container(
-                            width: 60,
-                            margin: EdgeInsets.only(
-                              right: AppDimensions.spaceS,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.background.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.radiusM,
-                              ),
-                              border: Border.all(
-                                color: AppColors.background.withOpacity(0.5),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.lock,
-                                  size: 30,
-                                  color: AppColors.background.withOpacity(0.7),
-                                ),
-                                SizedBox(height: AppDimensions.spaceXS),
-                                Text(
-                                  '${index + 1}',
-                                  style: AppTextStyles.bodySmall.copyWith(
+                          return Flexible(
+                            child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.background.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusM,
+                                  ),
+                                  border: Border.all(
                                     color: AppColors.background.withOpacity(
-                                      0.7,
+                                      0.5,
                                     ),
-                                    fontSize: 10,
                                   ),
                                 ),
-                              ],
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.lock,
+                                      size: 30,
+                                      color: AppColors.background.withOpacity(
+                                        0.7,
+                                      ),
+                                    ),
+                                    SizedBox(height: AppDimensions.spaceXS),
+                                    Text(
+                                      '${index + 1}',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.background.withOpacity(
+                                          0.7,
+                                        ),
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
                         }
 
                         final collectible = _collectibles[index];
-                        return Container(
-                          width: 60,
-                          margin: EdgeInsets.only(right: AppDimensions.spaceS),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(
-                              AppDimensions.radiusM,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.star,
-                                size: 30,
-                                color: AppColors.batik700,
-                              ),
-                              SizedBox(height: AppDimensions.spaceXS),
-                              Text(
-                                collectible['name'],
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.batik700,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
+                        return Flexible(
+                          child: AspectRatio(
+                            aspectRatio: 1.0,
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusM,
                                 ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 30,
+                                    color: AppColors.batik700,
+                                  ),
+                                  SizedBox(height: AppDimensions.spaceXS),
+                                  Text(
+                                    collectible['name'],
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.batik700,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
-                      },
+                      }),
                     ),
                   );
                 },
