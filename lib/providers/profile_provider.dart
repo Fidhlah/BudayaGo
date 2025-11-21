@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import '../config/supabase_config.dart';
+import '../services/collectibles_service.dart';
 
 class UserProfile {
   final String id;
@@ -153,29 +155,52 @@ class ProfileProvider extends ChangeNotifier {
   int get totalXPEarned =>
       _collectibles.fold(0, (sum, item) => sum + item.xpEarned);
 
-  /// Load user profile from backend
+  /// Load user profile from Supabase
   Future<void> loadProfile(String userId) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // TODO: Fetch from Supabase
-      // For now, create mock profile
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Fetch from Supabase
+      final userData =
+          await SupabaseConfig.client
+              .from('users')
+              .select('''
+          id,
+          email,
+          username,
+          display_name,
+          total_exp,
+          level,
+          created_at,
+          updated_at,
+          is_pelaku_budaya,
+          hide_progress,
+          uploaded_karya_ids
+        ''')
+              .eq('id', userId)
+              .single();
 
       _profile = UserProfile(
-        id: userId,
-        email: 'user@example.com',
-        displayName: 'Penjelajah Budaya',
-        mascot: 'default',
-        xp: 0,
-        level: 1,
-        createdAt: DateTime.now(),
-        lastActive: DateTime.now(),
-        isPelakuBudaya: false,
-        hideProgress: false,
-        uploadedKaryaIds: [],
+        id: userData['id'],
+        email: userData['email'] ?? '',
+        displayName: userData['display_name'] ?? userData['username'],
+        mascot: 'default', // TODO: Get from character assignment
+        xp: userData['total_exp'] ?? 0,
+        level: userData['level'] ?? 1,
+        createdAt: DateTime.parse(userData['created_at']),
+        lastActive:
+            userData['updated_at'] != null
+                ? DateTime.parse(userData['updated_at'])
+                : null,
+        isPelakuBudaya: userData['is_pelaku_budaya'] ?? false,
+        hideProgress: userData['hide_progress'] ?? false,
+        uploadedKaryaIds:
+            (userData['uploaded_karya_ids'] as List?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
       );
 
       debugPrint('✅ Profile loaded: ${_profile?.email}');
@@ -188,7 +213,7 @@ class ProfileProvider extends ChangeNotifier {
     }
   }
 
-  /// Update user profile
+  /// Update user profile in database
   Future<void> updateProfile({
     String? displayName,
     String? mascot,
@@ -206,8 +231,20 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Update in Supabase
-      await Future.delayed(const Duration(milliseconds: 300));
+      final userId = _profile!.id;
+
+      // Build update map
+      Map<String, dynamic> updates = {};
+      if (displayName != null) updates['display_name'] = displayName;
+      if (isPelakuBudaya != null) updates['is_pelaku_budaya'] = isPelakuBudaya;
+      if (hideProgress != null) updates['hide_progress'] = hideProgress;
+
+      if (updates.isNotEmpty) {
+        await SupabaseConfig.client
+            .from('users')
+            .update(updates)
+            .eq('id', userId);
+      }
 
       _profile = _profile!.copyWith(
         displayName: displayName ?? _profile!.displayName,
@@ -241,7 +278,7 @@ class ProfileProvider extends ChangeNotifier {
     // TODO: Sync to Supabase in background
   }
 
-  /// Load user's collectibles
+  /// Load user's collectibles from database
   Future<void> loadCollectibles() async {
     if (_profile == null) {
       _error = 'No profile loaded';
@@ -254,11 +291,33 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Fetch from Supabase
-      await Future.delayed(const Duration(milliseconds: 500));
+      final userId = _profile!.id;
 
-      // Mock data for now
-      _collectibles = [];
+      // Fetch from Supabase
+      final collectiblesData = await CollectiblesService.loadUserCollectibles(
+        userId,
+      );
+
+      // Convert to Collectible model
+      _collectibles =
+          collectiblesData
+              .where(
+                (item) => item['isUnlocked'] == true,
+              ) // Only include unlocked items
+              .map((item) {
+                return Collectible(
+                  id: item['id'],
+                  name: item['name'],
+                  category: 'Artifact', // Default category
+                  imageUrl: item['imageUrl'],
+                  collectedAt:
+                      item['unlockedAt'] != null
+                          ? DateTime.parse(item['unlockedAt'])
+                          : DateTime.now(),
+                  xpEarned: item['xpEarned'],
+                );
+              })
+              .toList();
 
       debugPrint('✅ Loaded ${_collectibles.length} collectibles');
     } catch (e) {

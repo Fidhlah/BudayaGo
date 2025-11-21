@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import '../models/character-matcher_questions_model.dart';
+import '../services/quiz_service.dart';
 
 /// Service untuk handle personality test logic
 class PersonalityTestService {
   static const String _testJsonPath = 'assets/text/test.json';
-  
+
   List<TestQuestion>? _questions;
   final Map<String, int> _dimensionScores = {
     'courage': 0,
@@ -25,18 +27,39 @@ class PersonalityTestService {
     'creativity': 0,
     'social': 0,
   };
+  final Map<int, String> _userAnswers = {};
 
-  /// Load questions from JSON
+  /// Load questions from Supabase database (preferred) or fallback to JSON
   Future<List<TestQuestion>> loadQuestions() async {
     if (_questions != null) return _questions!;
 
     try {
+      // Try loading from Supabase database first
+      debugPrint('📚 Attempting to load questions from Supabase...');
+      _questions = await QuizService.loadQuestionsFromDatabase();
+
+      // Calculate max scores for each dimension
+      _calculateMaxScores();
+
+      return _questions!;
+    } catch (e) {
+      debugPrint('⚠️ Failed to load from database, falling back to JSON: $e');
+
+      // Fallback to JSON if database fails
+      return await _loadQuestionsFromJSON();
+    }
+  }
+
+  /// Fallback: Load questions from JSON asset
+  Future<List<TestQuestion>> _loadQuestionsFromJSON() async {
+    try {
       final String jsonString = await rootBundle.loadString(_testJsonPath);
       final Map<String, dynamic> jsonData = json.decode(jsonString);
-      
-      _questions = (jsonData['questions'] as List)
-          .map((q) => TestQuestion.fromJson(q))
-          .toList();
+
+      _questions =
+          (jsonData['questions'] as List)
+              .map((q) => TestQuestion.fromJson(q))
+              .toList();
 
       // Calculate max scores for each dimension
       _calculateMaxScores();
@@ -54,7 +77,7 @@ class PersonalityTestService {
     for (var question in _questions!) {
       for (var option in question.options.values) {
         option.weights.forEach((dimension, weight) {
-          _dimensionMaxScores[dimension] = 
+          _dimensionMaxScores[dimension] =
               (_dimensionMaxScores[dimension] ?? 0) + weight;
         });
       }
@@ -65,6 +88,9 @@ class PersonalityTestService {
   void recordAnswer(String selectedOption, TestQuestion question) {
     final option = question.options[selectedOption];
     if (option == null) return;
+
+    // Store answer
+    _userAnswers[question.id] = selectedOption;
 
     option.weights.forEach((dimension, weight) {
       _dimensionScores[dimension] = (_dimensionScores[dimension] ?? 0) + weight;
@@ -77,10 +103,7 @@ class PersonalityTestService {
 
     _dimensionScores.forEach((dimension, score) {
       final maxScore = _dimensionMaxScores[dimension] ?? 1;
-      dimensions[dimension] = DimensionScore(
-        score: score,
-        maxScore: maxScore,
-      );
+      dimensions[dimension] = DimensionScore(score: score, maxScore: maxScore);
     });
 
     return TestResult(
@@ -93,7 +116,14 @@ class PersonalityTestService {
   /// Reset test (for retaking)
   void resetTest() {
     _dimensionScores.updateAll((key, value) => 0);
+    _userAnswers.clear();
   }
+
+  /// Get user answers (for submission to database)
+  Map<int, String> get userAnswers => Map.from(_userAnswers);
+
+  /// Get dimension scores (for submission to database)
+  Map<String, int> get dimensionScores => Map.from(_dimensionScores);
 
   /// Get current progress (0.0 to 1.0)
   double getProgress(int currentQuestionIndex) {

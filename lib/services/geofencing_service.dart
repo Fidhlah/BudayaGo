@@ -1,8 +1,8 @@
 import 'package:geolocator/geolocator.dart';
 import 'dart:math';
-import '../config/test_locations.dart';
 import '../models/qr_code_model.dart';
 import '../config/qr_config.dart';
+import '../config/supabase_config.dart';
 
 /// Service untuk handle geofencing logic
 class GeofencingService {
@@ -20,7 +20,7 @@ class GeofencingService {
   }
 
   /// Validate QR Code dengan geofencing
-  /// 
+  ///
   /// Process:
   /// 1. Decode QR string ke QRCodeModel
   /// 2. Validate UUID exists di database/test_locations
@@ -55,7 +55,8 @@ class GeofencingService {
         return {
           'valid': false,
           'error': 'INVALID_FORMAT',
-          'message': 'Format QR Code tidak valid.\n\nPastikan QR Code dalam kondisi baik.',
+          'message':
+              'Format QR Code tidak valid.\n\nPastikan QR Code dalam kondisi baik.',
           'details': e.message,
         };
       }
@@ -65,62 +66,74 @@ class GeofencingService {
         return {
           'valid': false,
           'error': 'UNSUPPORTED_VERSION',
-          'message': 'Versi QR Code tidak didukung.\n\nSilakan update aplikasi ke versi terbaru.',
+          'message':
+              'Versi QR Code tidak didukung.\n\nSilakan update aplikasi ke versi terbaru.',
           'qrVersion': qrCode.version,
           'supportedVersions': QRConfig.supportedVersions,
         };
       }
 
-      // Step 3: Check if UUID exists in database
-      // TODO: Ganti dengan query ke Supabase
-      if (!TestLocations.isValidUUID(qrCode.uuid)) {
+      // Step 3: Check if UUID exists in database (fetch from Supabase)
+      final locationData =
+          await SupabaseConfig.client
+              .from('cultural_partners')
+              .select()
+              .eq('id', qrCode.uuid)
+              .maybeSingle();
+
+      if (locationData == null) {
         print('❌ UUID not found in database');
         return {
           'valid': false,
           'error': 'LOCATION_NOT_FOUND',
-          'message': 'Lokasi tidak ditemukan.\n\nQR Code mungkin sudah tidak aktif.',
+          'message':
+              'Lokasi tidak ditemukan.\n\nQR Code mungkin sudah tidak aktif.',
           'uuid': qrCode.uuid,
         };
       }
 
       // Step 4: Get target location data
-      final targetLocation = TestLocations.getLocationByUUID(qrCode.uuid)!;
-      print('✅ Location found: ${targetLocation['name']}');
+      print('✅ Location found: ${locationData['name']}');
 
       // Step 5: Calculate distance
       double distanceInMeters = calculateDistance(
         userLat: userPosition.latitude,
         userLng: userPosition.longitude,
-        targetLat: targetLocation['lat'],
-        targetLng: targetLocation['lng'],
+        targetLat: locationData['latitude'],
+        targetLng: locationData['longitude'],
       );
 
+      // Default radius if not set
+      final radius = locationData['radius'] ?? 200.0;
+
       print('📏 Distance: ${distanceInMeters.toStringAsFixed(2)}m');
-      print('📏 Max radius: ${targetLocation['radius']}m');
+      print('📏 Max radius: ${radius}m');
 
       // Step 6: Check if within radius
-      if (distanceInMeters <= targetLocation['radius']) {
+      if (distanceInMeters <= radius) {
         return {
           'valid': true,
           'uuid': qrCode.uuid,
           'qrVersion': qrCode.version,
-          'locationName': targetLocation['name'],
-          'description': targetLocation['description'],
+          'locationName': locationData['name'],
+          'locationId': locationData['id'],
+          'description': locationData['description'] ?? '',
           'distance': distanceInMeters,
-          'radius': targetLocation['radius'],
+          'radius': radius,
           'coordinates': {
-            'lat': targetLocation['lat'],
-            'lng': targetLocation['lng'],
+            'lat': locationData['latitude'],
+            'lng': locationData['longitude'],
           },
         };
       } else {
         return {
           'valid': false,
           'error': 'OUT_OF_RANGE',
-          'message': 'Anda terlalu jauh dari lokasi.\n\nMohon datang ke lokasi terlebih dahulu.',
-          'locationName': targetLocation['name'],
+          'message':
+              'Anda terlalu jauh dari lokasi.\n\nMohon datang ke lokasi terlebih dahulu.',
+          'locationName': locationData['name'],
           'distance': distanceInMeters,
-          'radius': targetLocation['radius'],
+          'radius': radius,
         };
       }
     } catch (e) {
@@ -146,7 +159,8 @@ class GeofencingService {
     final dLat = _toRadians(targetLat - userLat);
     final dLng = _toRadians(targetLng - userLng);
 
-    final a = sin(dLat / 2) * sin(dLat / 2) +
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(_toRadians(userLat)) *
             cos(_toRadians(targetLat)) *
             sin(dLng / 2) *

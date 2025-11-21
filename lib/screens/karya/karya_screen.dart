@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
-import 'umkm_detail_screen.dart';
+import '../../services/karya_service.dart';
+import 'karya_detail_screen.dart';
 
 class KaryaScreen extends StatefulWidget {
   const KaryaScreen({Key? key}) : super(key: key);
@@ -16,91 +17,110 @@ class _KaryaScreenState extends State<KaryaScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _showSuggestions = false;
-
-  // Mock data karya dengan variasi ukuran
-  List<Map<String, dynamic>> get karyaItems => [
-    {
-      'name': 'Batik Tulis Parang',
-      'creator': 'Ibu Siti - Solo',
-      'tag': 'Batik',
-      'umkm': 'Batik Nusantara',
-      'color': AppColors.blueLight,
-      'height': 200.0,
-      'icon': Icons.auto_awesome,
-    },
-    {
-      'name': 'Meja Kayu Jati Ukir',
-      'creator': 'Pak Budi - Jepara',
-      'tag': 'Furniture',
-      'umkm': 'Kerajinan Kayu',
-      'color': AppColors.brownLight,
-      'height': 280.0,
-      'icon': Icons.table_restaurant,
-    },
-    {
-      'name': 'Guci Kasongan',
-      'creator': 'Pak Wawan - Yogyakarta',
-      'tag': 'Keramik',
-      'umkm': 'Gerabah Tradisional',
-      'color': AppColors.orange300,
-      'height': 160.0,
-      'icon': Icons.local_florist,
-    },
-    {
-      'name': 'Tas Anyaman Premium',
-      'creator': 'Ibu Ani - Tasikmalaya',
-      'tag': 'Anyaman',
-      'umkm': 'Anyaman Bambu',
-      'color': AppColors.greenLight,
-      'height': 220.0,
-      'icon': Icons.shopping_bag,
-    },
-    {
-      'name': 'Kain Tenun Flores',
-      'creator': 'Ibu Maria - NTT',
-      'tag': 'Tenun',
-      'umkm': 'Tenun Ikat',
-      'color': AppColors.purpleLight,
-      'height': 190.0,
-      'icon': Icons.texture,
-    },
-    {
-      'name': 'Wayang Arjuna',
-      'creator': 'Pak Dalang - Solo',
-      'tag': 'Wayang',
-      'umkm': 'Wayang Kulit',
-      'color': AppColors.redLight,
-      'height': 240.0,
-      'icon': Icons.person,
-    },
-    {
-      'name': 'Batik Cap Kawung',
-      'creator': 'Ibu Ratna - Pekalongan',
-      'tag': 'Batik',
-      'umkm': 'Batik Nusantara',
-      'color': AppColors.indigoLight,
-      'height': 170.0,
-      'icon': Icons.auto_awesome,
-    },
-    {
-      'name': 'Kursi Tamu Ukir',
-      'creator': 'Pak Joko - Jepara',
-      'tag': 'Furniture',
-      'umkm': 'Kerajinan Kayu',
-      'color': AppColors.brownDark,
-      'height': 210.0,
-      'icon': Icons.chair,
-    },
-  ];
+  List<Map<String, dynamic>> _karyaItems = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _loadKarya();
     _searchFocusNode.addListener(() {
       setState(() {
         _showSuggestions = _searchFocusNode.hasFocus;
       });
     });
+  }
+
+  Future<void> _loadKarya() async {
+    setState(() => _isLoading = true);
+    try {
+      final karya = await KaryaService.loadAllKarya();
+      if (mounted) {
+        setState(() {
+          _karyaItems =
+              karya.map((item) {
+                final creator = item['users'] as Map<String, dynamic>?;
+                final creatorName =
+                    '${creator?['display_name'] ?? creator?['username'] ?? 'Unknown'}';
+                return {
+                  'id': item['id'],
+                  'name': item['name'],
+                  'description': item['description'],
+                  'creator': creatorName,
+                  'creatorName': creatorName,
+                  'tag': item['tag'],
+                  'umkm': item['umkm_category'],
+                  'location': item['location'],
+                  'color': Color(item['color'] ?? AppColors.batik700.value),
+                  'height':
+                      200.0 +
+                      (item['name'].toString().length % 3) *
+                          40.0, // Varied heights
+                  'icon': IconData(
+                    item['icon_code_point'] ?? Icons.auto_awesome.codePoint,
+                    fontFamily: 'MaterialIcons',
+                  ),
+                  'imageUrl': item['image_url'],
+                  'likes': item['likes'] ?? 0,
+                  'views': item['views'] ?? 0,
+                };
+              }).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading karya: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _searchKarya(String query) async {
+    if (query.isEmpty) {
+      _loadKarya();
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final results = await KaryaService.searchKarya(query);
+      if (mounted) {
+        setState(() {
+          _karyaItems =
+              results.map((item) {
+                final creator = item['users'] as Map<String, dynamic>?;
+                final creatorName =
+                    '${creator?['display_name'] ?? creator?['username'] ?? 'Unknown'}';
+                return {
+                  'id': item['id'],
+                  'name': item['name'],
+                  'description': item['description'],
+                  'creator': creatorName,
+                  'creatorName': creatorName,
+                  'tag': item['tag'],
+                  'umkm': item['umkm_category'],
+                  'location': item['location'],
+                  'color': Color(item['color'] ?? AppColors.batik700.value),
+                  'height': 200.0 + (item['name'].toString().length % 3) * 40.0,
+                  'icon': IconData(
+                    item['icon_code_point'] ?? Icons.auto_awesome.codePoint,
+                    fontFamily: 'MaterialIcons',
+                  ),
+                  'imageUrl': item['image_url'],
+                  'likes': item['likes'] ?? 0,
+                  'views': item['views'] ?? 0,
+                };
+              }).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error searching karya: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -160,6 +180,12 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value.toLowerCase();
+                    });
+                    // Debounce search
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (_searchQuery == value.toLowerCase()) {
+                        _searchKarya(value);
+                      }
                     });
                   },
                 ),
@@ -222,7 +248,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
           // Content
           Expanded(
             child:
-                _getFilteredItems(karyaItems).isEmpty
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _karyaItems.isEmpty
                     ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -252,10 +280,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                     : SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: _buildMasonryLayout(
-                          context,
-                          _getFilteredItems(karyaItems),
-                        ),
+                        child: _buildMasonryLayout(context, _karyaItems),
                       ),
                     ),
           ),
@@ -297,26 +322,6 @@ class _KaryaScreenState extends State<KaryaScreen> {
         ),
       ),
     );
-  }
-
-  List<Map<String, dynamic>> _getFilteredItems(
-    List<Map<String, dynamic>> items,
-  ) {
-    if (_searchQuery.isEmpty) {
-      return items;
-    }
-
-    return items.where((item) {
-      final name = (item['name'] as String).toLowerCase();
-      final creator = (item['creator'] as String).toLowerCase();
-      final tag = (item['tag'] as String).toLowerCase();
-      final umkm = (item['umkm'] as String).toLowerCase();
-
-      return name.contains(_searchQuery) ||
-          creator.contains(_searchQuery) ||
-          tag.contains(_searchQuery) ||
-          umkm.contains(_searchQuery);
-    }).toList();
   }
 
   Widget _buildMasonryLayout(
@@ -366,51 +371,11 @@ class _KaryaScreenState extends State<KaryaScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () {
-          // Navigate ke detail screen UMKM
-          final umkmName = item['umkm'] as String;
-          Color accentColor;
-          String category;
-
-          // Map ke data UMKM yang sesuai
-          switch (umkmName) {
-            case 'Batik Nusantara':
-              accentColor = AppColors.blue;
-              category = 'Kain & Tekstil';
-              break;
-            case 'Kerajinan Kayu':
-              accentColor = AppColors.brown;
-              category = 'Furniture & Dekorasi';
-              break;
-            case 'Gerabah Tradisional':
-              accentColor = AppColors.orange;
-              category = 'Keramik & Tembikar';
-              break;
-            case 'Anyaman Bambu':
-              accentColor = AppColors.green;
-              category = 'Kerajinan Tangan';
-              break;
-            case 'Tenun Ikat':
-              accentColor = AppColors.purple;
-              category = 'Kain & Tekstil';
-              break;
-            case 'Wayang Kulit':
-              accentColor = AppColors.red;
-              category = 'Seni & Budaya';
-              break;
-            default:
-              accentColor = AppColors.grey500;
-              category = 'Kerajinan';
-          }
-
+          // Navigate ke detail screen karya spesifik
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) => UmkmDetailScreen(
-                    umkmName: umkmName,
-                    category: category,
-                    accentColor: accentColor,
-                  ),
+              builder: (context) => KaryaDetailScreen(karya: item),
             ),
           );
         },

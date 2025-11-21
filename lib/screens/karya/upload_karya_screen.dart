@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
 import '../../providers/profile_provider.dart';
+import '../../services/karya_service.dart';
+import '../../config/supabase_config.dart';
 
 class UploadKaryaScreen extends StatefulWidget {
   const UploadKaryaScreen({Key? key}) : super(key: key);
@@ -16,10 +20,12 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
 
   String? _selectedTag;
   String? _selectedUmkm;
-  String? _imagePath;
+  File? _imageFile;
+  bool _isUploading = false;
 
   final List<String> _tags = [
     'Batik',
@@ -47,17 +53,30 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
   }
 
   Future<void> _pickImage() async {
-    // TODO: Implement image picker
-    setState(() {
-      _imagePath = 'mock_image_path.jpg';
-    });
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Fitur upload foto akan segera tersedia'),
-        backgroundColor: AppColors.info,
-      ),
-    );
+      if (image != null) {
+        setState(() {
+          _imageFile = File(image.path);
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memilih gambar: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _submitKarya() async {
@@ -83,28 +102,112 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
       return;
     }
 
-    final profileProvider = Provider.of<ProfileProvider>(
-      context,
-      listen: false,
-    );
+    final userId = SupabaseConfig.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('User tidak terautentikasi'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
 
-    // TODO: Upload to Supabase
-    await Future.delayed(const Duration(seconds: 1));
+    setState(() => _isUploading = true);
 
-    // Mock karya ID
-    final karyaId = 'karya_${DateTime.now().millisecondsSinceEpoch}';
-    profileProvider.addUploadedKarya(karyaId);
+    try {
+      // TODO: Upload image to Supabase Storage if _imageFile is not null
+      String? imageUrl;
+      if (_imageFile != null) {
+        // For now, just use placeholder
+        // In production, upload to Supabase Storage:
+        // final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        // await SupabaseConfig.client.storage
+        //     .from('karya-images')
+        //     .upload(fileName, _imageFile!);
+        // imageUrl = SupabaseConfig.client.storage
+        //     .from('karya-images')
+        //     .getPublicUrl(fileName);
+      }
 
-    if (!mounted) return;
+      // Map tag to color and icon
+      final tagColorMap = {
+        'Batik': {
+          'color': AppColors.blueLight.value,
+          'icon': Icons.auto_awesome.codePoint,
+        },
+        'Furniture': {
+          'color': AppColors.brownLight.value,
+          'icon': Icons.table_restaurant.codePoint,
+        },
+        'Keramik': {
+          'color': AppColors.orange300.value,
+          'icon': Icons.local_florist.codePoint,
+        },
+        'Anyaman': {
+          'color': AppColors.greenLight.value,
+          'icon': Icons.shopping_bag.codePoint,
+        },
+        'Tenun': {
+          'color': AppColors.purpleLight.value,
+          'icon': Icons.texture.codePoint,
+        },
+        'Wayang': {
+          'color': AppColors.redLight.value,
+          'icon': Icons.person.codePoint,
+        },
+      };
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Karya berhasil diupload!'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+      final tagData =
+          tagColorMap[_selectedTag] ??
+          {'color': AppColors.batik700.value, 'icon': Icons.star.codePoint};
 
-    Navigator.pop(context);
+      // Upload to database
+      final result = await KaryaService.uploadKarya(
+        creatorId: userId,
+        name: _nameController.text.trim(),
+        description: _descriptionController.text.trim(),
+        tag: _selectedTag!,
+        umkmCategory: _selectedUmkm!,
+        imageUrl: imageUrl,
+        color: tagData['color'] as int,
+        iconCodePoint: tagData['icon'] as int,
+      );
+
+      if (result != null && mounted) {
+        // Update profile provider
+        final profileProvider = Provider.of<ProfileProvider>(
+          context,
+          listen: false,
+        );
+        profileProvider.addUploadedKarya(result['id']);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('✅ Karya berhasil diupload!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+
+        Navigator.pop(context, true); // Return true to indicate success
+      } else {
+        throw Exception('Failed to upload karya');
+      }
+    } catch (e) {
+      debugPrint('❌ Error uploading karya: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal mengupload karya: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
+    }
   }
 
   @override
@@ -133,7 +236,7 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
                     ),
                   ),
                   child:
-                      _imagePath == null
+                      _imageFile == null
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

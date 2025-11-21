@@ -2,9 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
+import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
+import '../../services/karya_service.dart';
+import '../../services/visit_service.dart';
+import '../../config/supabase_config.dart';
 import 'category_list_screen.dart';
 import '../qr/qr_scanner_screen.dart';
 
@@ -21,68 +25,55 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
   Timer? _timer;
   int _currentPage = 0;
+  List<Map<String, dynamic>> _karyaItems = [];
+  bool _isLoadingKarya = true;
 
-  // Karya items data (getter to avoid Flutter Web issues)
-  List<Map<String, dynamic>> get _karyaItems => [
-    {
-      'name': 'Batik Tulis Parang',
-      'creator': 'Ibu Siti - Solo',
-      'tag': 'Batik',
-      'umkm': 'Batik Nusantara',
-      'color': AppColors.blueLight,
-      'icon': Icons.auto_awesome,
-    },
-    {
-      'name': 'Meja Kayu Jati Ukir',
-      'creator': 'Pak Budi - Jepara',
-      'tag': 'Furniture',
-      'umkm': 'Kerajinan Kayu',
-      'color': AppColors.brownLight,
-      'icon': Icons.table_restaurant,
-    },
-    {
-      'name': 'Guci Kasongan',
-      'creator': 'Pak Wawan - Yogyakarta',
-      'tag': 'Keramik',
-      'umkm': 'Gerabah Tradisional',
-      'color': AppColors.orange300,
-      'icon': Icons.local_florist,
-    },
-    {
-      'name': 'Tas Anyaman Premium',
-      'creator': 'Ibu Ani - Tasikmalaya',
-      'tag': 'Anyaman',
-      'umkm': 'Anyaman Bambu',
-      'color': AppColors.greenLight,
-      'icon': Icons.shopping_bag,
-    },
-    {
-      'name': 'Kain Tenun Flores',
-      'creator': 'Ibu Maria - NTT',
-      'tag': 'Tenun',
-      'umkm': 'Tenun Ikat',
-      'color': AppColors.purpleLight,
-      'icon': Icons.texture,
-    },
-    {
-      'name': 'Wayang Arjuna',
-      'creator': 'Pak Dalang - Solo',
-      'tag': 'Wayang',
-      'umkm': 'Wayang Kulit',
-      'color': AppColors.redLight,
-      'icon': Icons.person,
-    },
-  ];
+  // Load karya from database
+  Future<void> _loadKaryaItems() async {
+    try {
+      final karya = await KaryaService.loadAllKarya();
+      if (mounted) {
+        setState(() {
+          _karyaItems =
+              karya.take(6).map((item) {
+                // Transform database data to display format
+                final creator = item['users'] as Map<String, dynamic>?;
+                return {
+                  'id': item['id'],
+                  'name': item['name'],
+                  'creator':
+                      '${creator?['display_name'] ?? creator?['username'] ?? 'Unknown'}',
+                  'tag': item['tag'],
+                  'umkm': item['umkm_category'],
+                  'color': Color(item['color'] ?? AppColors.batik700.value),
+                  'icon': IconData(
+                    item['icon_code_point'] ?? Icons.auto_awesome.codePoint,
+                    fontFamily: 'MaterialIcons',
+                  ),
+                  'imageUrl': item['image_url'],
+                };
+              }).toList();
+          _isLoadingKarya = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading karya: $e');
+      if (mounted) {
+        setState(() => _isLoadingKarya = false);
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _startAutoScroll();
 
-    // Initialize HomeProvider
+    // Initialize HomeProvider and load karya
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final homeProvider = Provider.of<HomeProvider>(context, listen: false);
       homeProvider.initializeUserData();
+      _loadKaryaItems();
     });
   }
 
@@ -198,13 +189,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Tombol Scan QR - ✅ FIXED NAVIGATION
+                // Tombol Scan QR - ✅ INTEGRATED WITH DATABASE
                 Material(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   child: InkWell(
                     onTap: () async {
-                      // ✅ Navigate to QR Scanner Screen
+                      // Navigate to QR Scanner Screen
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -212,24 +203,65 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
 
-                      // ✅ Handle result after scan (if needed)
-                      if (result != null && mounted) {
-                        // Show success message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '✅ Check-in berhasil di ${result['locationName']}!',
-                            ),
-                            backgroundColor: AppColors.success,
-                          ),
-                        );
+                      // Handle result after scan
+                      if (result != null &&
+                          result['valid'] == true &&
+                          mounted) {
+                        final userId = SupabaseConfig.currentUser?.id;
 
-                        // Give XP bonus using HomeProvider
-                        final homeProvider = Provider.of<HomeProvider>(
-                          context,
-                          listen: false,
-                        );
-                        homeProvider.claimXP(50); // Give 50 XP for scanning
+                        if (userId != null) {
+                          try {
+                            // Record visit and give XP through database
+                            final visitResult =
+                                await VisitService.recordVisitAndGiveExp(
+                                  userId: userId,
+                                  partnerId: result['uuid'],
+                                  expGained: 500, // 500 XP for museum visit
+                                );
+
+                            if (mounted && visitResult['success'] == true) {
+                              // Sync HomeProvider with new XP/Level
+                              final homeProvider = Provider.of<HomeProvider>(
+                                context,
+                                listen: false,
+                              );
+                              await homeProvider.syncUserProgress();
+
+                              // Sync ProfileProvider for collectibles
+                              final profileProvider =
+                                  Provider.of<ProfileProvider>(
+                                    context,
+                                    listen: false,
+                                  );
+                              if (profileProvider.hasProfile) {
+                                await profileProvider.loadCollectibles();
+                              }
+
+                              // Show success message with details
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '✅ ${visitResult['message']}\n'
+                                    '🎉 +${visitResult['expGained']} XP | Level ${visitResult['newLevel']}\n'
+                                    '${visitResult['unlockedCollectibles'] > 0 ? '🎁 ${visitResult['unlockedCollectibles']} Collectible Baru!' : ''}',
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            debugPrint('❌ Error recording visit: $e');
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Gagal mencatat kunjungan: $e'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          }
+                        }
                       }
                     },
                     borderRadius: BorderRadius.circular(16),
@@ -386,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Section: Karya Pelaku Budaya (Mockup UMKM)
+                // Section: Karya Pelaku Budaya (From Database)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -406,132 +438,163 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  height: 220,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _karyaItems.length,
-                    itemBuilder: (context, index) {
-                      final item = _karyaItems[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: GestureDetector(
-                          onTap: () {
-                            // Navigate to Karya tab when tapped
-                            widget.onNavigateToTab?.call(2);
-                          },
-                          child: Container(
-                            width: 160,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 2),
+                _isLoadingKarya
+                    ? const SizedBox(
+                      height: 220,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                    : SizedBox(
+                      height: 220,
+                      child:
+                          _karyaItems.isEmpty
+                              ? Center(
+                                child: Text(
+                                  'Belum ada karya',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Image with gradient
-                                Container(
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(16),
+                              )
+                              : ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _karyaItems.length,
+                                itemBuilder: (context, index) {
+                                  final item = _karyaItems[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 16),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        // Navigate to Karya tab when tapped
+                                        widget.onNavigateToTab?.call(2);
+                                      },
+                                      child: Container(
+                                        width: 160,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.05,
+                                              ),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Image with gradient
+                                            Container(
+                                              height: 120,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.vertical(
+                                                      top: Radius.circular(16),
+                                                    ),
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    (item['color'] as Color)
+                                                        .withOpacity(0.8),
+                                                    (item['color'] as Color)
+                                                        .withOpacity(0.4),
+                                                  ],
+                                                ),
+                                              ),
+                                              child: Stack(
+                                                children: [
+                                                  // Decorative icon
+                                                  Center(
+                                                    child: Icon(
+                                                      item['icon'] as IconData,
+                                                      size: 50,
+                                                      color: Colors.white
+                                                          .withOpacity(0.4),
+                                                    ),
+                                                  ),
+                                                  // Tag at bottom
+                                                  Positioned(
+                                                    bottom: 8,
+                                                    left: 8,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 4,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white
+                                                            .withOpacity(0.9),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
+                                                            ),
+                                                      ),
+                                                      child: Text(
+                                                        item['tag'] as String,
+                                                        style: TextStyle(
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color:
+                                                              item['color']
+                                                                  as Color,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Content
+                                            Padding(
+                                              padding: const EdgeInsets.all(12),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    item['name'] as String,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 13,
+                                                    ),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    item['creator'] as String,
+                                                    style: AppTextStyles
+                                                        .bodySmall
+                                                        .copyWith(
+                                                          color:
+                                                              AppColors
+                                                                  .textSecondary,
+                                                        ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        (item['color'] as Color).withOpacity(
-                                          0.8,
-                                        ),
-                                        (item['color'] as Color).withOpacity(
-                                          0.4,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      // Decorative icon
-                                      Center(
-                                        child: Icon(
-                                          item['icon'] as IconData,
-                                          size: 50,
-                                          color: Colors.white.withOpacity(0.4),
-                                        ),
-                                      ),
-                                      // Tag at bottom
-                                      Positioned(
-                                        bottom: 8,
-                                        left: 8,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.9,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            item['tag'] as String,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                              color: item['color'] as Color,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Content
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['name'] as String,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item['creator'] as String,
-                                        style: AppTextStyles.bodySmall.copyWith(
-                                          color: AppColors.textSecondary,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                                  );
+                                },
+                              ),
+                    ),
               ],
             ),
           ),
