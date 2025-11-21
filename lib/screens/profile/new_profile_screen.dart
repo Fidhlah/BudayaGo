@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../config/supabase_config.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -30,43 +31,63 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     super.initState();
     // Always create 2 tabs: Progress & Karya
     _tabController = TabController(length: 2, vsync: this);
-    _loadProfileData();
+
+    // Load data after build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProfileData();
+    });
   }
 
   Future<void> _loadProfileData() async {
     final userId = SupabaseConfig.currentUser?.id;
-    if (userId == null) return;
+    if (userId == null) {
+      if (mounted) {
+        setState(() {
+          _isLoadingCollectibles = false;
+        });
+      }
+      return;
+    }
 
     final profileProvider = Provider.of<ProfileProvider>(
       context,
       listen: false,
     );
 
-    // Load profile if not already loaded
-    if (!profileProvider.hasProfile) {
-      await profileProvider.loadProfile(userId);
-    }
+    try {
+      // Load profile if not already loaded
+      if (!profileProvider.hasProfile) {
+        await profileProvider.loadProfile(userId);
+      }
 
-    // Load collectibles
-    await profileProvider.loadCollectibles();
+      // Load collectibles
+      await profileProvider.loadCollectibles();
 
-    if (mounted) {
-      setState(() {
-        _collectibles =
-            profileProvider.collectibles
-                .map(
-                  (c) => {
-                    'id': c.id,
-                    'name': c.name,
-                    'category': c.category,
-                    'imageUrl': c.imageUrl,
-                    'xpEarned': c.xpEarned,
-                    'unlocked': true,
-                  },
-                )
-                .toList();
-        _isLoadingCollectibles = false;
-      });
+      if (mounted) {
+        setState(() {
+          _collectibles =
+              profileProvider.collectibles
+                  .map(
+                    (c) => {
+                      'id': c.id,
+                      'name': c.name,
+                      'category': c.category,
+                      'imageUrl': c.imageUrl,
+                      'xpEarned': c.xpEarned,
+                      'unlocked': true,
+                    },
+                  )
+                  .toList();
+          _isLoadingCollectibles = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading profile data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingCollectibles = false;
+        });
+      }
     }
   }
 
@@ -117,16 +138,46 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  showDialog(
+                icon: const Icon(Icons.logout),
+                tooltip: 'Logout',
+                onPressed: () async {
+                  // Konfirmasi logout
+                  final shouldLogout = await showDialog<bool>(
                     context: context,
                     builder:
-                        (context) => EditDisplayNameDialog(
-                          currentName:
-                              profile?.displayName ?? 'Penjelajah Budaya',
+                        (context) => AlertDialog(
+                          title: const Text('Konfirmasi Logout'),
+                          content: const Text(
+                            'Apakah Anda yakin ingin keluar?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Batal'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.batik700,
+                              ),
+                              child: const Text('Logout'),
+                            ),
+                          ],
                         ),
                   );
+
+                  if (shouldLogout == true && context.mounted) {
+                    final authProvider = Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    );
+                    await authProvider.signOut();
+                    if (context.mounted) {
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil('/login', (route) => false);
+                    }
+                  }
                 },
               ),
             ],
@@ -226,10 +277,40 @@ class _NewProfileScreenState extends State<NewProfileScreen>
           ),
           SizedBox(height: AppDimensions.spaceM),
 
-          // Display Name
-          Text(
-            profile?.displayName ?? 'Penjelajah Budaya',
-            style: AppTextStyles.h4.copyWith(color: AppColors.background),
+          // Display Name with Edit Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                profile?.displayName ?? 'Penjelajah Budaya',
+                style: AppTextStyles.h4.copyWith(color: AppColors.background),
+              ),
+              SizedBox(width: AppDimensions.spaceS),
+              InkWell(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => EditDisplayNameDialog(
+                          currentName:
+                              profile?.displayName ?? 'Penjelajah Budaya',
+                        ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.background.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                  ),
+                  child: Icon(
+                    Icons.edit,
+                    size: 16,
+                    color: AppColors.background,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: AppDimensions.spaceXS),
 
@@ -250,6 +331,114 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               ),
             ),
           ),
+
+          // Koleksi Artifacts
+          SizedBox(height: AppDimensions.spaceL),
+          _isLoadingCollectibles
+              ? const SizedBox(
+                height: 60,
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+              )
+              : Builder(
+                builder: (context) {
+                  final collectibleCount = _collectibles.length;
+                  final displayCount =
+                      collectibleCount > 0 ? collectibleCount : 5;
+
+                  return SizedBox(
+                    height: 80,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: displayCount,
+                      itemBuilder: (context, index) {
+                        final hasCollectible =
+                            collectibleCount > 0 && index < collectibleCount;
+
+                        if (!hasCollectible) {
+                          return Container(
+                            width: 60,
+                            margin: EdgeInsets.only(
+                              right: AppDimensions.spaceS,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.background.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusM,
+                              ),
+                              border: Border.all(
+                                color: AppColors.background.withOpacity(0.5),
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.lock,
+                                  size: 30,
+                                  color: AppColors.background.withOpacity(0.7),
+                                ),
+                                SizedBox(height: AppDimensions.spaceXS),
+                                Text(
+                                  '${index + 1}',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.background.withOpacity(
+                                      0.7,
+                                    ),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        final collectible = _collectibles[index];
+                        return Container(
+                          width: 60,
+                          margin: EdgeInsets.only(right: AppDimensions.spaceS),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                size: 30,
+                                color: AppColors.batik700,
+                              ),
+                              SizedBox(height: AppDimensions.spaceXS),
+                              Text(
+                                collectible['name'],
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.batik700,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
 
           // Progress Bar (if not hidden and not pelaku budaya with hide option)
           if (!hideProgress) ...[
@@ -369,7 +558,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         'name': 'Kolektor Budaya',
         'desc': 'Kumpulkan 3 artifact',
         'icon': Icons.collections,
-        'unlocked': _collectibles.length >= 3,
+        'unlocked': false, // Will check dynamically later
       },
       {
         'name': 'Master Budaya',
@@ -390,152 +579,103 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Koleksi Artifacts Section
-          Text(
-            'Koleksi Artifact',
-            style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-          ),
-          SizedBox(height: AppDimensions.spaceM),
-          _isLoadingCollectibles
-              ? const Center(child: CircularProgressIndicator())
-              : GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 0.8,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: _collectibles.isEmpty ? 5 : _collectibles.length,
-                itemBuilder: (context, index) {
-                  if (_collectibles.isEmpty || index >= _collectibles.length) {
-                    // Show locked placeholders
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.grey100,
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusM,
-                        ),
-                        border: Border.all(color: AppColors.grey300),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.lock, size: 40, color: AppColors.grey400),
-                          SizedBox(height: AppDimensions.spaceXS),
-                          Text(
-                            'Locked',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final collectible = _collectibles[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.batik50,
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      border: Border.all(color: AppColors.batik300),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.star, size: 40, color: AppColors.batik700),
-                        SizedBox(height: AppDimensions.spaceXS),
-                        Text(
-                          collectible['name'],
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-          SizedBox(height: AppDimensions.spaceXL),
-
           // Achievements Section
           Text(
             'Pencapaian',
             style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
           ),
           SizedBox(height: AppDimensions.spaceM),
-          ...achievements.map((achievement) {
-            final unlocked = achievement['unlocked'] as bool;
-            return Container(
-              margin: EdgeInsets.only(bottom: AppDimensions.spaceM),
-              padding: EdgeInsets.all(AppDimensions.paddingM),
-              decoration: BoxDecoration(
-                color: unlocked ? AppColors.batik50 : AppColors.grey50,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                border: Border.all(
-                  color: unlocked ? AppColors.batik300 : AppColors.grey200,
+          // Build achievement widgets as grid
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.0, // Bujur sangkar
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: achievements.length,
+            itemBuilder: (context, index) {
+              final achievement = achievements[index];
+              // Dynamic check for Kolektor Budaya achievement
+              bool unlocked = achievement['unlocked'] as bool;
+              if (achievement['name'] == 'Kolektor Budaya') {
+                try {
+                  final count = _collectibles.length;
+                  unlocked = count >= 3;
+                } catch (e) {
+                  unlocked = false;
+                }
+              }
+
+              return Container(
+                padding: EdgeInsets.all(AppDimensions.paddingM),
+                decoration: BoxDecoration(
+                  color: unlocked ? AppColors.batik50 : AppColors.grey50,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  border: Border.all(
+                    color: unlocked ? AppColors.batik300 : AppColors.grey200,
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: unlocked ? AppColors.batik700 : AppColors.grey300,
-                      shape: BoxShape.circle,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color:
+                            unlocked ? AppColors.batik700 : AppColors.grey300,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        achievement['icon'] as IconData,
+                        color: AppColors.background,
+                        size: 30,
+                      ),
                     ),
-                    child: Icon(
-                      achievement['icon'] as IconData,
-                      color: AppColors.background,
-                      size: 30,
+                    SizedBox(height: AppDimensions.spaceS),
+                    Text(
+                      achievement['name'] as String,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color:
+                            unlocked
+                                ? AppColors.textPrimary
+                                : AppColors.textTertiary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  SizedBox(width: AppDimensions.spaceM),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          achievement['name'] as String,
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color:
-                                unlocked
-                                    ? AppColors.textPrimary
-                                    : AppColors.textTertiary,
-                          ),
-                        ),
-                        SizedBox(height: AppDimensions.spaceXS),
-                        Text(
-                          achievement['desc'] as String,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color:
-                                unlocked
-                                    ? AppColors.textSecondary
-                                    : AppColors.textTertiary,
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: AppDimensions.spaceXS),
+                    Text(
+                      achievement['desc'] as String,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color:
+                            unlocked
+                                ? AppColors.textSecondary
+                                : AppColors.textTertiary,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  if (unlocked)
-                    Icon(
-                      Icons.check_circle,
-                      color: AppColors.success,
-                      size: 30,
-                    ),
-                ],
-              ),
-            );
-          }).toList(),
+                    if (unlocked) ...[
+                      SizedBox(height: AppDimensions.spaceXS),
+                      Icon(
+                        Icons.check_circle,
+                        color: AppColors.success,
+                        size: 20,
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
