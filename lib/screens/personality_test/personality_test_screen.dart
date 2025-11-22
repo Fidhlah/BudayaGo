@@ -25,49 +25,44 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
     });
   }
 
-  void _selectAnswer(String optionKey) {
+  void _selectAnswer(String optionKey) async {
     final testProvider = Provider.of<character_matcher.PersonalityTestProvider>(
       context,
       listen: false,
     );
 
-    testProvider.submitAnswer(optionKey);
+    // Submit answer and wait for completion if it's the last question
+    await testProvider.submitAnswer(optionKey);
 
     // Check if test is complete
     if (testProvider.isTestComplete) {
-      final result = testProvider.testResult;
-      if (result != null) {
-        // Get highest dimension as mascot type
-        String mascot = _getDominantDimension(result.dimensions);
+      final character = testProvider.assignedCharacter;
+      if (character != null) {
+        if (!mounted) return;
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MascotResultScreen(mascot: mascot),
+            builder:
+                (context) => MascotResultScreen(
+                  characterName: character['name'],
+                  characterDescription: character['description'],
+                  characterImageUrl: character['image_url'],
+                  characterTraits: List<String>.from(
+                    character['personality_traits'] ?? [],
+                  ),
+                ),
           ),
+        );
+      } else {
+        // Fallback if no character assigned
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal mendapatkan hasil karakter')),
         );
       }
     }
-  }
-
-  String _getDominantDimension(Map<String, dynamic> dimensions) {
-    // Convert dimensions to sorted list
-    var sortedDimensions =
-        dimensions.entries.toList()..sort(
-          (a, b) => (b.value.percentage as double).compareTo(
-            a.value.percentage as double,
-          ),
-        );
-
-    // Map dimension to mascot
-    final dimensionToMascot = {
-      'Spiritual': 'Wayang',
-      'Creative': 'Batik',
-      'Analytical': 'Keris',
-      'Social': 'Angklung',
-    };
-
-    return dimensionToMascot[sortedDimensions.first.key] ?? 'Wayang';
   }
 
   @override
@@ -79,6 +74,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              automaticallyImplyLeading: false, // Remove back button
               title: const Text(
                 'Tes Kepribadian',
                 style: TextStyle(color: Colors.black87),
@@ -93,6 +89,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              automaticallyImplyLeading: false, // Remove back button
               title: const Text(
                 'Tes Kepribadian',
                 style: TextStyle(color: Colors.black87),
@@ -115,9 +112,25 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
         }
 
         final currentQuestion = testProvider.currentQuestion;
-        if (currentQuestion == null) {
+        if (currentQuestion == null && !testProvider.isTestComplete) {
           return const Scaffold(
             body: Center(child: Text('No questions available')),
+          );
+        }
+
+        // Show loading if test is complete and processing
+        if (testProvider.isTestComplete) {
+          return const Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Menghitung hasil...'),
+                ],
+              ),
+            ),
           );
         }
 
@@ -127,10 +140,8 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black87),
-              onPressed: () => Navigator.pop(context),
-            ),
+            automaticallyImplyLeading:
+                false, // Remove back button - user must complete test
             title: const Text(
               'Tes Kepribadian',
               style: TextStyle(color: Colors.black87),
@@ -169,7 +180,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                     ),
                     const SizedBox(height: 32),
                     Text(
-                      currentQuestion.text,
+                      currentQuestion!.text,
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

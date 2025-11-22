@@ -34,7 +34,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
   Future<void> _loadKarya() async {
     setState(() => _isLoading = true);
     try {
+      debugPrint('🔄 KaryaScreen: Starting to load karya...');
       final karya = await KaryaService.loadAllKarya();
+      debugPrint('📊 KaryaScreen: Received ${karya.length} karya items');
       if (mounted) {
         setState(() {
           _karyaItems =
@@ -50,7 +52,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'creatorName': creatorName,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
-                  'location': item['location'],
+                  'location': creator?['location'],
                   'color': Color(item['color'] ?? AppColors.batik700.value),
                   'height':
                       200.0 +
@@ -63,13 +65,19 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'imageUrl': item['image_url'],
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
+                  'mascot': creator?['mascot'],
+                  'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
                 };
               }).toList();
           _isLoading = false;
         });
+        debugPrint(
+          '✅ KaryaScreen: State updated with ${_karyaItems.length} items',
+        );
       }
-    } catch (e) {
-      debugPrint('❌ Error loading karya: $e');
+    } catch (e, stackTrace) {
+      debugPrint('❌ KaryaScreen Error loading karya: $e');
+      debugPrint('Stack trace: $stackTrace');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -100,7 +108,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'creatorName': creatorName,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
-                  'location': item['location'],
+                  'location': creator?['location'],
                   'color': Color(item['color'] ?? AppColors.batik700.value),
                   'height': 200.0 + (item['name'].toString().length % 3) * 40.0,
                   'icon': IconData(
@@ -110,6 +118,8 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'imageUrl': item['image_url'],
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
+                  'mascot': creator?['mascot'],
+                  'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
                 };
               }).toList();
           _isLoading = false;
@@ -256,24 +266,50 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.search_off,
-                            size: AppDimensions.iconXL,
+                            Icons.palette_outlined,
+                            size: AppDimensions.iconXL * 1.5,
                             color: AppColors.grey400,
                           ),
                           const SizedBox(height: AppDimensions.spaceM),
                           Text(
-                            'Tidak ada karya yang ditemukan',
+                            _searchQuery.isEmpty
+                                ? 'Belum Ada Karya'
+                                : 'Tidak ada karya yang ditemukan',
                             style: AppTextStyles.h6.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: AppDimensions.spaceXS),
                           Text(
-                            'Coba kata kunci lain',
+                            _searchQuery.isEmpty
+                                ? 'Upload karya pertamamu sebagai Pelaku Budaya'
+                                : 'Coba kata kunci lain',
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.textTertiary,
                             ),
+                            textAlign: TextAlign.center,
                           ),
+                          if (_searchQuery.isEmpty) ...[
+                            const SizedBox(height: AppDimensions.spaceL),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                // Navigate to home and switch to profile tab
+                                Navigator.of(
+                                  context,
+                                ).popUntil((route) => route.isFirst);
+                              },
+                              icon: const Icon(Icons.upload),
+                              label: const Text('Upgrade & Upload Karya'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.batik700,
+                                foregroundColor: AppColors.background,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppDimensions.paddingL,
+                                  vertical: AppDimensions.paddingM,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     )
@@ -358,6 +394,8 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         item['creatorName'] as String,
                         item['color'] as Color,
                         item['location'] as String?,
+                        item['mascot'] as String?,
+                        item['isPelakuBudaya'] as bool,
                       );
                     },
                     child: Row(
@@ -862,6 +900,8 @@ class _KaryaScreenState extends State<KaryaScreen> {
     String userName,
     Color userColor,
     String? location,
+    String? mascot,
+    bool isPelakuBudaya,
   ) {
     Navigator.push(
       context,
@@ -871,6 +911,8 @@ class _KaryaScreenState extends State<KaryaScreen> {
               userName: userName,
               userColor: userColor,
               location: location,
+              mascot: mascot,
+              isPelakuBudaya: isPelakuBudaya,
             ),
       ),
     );

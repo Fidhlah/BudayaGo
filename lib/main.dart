@@ -12,6 +12,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/email_verification_screen.dart';
 import 'screens/main/main_screen.dart';
+import 'screens/personality_test/personality_test_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +43,11 @@ class MyApp extends StatelessWidget {
         // ✅ USE SINGLE THEME
         theme: AppTheme.theme,
 
+        // 🔒 PRODUCTION MODE - Normal authentication flow
         home: const AuthGate(),
+
+        // ⚠️ TESTING MODE - Uncomment untuk langsung ke Personality Test
+        // home: const PersonalityTestScreen(),
         routes: {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
@@ -54,22 +59,152 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ✅ FIXED: AuthGate - Reactive to provider changes only
-class AuthGate extends StatelessWidget {
+// ✅ FIXED: AuthGate - Check auth state AND personality test completion
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  bool _isCheckingCharacter = true;
+  bool _hasCharacter = false;
+  String? _lastCheckedUserId;
+  bool _lastEmailConfirmed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('🔧 AuthGate initState');
+    _checkUserCharacter();
+  }
+
+  Future<void> _checkUserCharacter() async {
+    final user = SupabaseConfig.currentUser;
+
+    if (user == null) {
+      if (mounted) {
+        setState(() {
+          _isCheckingCharacter = false;
+          _hasCharacter = false;
+          _lastCheckedUserId = null;
+        });
+      }
+      return;
+    }
+
+    // Skip check if we already checked this user
+    if (_lastCheckedUserId == user.id) {
+      debugPrint('👤 Already checked user ${user.id}, skipping...');
+      return;
+    }
+
+    // Mark as checking for new user
+    if (mounted) {
+      setState(() {
+        _isCheckingCharacter = true;
+        _lastCheckedUserId = user.id;
+      });
+    }
+
+    try {
+      debugPrint('👤 Checking user character...');
+      debugPrint('   User ID: ${user.id}');
+      debugPrint('   User Email: ${user.email}');
+
+      // Retry logic for new users (trigger might take a moment)
+      int attempts = 0;
+      Map<String, dynamic>? response;
+
+      while (attempts < 3) {
+        response =
+            await SupabaseConfig.client
+                .from('users')
+                .select('character_id, email, username')
+                .eq('id', user.id)
+                .maybeSingle();
+
+        if (response != null) break;
+
+        attempts++;
+        if (attempts < 3) {
+          debugPrint(
+            '   User not found in public.users, retrying... ($attempts/3)',
+          );
+          await Future.delayed(Duration(milliseconds: 500 * attempts));
+        }
+      }
+
+      debugPrint('   Response from DB: $response');
+      debugPrint('   Character ID: ${response?['character_id']}');
+      debugPrint('   Has Character: ${response?['character_id'] != null}');
+
+      if (mounted) {
+        setState(() {
+          _hasCharacter = response?['character_id'] != null;
+          _isCheckingCharacter = false;
+        });
+        debugPrint('   State updated: _hasCharacter=$_hasCharacter');
+      }
+    } catch (e) {
+      debugPrint('❌ Error checking character: $e');
+      if (mounted) {
+        setState(() {
+          _hasCharacter = false;
+          _isCheckingCharacter = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    debugPrint('🔍 AuthGate build() called');
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
+        final user = authProvider.user;
+        final emailConfirmed = authProvider.isEmailConfirmed;
+
+        debugPrint('🔍 Consumer builder - user: ${user?.email ?? "null"}');
+        debugPrint('   Last checked: $_lastCheckedUserId, New: ${user?.id}');
+        debugPrint(
+          '   Email confirmed: $emailConfirmed (was: $_lastEmailConfirmed)',
+        );
+
+        // ✅ Check if user changed OR email confirmation status changed
+        if (user?.id != _lastCheckedUserId ||
+            emailConfirmed != _lastEmailConfirmed) {
+          debugPrint(
+            '🔄 User or email status changed, triggering character check',
+          );
+          // Schedule check for next frame to avoid setState during build
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _lastEmailConfirmed = emailConfirmed;
+              _checkUserCharacter();
+            }
+          });
+        }
+
+        // ✅ User is logged out
+        if (user == null) {
+          debugPrint('🔄 AuthGate - User logged out');
+          debugPrint('→ Showing LoginScreen');
+          return const LoginScreen();
+        }
+
         // ✅ Debug logs
         debugPrint('🔄 AuthGate - Building UI...');
         debugPrint('   Loading: ${authProvider.isLoading}');
         debugPrint('   User: ${authProvider.user?.email}');
         debugPrint('   Email Confirmed: ${authProvider.isEmailConfirmed}');
+        debugPrint('   Checking Character: $_isCheckingCharacter');
+        debugPrint('   Has Character: $_hasCharacter');
 
         // ✅ Loading state
-        if (authProvider.isLoading) {
+        if (authProvider.isLoading || _isCheckingCharacter) {
           return const Scaffold(
             body: Center(
               child: Column(
@@ -85,18 +220,16 @@ class AuthGate extends StatelessWidget {
         }
 
         // ✅ Determine screen based on auth state
-        final user = authProvider.user;
-
-        if (user == null) {
-          // Not logged in
-          debugPrint('→ Showing LoginScreen');
-          return const LoginScreen();
-        } else if (!authProvider.isEmailConfirmed) {
+        if (!authProvider.isEmailConfirmed) {
           // Logged in but email not verified
           debugPrint('→ Showing EmailVerificationScreen');
           return const EmailVerificationScreen();
+        } else if (!_hasCharacter) {
+          // Logged in & verified but no character assigned
+          debugPrint('→ Showing PersonalityTestScreen');
+          return const PersonalityTestScreen();
         } else {
-          // Logged in & email verified
+          // Logged in, verified, and has character
           debugPrint('→ Showing MainScreen');
           return const MainScreen();
         }

@@ -4,9 +4,18 @@ import '../../providers/profile_provider.dart';
 import '../main/main_screen.dart';
 
 class MascotResultScreen extends StatefulWidget {
-  final String mascot;
+  final String characterName;
+  final String characterDescription;
+  final String? characterImageUrl;
+  final List<String> characterTraits;
 
-  const MascotResultScreen({Key? key, required this.mascot}) : super(key: key);
+  const MascotResultScreen({
+    Key? key,
+    required this.characterName,
+    required this.characterDescription,
+    this.characterImageUrl,
+    this.characterTraits = const [],
+  }) : super(key: key);
 
   @override
   State<MascotResultScreen> createState() => _MascotResultScreenState();
@@ -28,45 +37,12 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
       listen: false,
     );
 
-    // TODO: Get actual user ID from AuthProvider
-    // For now, just update the mascot
-    await profileProvider.updateProfile(mascot: widget.mascot);
-  }
-
-  Map<String, dynamic> getMascotInfo() {
-    final mascots = {
-      'Wayang': {
-        'name': 'Si Wayang',
-        'description':
-            'Kamu adalah pendongeng yang bijaksana! Kamu suka berbagi cerita dan makna mendalam.',
-        'icon': Icons.theater_comedy,
-      },
-      'Batik': {
-        'name': 'Si Batik',
-        'description':
-            'Kamu adalah kreator yang artistik! Kamu suka menciptakan sesuatu yang indah dan bermakna.',
-        'icon': Icons.palette,
-      },
-      'Keris': {
-        'name': 'Si Keris',
-        'description':
-            'Kamu adalah peneliti yang tajam! Kamu suka menggali pengetahuan secara mendalam.',
-        'icon': Icons.auto_stories,
-      },
-      'Angklung': {
-        'name': 'Si Angklung',
-        'description':
-            'Kamu adalah kolaborator yang harmonis! Kamu suka bekerja bersama dan menciptakan keselarasan.',
-        'icon': Icons.music_note,
-      },
-    };
-    return mascots[widget.mascot] ?? mascots['Wayang']!;
+    // Save character name as mascot
+    await profileProvider.updateProfile(mascot: widget.characterName);
   }
 
   @override
   Widget build(BuildContext context) {
-    final info = getMascotInfo();
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -96,11 +72,26 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    info['icon'],
-                    size: 100,
-                    color: Colors.orange.shade700,
-                  ),
+                  child:
+                      widget.characterImageUrl != null
+                          ? ClipOval(
+                            child: Image.network(
+                              widget.characterImageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.person,
+                                  size: 100,
+                                  color: Colors.orange.shade700,
+                                );
+                              },
+                            ),
+                          )
+                          : Icon(
+                            Icons.person,
+                            size: 100,
+                            color: Colors.orange.shade700,
+                          ),
                 ),
                 const SizedBox(height: 40),
                 const Text(
@@ -113,7 +104,7 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Pemandumu adalah',
+                  'Karakter kepribadianmu adalah',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white.withOpacity(0.9),
@@ -121,7 +112,7 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  info['name'],
+                  widget.characterName,
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -135,14 +126,47 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    info['description'],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      height: 1.5,
-                    ),
+                  child: Column(
+                    children: [
+                      Text(
+                        widget.characterDescription,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          height: 1.5,
+                        ),
+                      ),
+                      if (widget.characterTraits.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.center,
+                          children:
+                              widget.characterTraits.map((trait) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    trait,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 const Spacer(),
@@ -151,12 +175,14 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      // Navigate to MainScreen and remove all previous routes
+                      // User cannot go back to personality test
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) => MainScreen(mascot: widget.mascot),
+                          builder: (context) => const MainScreen(),
                         ),
+                        (route) => false, // Remove all previous routes
                       );
                     },
                     style: ElevatedButton.styleFrom(
