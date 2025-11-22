@@ -3,6 +3,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/karya_service.dart';
+import '../profile/other_user_profile_screen.dart';
 
 class KaryaScreen extends StatefulWidget {
   const KaryaScreen({Key? key}) : super(key: key);
@@ -348,67 +349,62 @@ class _KaryaScreenState extends State<KaryaScreen> {
             padding: EdgeInsets.all(AppDimensions.paddingM),
             child: Row(
               children: [
-                // Avatar
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        (item['color'] as Color).withOpacity(0.7),
-                        (item['color'] as Color),
-                      ],
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    color: AppColors.background,
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: AppDimensions.spaceS),
-                // Creator name
+                // Avatar & Creator name (clickable)
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                  child: GestureDetector(
+                    onTap: () {
+                      _navigateToUserProfile(
+                        context,
                         item['creatorName'] as String,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      if (item['location'] != null)
-                        Text(
-                          item['location'] as String,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textTertiary,
+                        item['color'] as Color,
+                        item['location'] as String?,
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        // Avatar
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                (item['color'] as Color).withOpacity(0.7),
+                                (item['color'] as Color),
+                              ],
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.background,
+                            size: 24,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                // Tag chip
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: (item['color'] as Color).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: (item['color'] as Color).withOpacity(0.3),
-                    ),
-                  ),
-                  child: Text(
-                    item['tag'] as String,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: item['color'] as Color,
+                        SizedBox(width: AppDimensions.spaceS),
+                        // Creator name
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['creatorName'] as String,
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              if (item['location'] != null)
+                                Text(
+                                  item['location'] as String,
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.textTertiary,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -463,54 +459,40 @@ class _KaryaScreenState extends State<KaryaScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-              ],
-            ),
-          ),
-
-          // Actions & Info
-          Padding(
-            padding: EdgeInsets.all(AppDimensions.paddingM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Karya name and description in Instagram style
-                RichText(
-                  text: TextSpan(
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
+                SizedBox(height: AppDimensions.spaceS),
+                // Tag chip
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (item['color'] as Color).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: (item['color'] as Color).withOpacity(0.3),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextSpan(
-                        text: '${item['creatorName']} ',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                      Icon(
+                        Icons.local_offer,
+                        size: 14,
+                        color: item['color'] as Color,
                       ),
-                      TextSpan(
-                        text: item['name'] as String,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
+                      SizedBox(width: 4),
+                      Text(
+                        item['tag'] as String,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: item['color'] as Color,
                         ),
                       ),
                     ],
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                if (item['description'] != null &&
-                    (item['description'] as String).isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      item['description'] as String,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
               ],
             ),
           ),
@@ -871,6 +853,26 @@ class _KaryaScreenState extends State<KaryaScreen> {
             photos: photos,
             initialIndex: initialIndex,
           ),
+    );
+  }
+
+  // Navigate to user profile
+  void _navigateToUserProfile(
+    BuildContext context,
+    String userName,
+    Color userColor,
+    String? location,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => OtherUserProfileScreen(
+              userName: userName,
+              userColor: userColor,
+              location: location,
+            ),
+      ),
     );
   }
 }
