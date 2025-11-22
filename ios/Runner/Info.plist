@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-    <string>BudayaGo needs camera access to scan QR codes</string>
+    <string>Sembara needs camera access to scan QR codes</string>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>BudayaGo perlu akses lokasi untuk verifikasi check-in</string>
+    <string>Sembara perlu akses lokasi untuk verifikasi check-in</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Budayago</string>
+	<string>Sembara</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,7 +19,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>budayago</string>
+	<string>Sembara</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

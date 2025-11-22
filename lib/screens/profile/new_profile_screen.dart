@@ -1648,12 +1648,12 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       );
 
                       if (shouldLogout == true && context.mounted) {
-                        print('🚪 Logout confirmed, starting logout process...');
-                        
-                        // Close the settings dialog first
-                        Navigator.pop(context);
-                        
-                        // Get all providers
+                        print(
+                          '🚪 Logout confirmed, starting logout process...',
+                        );
+
+                        // Get navigator and providers BEFORE closing dialog
+                        final navigator = Navigator.of(context, rootNavigator: true);
                         final authProvider = Provider.of<AuthProvider>(
                           context,
                           listen: false,
@@ -1667,7 +1667,10 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           listen: false,
                         );
 
-                        print('✅ Got all providers');
+                        print('✅ Got navigator and all providers');
+
+                        // Close the settings dialog
+                        Navigator.pop(context);
 
                         // Clear all state
                         print('🧹 Clearing ProfileProvider...');
@@ -1681,16 +1684,13 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         await authProvider.signOut();
                         print('✅ SignOut completed');
 
-                        // FORCE navigate to login screen
-                        if (context.mounted) {
-                          print('🚀 Navigating to /login...');
-                          Navigator.of(
-                            context,
-                          ).pushNamedAndRemoveUntil('/login', (route) => false);
-                          print('✅ Navigation completed');
-                        } else {
-                          print('❌ Context not mounted, cannot navigate');
-                        }
+                        // Navigate to login screen using saved navigator
+                        print('🚀 Navigating to /login...');
+                        navigator.pushNamedAndRemoveUntil(
+                          '/login',
+                          (route) => false,
+                        );
+                        print('✅ Navigation completed');
                       } else {
                         print('❌ Logout cancelled or context not mounted');
                       }

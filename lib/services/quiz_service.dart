@@ -29,7 +29,7 @@ class QuizService {
             weight_principle
           )
         ''')
-          .order('question_number');
+          .order('question_number', ascending: true);
 
       debugPrint('✅ Loaded ${questionsData.length} questions from database');
       debugPrint('📋 Raw data type: ${questionsData.runtimeType}');
@@ -87,7 +87,8 @@ class QuizService {
     }
   }
 
-  /// Submit test results ke Supabase dan trigger character matching
+  /// Submit test results ke Supabase - ONLY save raw scores
+  /// Character matching will be done by Flutter background service (PersonalityMatcherService)
   static Future<Map<String, dynamic>> submitTestResults({
     required String userId,
     required Map<String, int> scores,
@@ -103,7 +104,7 @@ class QuizService {
         (key, value) => MapEntry(key.toString(), value),
       );
 
-      // Step 1: Upsert test results (insert or update if exists)
+      // Save raw scores ONLY - background service will process
       final resultData =
           await SupabaseConfig.client
               .from('personality_test_results')
@@ -117,53 +118,51 @@ class QuizService {
                 'raw_social': scores['social'] ?? 0,
                 'raw_principle': scores['principle'] ?? 0,
                 'answers': jsonEncode(answersJson),
+                'completed_at': DateTime.now().toIso8601String(),
               }, onConflict: 'user_id')
               .select()
               .single();
 
       debugPrint('✅ Test results saved with ID: ${resultData['id']}');
+      debugPrint('⏳ Background service will process character matching...');
 
-      // Step 2: Verify characters data exists
-      final charactersData = await SupabaseConfig.client
-          .from('characters')
-          .select('id');
+      // Wait for background service to assign character (polling with timeout)
+      final maxAttempts = 30; // 30 seconds max
+      int attempts = 0;
+      String? characterId;
 
-      debugPrint('📊 Characters in database: ${charactersData.length}');
+      while (attempts < maxAttempts) {
+        await Future.delayed(const Duration(seconds: 1));
+        attempts++;
 
-      if (charactersData.isEmpty) {
-        throw Exception(
-          'No characters found in database. Please run UPDATE_CHARACTERS_TABLE.sql first.',
-        );
+        // Check if character has been assigned by background service
+        final testResult =
+            await SupabaseConfig.client
+                .from('personality_test_results')
+                .select('assigned_character_id')
+                .eq('user_id', userId)
+                .single();
+
+        characterId = testResult['assigned_character_id'];
+        
+        if (characterId != null) {
+          debugPrint('✅ Character assigned by background service after ${attempts}s');
+          break;
+        }
+        
+        if (attempts % 5 == 0) {
+          debugPrint('⏳ Still waiting... (${attempts}/${maxAttempts}s)');
+        }
       }
 
-      // Step 3: Process test (normalization + character matching)
-      debugPrint('🎯 Processing personality test...');
-      await SupabaseConfig.client.rpc(
-        'process_personality_test',
-        params: {'p_user_id': userId},
-      );
-
-      debugPrint('✅ Personality test processed');
-
-      // Step 4: Get assigned character from test results
-      final testResult =
-          await SupabaseConfig.client
-              .from('personality_test_results')
-              .select('assigned_character_id')
-              .eq('user_id', userId)
-              .single();
-
-      debugPrint('📋 Test result: $testResult');
-
-      final characterId = testResult['assigned_character_id'];
       if (characterId == null) {
         throw Exception(
-          'Character assignment failed. assigned_character_id is null. '
-          'Check process_personality_test() function in Supabase.',
+          'Character matching timeout. Background service did not assign character within 30 seconds. '
+          'Please check if PersonalityMatcherService is running.',
         );
       }
 
-      // Step 5: Get assigned character details
+      // Get assigned character details
       final characterData =
           await SupabaseConfig.client
               .from('characters')

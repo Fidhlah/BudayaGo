@@ -7,6 +7,7 @@ import 'providers/character-matcher_provider.dart' as character_matcher;
 import 'providers/home_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/chatbot_provider.dart';
+import 'services/personality_matcher_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -17,6 +18,12 @@ import 'screens/personality_test/personality_test_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseConfig.initialize();
+  
+  // 🤖 Start background personality matcher service
+  PersonalityMatcherService.startPolling(
+    interval: const Duration(seconds: 3), // Poll every 3 seconds
+  );
+  
   runApp(const MyApp());
 }
 
