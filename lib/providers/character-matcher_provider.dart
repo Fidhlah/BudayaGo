@@ -47,7 +47,7 @@ class PersonalityTestProvider with ChangeNotifier {
   }
 
   /// Submit answer and move to next question
-  void submitAnswer(String selectedOption) {
+  Future<void> submitAnswer(String selectedOption) async {
     if (currentQuestion == null) return;
 
     // Record answer
@@ -56,19 +56,20 @@ class PersonalityTestProvider with ChangeNotifier {
     // Move to next question
     _currentQuestionIndex++;
 
-    // If test is complete, calculate result
+    // If test is complete, calculate result (await to finish before UI navigates)
     if (isTestComplete) {
-      _calculateResult();
+      await _calculateResult();
+    } else {
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   /// Calculate final result and submit to database
   Future<void> _calculateResult() async {
     try {
       _isLoading = true;
-      notifyListeners();
+      // Don't notify here - let UI handle based on isTestComplete
+      // notifyListeners();
 
       // Get user ID from auth
       final userId = SupabaseConfig.currentUser?.id;
@@ -76,10 +77,20 @@ class PersonalityTestProvider with ChangeNotifier {
         throw Exception('User not authenticated');
       }
 
-      // Get local test result
+      debugPrint('📊 Calculating personality test result...');
+      debugPrint('   Dimension Scores: ${_testService.dimensionScores}');
+
+      // Get local test result (for display purposes)
       _testResult = _testService.calculateResult(userId);
 
-      // Submit to database and get assigned character
+      // Submit to database - akan otomatis:
+      // 1. Save raw scores ke personality_test_results
+      // 2. Trigger process_personality_test() function
+      // 3. Normalisasi skor jadi persentase
+      // 4. Hitung Euclidean Distance dengan semua karakter
+      // 5. Assign karakter dengan jarak terdekat ke user
+      debugPrint('📤 Submitting to database for character matching...');
+
       final result = await QuizService.submitTestResults(
         userId: userId,
         scores: _testService.dimensionScores,
@@ -88,12 +99,14 @@ class PersonalityTestProvider with ChangeNotifier {
 
       if (result['success'] == true) {
         _assignedCharacter = result['character'];
-        debugPrint('✅ Character assigned: ${_assignedCharacter!['name']}');
+        debugPrint('✅ Character matched: ${_assignedCharacter!['name']}');
+        debugPrint('   Description: ${_assignedCharacter!['description']}');
       }
 
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      debugPrint('❌ Error calculating result: $e');
       _error = e.toString();
       _isLoading = false;
       notifyListeners();

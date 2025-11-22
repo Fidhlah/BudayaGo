@@ -9,7 +9,8 @@ class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
 
   @override
-  State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
+  State<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
@@ -25,15 +26,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   // ✅ Listen for email verification (deep link)
   void _listenToAuthChanges() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     // Add listener to detect when email gets verified
     authProvider.addListener(() {
       if (!mounted) return;
-      
-      // ✅ Auto-redirect when email is verified
+
+      // ✅ Navigate to home when email is verified - AuthGate will handle routing
       if (authProvider.isEmailConfirmed) {
-        debugPrint('✅ Email verified! Auto-redirecting to home...');
-        
+        debugPrint(
+          '✅ Email verified! Navigating to trigger AuthGate routing...',
+        );
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -42,14 +45,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        
-        // ✅ Navigate to home (replace entire stack)
+
+        // ✅ Use pushNamedAndRemoveUntil to clear stack and let MaterialApp rebuild with AuthGate
         Future.delayed(const Duration(milliseconds: 500), () {
           if (!mounted) return;
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/home',
-            (route) => false, // Remove all previous routes
-          );
+          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
         });
       }
     });
@@ -60,51 +60,52 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() => _isChecking = true);
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     try {
       debugPrint('🔄 Manually checking email verification...');
-      
+
       await authProvider.refreshUser();
-      
+
       // Add a small delay to ensure state is updated
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       if (!mounted) return;
-      
+
       // ✅ Check if email is now verified
       if (authProvider.isEmailConfirmed) {
-        debugPrint('✅ Email verified!');
-        
+        debugPrint(
+          '✅ Email verified! Navigating to trigger AuthGate routing...',
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('✅ Email verified! Redirecting...'),
             backgroundColor: Colors.green,
           ),
         );
-        
-        // ✅ Navigate to home (listener will also trigger, but that's okay)
+
+        // ✅ Use pushNamedAndRemoveUntil to clear stack and let MaterialApp rebuild with AuthGate
         Future.delayed(const Duration(milliseconds: 500), () {
           if (!mounted) return;
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/home',
-            (route) => false,
-          );
+          Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
         });
       } else {
         debugPrint('⚠️ Email not verified yet');
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('⚠️ Email not verified yet. Please check your inbox.'),
+            content: Text(
+              '⚠️ Email not verified yet. Please check your inbox.',
+            ),
             backgroundColor: Colors.orange,
           ),
         );
       }
     } catch (e) {
       debugPrint('❌ Error checking verification: $e');
-      
+
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('❌ Error: ${e.toString()}'),
@@ -122,7 +123,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Future<void> _resendVerification() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final email = authProvider.user?.email;
-    
+
     if (email == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -135,12 +136,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
     try {
       debugPrint('📧 Resending verification email to: $email');
-      
+
       // TODO: Implement resend in auth_service.dart
       // await authProvider.resendVerificationEmail();
-      
+
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('📧 Verification email sent to $email'),
@@ -149,9 +150,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       );
     } catch (e) {
       debugPrint('❌ Error resending email: $e');
-      
+
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('❌ Error: ${e.toString()}'),
@@ -217,16 +218,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 // Check verification button
                 ElevatedButton.icon(
                   onPressed: _isChecking ? null : _checkVerification,
-                  icon: _isChecking
-                      ? SizedBox(
-                          width: AppDimensions.iconS,
-                          height: AppDimensions.iconS,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Icon(Icons.refresh),
+                  icon:
+                      _isChecking
+                          ? SizedBox(
+                            width: AppDimensions.iconS,
+                            height: AppDimensions.iconS,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                          : const Icon(Icons.refresh),
                   label: Text(_isChecking ? 'Checking...' : 'I\'ve Verified'),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(
@@ -276,7 +280,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 // Sign out option
                 TextButton(
                   onPressed: () async {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    final authProvider = Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    );
                     await authProvider.signOut();
                     // AuthGate will automatically redirect to login
                   },

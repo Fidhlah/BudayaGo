@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../config/supabase_config.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../widgets/custom_bottom_navbar.dart';
@@ -39,8 +40,10 @@ class _MainScreenState extends State<MainScreen> {
 
       // Load profile if not loaded
       if (!profileProvider.hasProfile) {
-        // Will use AuthProvider userId in future
-        profileProvider.loadProfile('default-user');
+        final userId = SupabaseConfig.currentUser?.id;
+        if (userId != null) {
+          profileProvider.loadProfile(userId);
+        }
       }
     });
   }

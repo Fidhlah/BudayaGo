@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
-import '../onboarding/onboarding_screen.dart';
+import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String mascot;
@@ -477,8 +477,8 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: OutlinedButton(
-                  onPressed: () {
-                    showDialog(
+                  onPressed: () async {
+                    final shouldLogout = await showDialog<bool>(
                       context: context,
                       builder:
                           (context) => AlertDialog(
@@ -488,27 +488,46 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () => Navigator.pop(context, false),
                                 child: const Text('Batal'),
                               ),
                               TextButton(
-                                onPressed: () {
-                                  Navigator.of(
-                                    context,
-                                  ).popUntil((route) => route.isFirst);
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => const OnboardingScreen(),
-                                    ),
-                                  );
-                                },
+                                onPressed: () => Navigator.pop(context, true),
                                 child: const Text('Logout'),
                               ),
                             ],
                           ),
                     );
+
+                    if (shouldLogout == true && context.mounted) {
+                      // Get all providers
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
+                      final profileProvider = Provider.of<ProfileProvider>(
+                        context,
+                        listen: false,
+                      );
+                      final homeProvider = Provider.of<HomeProvider>(
+                        context,
+                        listen: false,
+                      );
+
+                      // Clear all state
+                      profileProvider.clear();
+                      homeProvider.resetProgress();
+
+                      // Sign out
+                      await authProvider.signOut();
+
+                      // FORCE navigate to login screen
+                      if (context.mounted) {
+                        Navigator.of(
+                          context,
+                        ).pushNamedAndRemoveUntil('/login', (route) => false);
+                      }
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.red.shade300),

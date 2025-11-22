@@ -4,7 +4,7 @@ import '../services/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   User? _user;
   bool _isLoading = true;
   String? _error;
@@ -22,16 +22,15 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> _initialize() async {
     debugPrint('🔐 AuthProvider: Initializing...');
-    
+
     try {
       // ✅ Get initial user
       _user = _authService.currentUser;
       debugPrint('   Initial user: ${_user?.email}');
       debugPrint('   Email confirmed: ${_user?.emailConfirmedAt != null}');
-      
+
       // ✅ Setup deep link listener
       _setupAuthListener();
-      
     } catch (e) {
       debugPrint('❌ AuthProvider initialization error: $e');
       _error = e.toString();
@@ -48,11 +47,11 @@ class AuthProvider with ChangeNotifier {
       (data) async {
         final event = data.event;
         final newUser = data.session?.user;
-        
+
         debugPrint('🔐 AuthProvider: Auth event - $event');
         debugPrint('   New user: ${newUser?.email}');
         debugPrint('   Email confirmed: ${newUser?.emailConfirmedAt != null}');
-        
+
         // ✅ Handle specific events
         switch (event) {
           case AuthChangeEvent.signedIn:
@@ -61,24 +60,24 @@ class AuthProvider with ChangeNotifier {
             // ✅ Update user state
             final oldEmailConfirmed = _user?.emailConfirmedAt != null;
             final newEmailConfirmed = newUser?.emailConfirmedAt != null;
-            
+
             _user = newUser;
-            
+
             // ✅ If email just got confirmed (deep link success)
             if (!oldEmailConfirmed && newEmailConfirmed) {
               debugPrint('✅ Email verification completed via deep link!');
             }
-            
+
             notifyListeners();
             break;
-            
+
           case AuthChangeEvent.signedOut:
             _user = null;
             _error = null;
             debugPrint('👋 User signed out');
             notifyListeners();
             break;
-            
+
           default:
             debugPrint('ℹ️ Auth event ignored: $event');
         }
@@ -92,29 +91,25 @@ class AuthProvider with ChangeNotifier {
   }
 
   /// ✅ LOGIN: Delegate to service
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> signIn({required String email, required String password}) async {
     try {
       _error = null;
       notifyListeners();
 
       debugPrint('🔐 AuthProvider: Signing in...');
-      
+
       final response = await _authService.signInWithEmail(
         email: email,
         password: password,
       );
 
       _user = response.user;
-      
+
       debugPrint('✅ Sign in successful');
       debugPrint('   Email confirmed: ${_user?.emailConfirmedAt != null}');
-      
+
       notifyListeners();
       return true;
-
     } catch (e) {
       debugPrint('❌ Sign in error: $e');
       _error = e.toString();
@@ -134,7 +129,7 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
 
       debugPrint('📧 AuthProvider: Signing up...');
-      
+
       final response = await _authService.signUpWithEmail(
         email: email,
         password: password,
@@ -142,13 +137,12 @@ class AuthProvider with ChangeNotifier {
       );
 
       _user = response.user;
-      
+
       debugPrint('✅ Sign up successful');
       debugPrint('   Verification email sent to: ${_user?.email}');
-      
+
       notifyListeners();
       return true;
-
     } catch (e) {
       debugPrint('❌ Sign up error: $e');
       _error = e.toString();
@@ -161,15 +155,16 @@ class AuthProvider with ChangeNotifier {
   Future<void> signOut() async {
     try {
       debugPrint('👋 AuthProvider: Signing out...');
-      
+
       await _authService.signOut();
-      
+
       _user = null;
       _error = null;
-      
-      debugPrint('✅ Signed out');
-      notifyListeners();
 
+      debugPrint('✅ Signed out, calling notifyListeners()...');
+      debugPrint('   hasListeners: $hasListeners');
+      notifyListeners();
+      debugPrint('✅ notifyListeners() called');
     } catch (e) {
       debugPrint('❌ Sign out error: $e');
       _error = e.toString();
@@ -181,16 +176,15 @@ class AuthProvider with ChangeNotifier {
   Future<void> refreshUser() async {
     try {
       debugPrint('🔄 AuthProvider: Refreshing user...');
-      
+
       final response = await _authService.refreshSession();
-      
+
       _user = response.session?.user;
-      
+
       debugPrint('✅ User refreshed');
       debugPrint('   Email confirmed: ${_user?.emailConfirmedAt != null}');
-      
-      notifyListeners();
 
+      notifyListeners();
     } catch (e) {
       debugPrint('❌ Refresh error: $e');
       _error = e.toString();
@@ -201,7 +195,7 @@ class AuthProvider with ChangeNotifier {
   /// ✅ Helper: Get user-friendly error message
   String getErrorMessage() {
     if (_error == null) return '';
-    
+
     if (_error!.contains('Invalid login credentials')) {
       return 'Email atau password salah!';
     } else if (_error!.contains('Email not confirmed')) {
@@ -213,7 +207,7 @@ class AuthProvider with ChangeNotifier {
     } else if (_error!.contains('Too many requests')) {
       return 'Terlalu banyak percobaan. Tunggu sebentar.';
     }
-    
+
     return _error!;
   }
 

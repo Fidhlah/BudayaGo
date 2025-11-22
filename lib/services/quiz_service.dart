@@ -32,6 +32,7 @@ class QuizService {
           .order('question_number');
 
       debugPrint('✅ Loaded ${questionsData.length} questions from database');
+      debugPrint('📋 Raw data type: ${questionsData.runtimeType}');
 
       // Convert to TestQuestion model
       List<TestQuestion> questions = [];
@@ -39,32 +40,41 @@ class QuizService {
       for (var qData in questionsData) {
         Map<String, TestOption> options = {};
 
-        // Parse answers
-        final answers = qData['quiz_answers'] as List;
-        for (var answer in answers) {
+        // Parse answers - handle both List and dynamic type
+        final answersRaw = qData['quiz_answers'];
+        final answers = answersRaw is List ? answersRaw : [];
+
+        for (var answerRaw in answers) {
+          // Convert to Map if needed
+          final answer =
+              answerRaw is Map<String, dynamic>
+                  ? answerRaw
+                  : Map<String, dynamic>.from(answerRaw as Map);
+
           final optionKey = answer['option_key'] as String;
 
-          // Build weights map
+          // Build weights map - safely cast to int
           Map<String, int> weights = {
-            'spirituality': answer['weight_spirituality'] ?? 0,
-            'courage': answer['weight_courage'] ?? 0,
-            'empathy': answer['weight_empathy'] ?? 0,
-            'logic': answer['weight_logic'] ?? 0,
-            'creativity': answer['weight_creativity'] ?? 0,
-            'social': answer['weight_social'] ?? 0,
-            'principle': answer['weight_principle'] ?? 0,
+            'spirituality':
+                (answer['weight_spirituality'] as num?)?.toInt() ?? 0,
+            'courage': (answer['weight_courage'] as num?)?.toInt() ?? 0,
+            'empathy': (answer['weight_empathy'] as num?)?.toInt() ?? 0,
+            'logic': (answer['weight_logic'] as num?)?.toInt() ?? 0,
+            'creativity': (answer['weight_creativity'] as num?)?.toInt() ?? 0,
+            'social': (answer['weight_social'] as num?)?.toInt() ?? 0,
+            'principle': (answer['weight_principle'] as num?)?.toInt() ?? 0,
           };
 
           options[optionKey] = TestOption(
-            text: answer['option_text'],
+            text: answer['option_text'] as String,
             weights: weights,
           );
         }
 
         questions.add(
           TestQuestion(
-            id: qData['question_number'],
-            text: qData['question_text'],
+            id: (qData['question_number'] as num).toInt(),
+            text: qData['question_text'] as String,
             options: options,
           ),
         );
@@ -88,11 +98,16 @@ class QuizService {
       debugPrint('   User ID: $userId');
       debugPrint('   Scores: $scores');
 
-      // Step 1: Insert test results
+      // Convert answers Map<int, String> to JSON-compatible format
+      final answersJson = answers.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
+
+      // Step 1: Upsert test results (insert or update if exists)
       final resultData =
           await SupabaseConfig.client
               .from('personality_test_results')
-              .insert({
+              .upsert({
                 'user_id': userId,
                 'raw_spirituality': scores['spirituality'] ?? 0,
                 'raw_courage': scores['courage'] ?? 0,
@@ -101,14 +116,27 @@ class QuizService {
                 'raw_creativity': scores['creativity'] ?? 0,
                 'raw_social': scores['social'] ?? 0,
                 'raw_principle': scores['principle'] ?? 0,
-                'answers': jsonEncode(answers),
-              })
+                'answers': jsonEncode(answersJson),
+              }, onConflict: 'user_id')
               .select()
               .single();
 
-      debugPrint('✅ Test results inserted with ID: ${resultData['id']}');
+      debugPrint('✅ Test results saved with ID: ${resultData['id']}');
 
-      // Step 2: Process test (normalization + character matching)
+      // Step 2: Verify characters data exists
+      final charactersData = await SupabaseConfig.client
+          .from('characters')
+          .select('id');
+
+      debugPrint('📊 Characters in database: ${charactersData.length}');
+
+      if (charactersData.isEmpty) {
+        throw Exception(
+          'No characters found in database. Please run UPDATE_CHARACTERS_TABLE.sql first.',
+        );
+      }
+
+      // Step 3: Process test (normalization + character matching)
       debugPrint('🎯 Processing personality test...');
       await SupabaseConfig.client.rpc(
         'process_personality_test',
@@ -117,26 +145,39 @@ class QuizService {
 
       debugPrint('✅ Personality test processed');
 
-      // Step 3: Get assigned character
-      final userData =
+      // Step 4: Get assigned character from test results
+      final testResult =
           await SupabaseConfig.client
-              .from('users')
+              .from('personality_test_results')
+              .select('assigned_character_id')
+              .eq('user_id', userId)
+              .single();
+
+      debugPrint('📋 Test result: $testResult');
+
+      final characterId = testResult['assigned_character_id'];
+      if (characterId == null) {
+        throw Exception(
+          'Character assignment failed. assigned_character_id is null. '
+          'Check process_personality_test() function in Supabase.',
+        );
+      }
+
+      // Step 5: Get assigned character details
+      final characterData =
+          await SupabaseConfig.client
+              .from('characters')
               .select('''
-          character_id,
-          quiz_completed,
-          characters (
             id,
             name,
             description,
             lore,
             archetype,
-            image_url
-          )
-        ''')
-              .eq('id', userId)
+            image_url,
+            personality_traits
+          ''')
+              .eq('id', characterId)
               .single();
-
-      final characterData = userData['characters'];
 
       debugPrint('✅ Character assigned: ${characterData['name']}');
 
@@ -148,7 +189,8 @@ class QuizService {
           'description': characterData['description'],
           'lore': characterData['lore'],
           'archetype': characterData['archetype'],
-          'imageUrl': characterData['image_url'],
+          'image_url': characterData['image_url'],
+          'personality_traits': characterData['personality_traits'] ?? [],
         },
         'testResultId': resultData['id'],
       };

@@ -167,11 +167,28 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   );
 
                   if (shouldLogout == true && context.mounted) {
+                    // Get all providers
                     final authProvider = Provider.of<AuthProvider>(
                       context,
                       listen: false,
                     );
+                    final profileProvider = Provider.of<ProfileProvider>(
+                      context,
+                      listen: false,
+                    );
+                    final homeProvider = Provider.of<HomeProvider>(
+                      context,
+                      listen: false,
+                    );
+
+                    // Clear all state
+                    profileProvider.clear();
+                    homeProvider.resetProgress();
+
+                    // Sign out
                     await authProvider.signOut();
+
+                    // FORCE navigate to login screen
                     if (context.mounted) {
                       Navigator.of(
                         context,
