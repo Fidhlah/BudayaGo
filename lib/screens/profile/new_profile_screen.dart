@@ -23,14 +23,19 @@ class NewProfileScreen extends StatefulWidget {
 class _NewProfileScreenState extends State<NewProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  List<Map<String, dynamic>> _collectibles = [];
+  List<Map<String, dynamic>>? _collectibles;
   bool _isLoadingCollectibles = true;
+  List<Map<String, dynamic>>? _visitedLocations;
 
   @override
   void initState() {
     super.initState();
     // Always create 2 tabs: Progress & Karya
     _tabController = TabController(length: 2, vsync: this);
+
+    // Explicitly initialize lists for Flutter Web compatibility
+    _collectibles = <Map<String, dynamic>>[];
+    _visitedLocations = <Map<String, dynamic>>[];
 
     // Load data after build is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,6 +70,28 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
       if (mounted) {
         setState(() {
+          // Demo visited locations (nanti bisa dari database)
+          _visitedLocations = [
+            {
+              'uuid': '550e8400-e29b-41d4-a716-446655440002',
+              'name': 'Candi Borobudur',
+              'description': 'Candi Buddha terbesar di dunia',
+              'visitedAt': DateTime.now().subtract(const Duration(days: 2)),
+            },
+            {
+              'uuid': '550e8400-e29b-41d4-a716-446655440003',
+              'name': 'Candi Prambanan',
+              'description': 'Candi Hindu terbesar di Indonesia',
+              'visitedAt': DateTime.now().subtract(const Duration(days: 5)),
+            },
+            {
+              'uuid': '550e8400-e29b-41d4-a716-446655440004',
+              'name': 'Keraton Yogyakarta',
+              'description': 'Istana resmi Kesultanan Yogyakarta',
+              'visitedAt': DateTime.now().subtract(const Duration(days: 10)),
+            },
+          ];
+
           // Fixed 5 collectibles: mix of locked and unlocked
           _collectibles = [
             // 2 unlocked collectibles for demo clickable feature
@@ -392,7 +419,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               )
               : Builder(
                 builder: (context) {
-                  final collectibleCount = _collectibles.length;
+                  final collectibleCount = _collectibles?.length ?? 0;
                   final displayCount =
                       collectibleCount > 0 ? collectibleCount : 5;
 
@@ -450,7 +477,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           );
                         }
 
-                        final collectible = _collectibles[index];
+                        final collectible = _collectibles![index];
                         final isUnlocked = collectible['unlocked'] == true;
 
                         return Flexible(
@@ -677,7 +704,126 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Visited Locations Section
+          Text(
+            'Tempat yang Sudah Dikunjungi',
+            style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          ),
+          SizedBox(height: AppDimensions.spaceM),
+
+          if ((_visitedLocations?.length ?? 0) == 0)
+            Container(
+              padding: EdgeInsets.all(AppDimensions.paddingL),
+              decoration: BoxDecoration(
+                color: AppColors.grey50,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                border: Border.all(color: AppColors.grey200),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.location_off, size: 48, color: AppColors.grey300),
+                  SizedBox(height: AppDimensions.spaceS),
+                  Text(
+                    'Belum ada tempat yang dikunjungi',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          if ((_visitedLocations?.length ?? 0) > 0)
+            ...(_visitedLocations ?? []).map((location) {
+              final visitedAt = location['visitedAt'] as DateTime;
+              final daysAgo = DateTime.now().difference(visitedAt).inDays;
+
+              return Container(
+                margin: EdgeInsets.only(bottom: AppDimensions.spaceM),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  border: Border.all(color: AppColors.batik200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(AppDimensions.paddingM),
+                  leading: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: AppColors.orangePinkGradient,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.location_on,
+                      color: AppColors.background,
+                      size: 28,
+                    ),
+                  ),
+                  title: Text(
+                    location['name'] ?? 'Unknown Location',
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: AppDimensions.spaceXS),
+                      Text(
+                        location['description'] ?? '',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: AppDimensions.spaceXS),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: AppColors.textTertiary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            daysAgo == 0
+                                ? 'Hari ini'
+                                : daysAgo == 1
+                                ? '1 hari yang lalu'
+                                : '$daysAgo hari yang lalu',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textTertiary,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  trailing: Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                    size: 24,
+                  ),
+                ),
+              );
+            }).toList(),
+
           // Achievements Section
+          SizedBox(height: AppDimensions.spaceXL),
           Text(
             'Pencapaian',
             style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
@@ -698,10 +844,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               final achievement = achievements[index];
               // Dynamic check for Kolektor Budaya achievement
               bool unlocked = achievement['unlocked'] as bool;
-              if (achievement['name'] == 'Kolektor Budaya') {
+              if (achievement['name'] == 'Kolektor Budaya' && mounted) {
                 try {
-                  final count = _collectibles.length;
-                  unlocked = count >= 3;
+                  unlocked = (_collectibles?.length ?? 0) >= 3;
                 } catch (e) {
                   unlocked = false;
                 }
