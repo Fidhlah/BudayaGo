@@ -65,19 +65,68 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
       if (mounted) {
         setState(() {
-          _collectibles =
-              profileProvider.collectibles
-                  .map(
-                    (c) => {
-                      'id': c.id,
-                      'name': c.name,
-                      'category': c.category,
-                      'imageUrl': c.imageUrl,
-                      'xpEarned': c.xpEarned,
-                      'unlocked': true,
-                    },
-                  )
-                  .toList();
+          // Fixed 5 collectibles: mix of locked and unlocked
+          _collectibles = [
+            // 2 unlocked collectibles for demo clickable feature
+            {
+              'id': 'artifact_batik_1',
+              'name': 'Batik Parang',
+              'category': 'Kain',
+              'imageUrl': null,
+              'xpEarned': 50,
+              'unlocked': true,
+              'description':
+                  'Motif batik klasik yang melambangkan kekuatan dan ketangguhan. Berasal dari Jawa Tengah.',
+              'location': 'Yogyakarta',
+              'rarity': 'Rare',
+            },
+            {
+              'id': 'artifact_wayang_1',
+              'name': 'Wayang Arjuna',
+              'category': 'Wayang',
+              'imageUrl': null,
+              'xpEarned': 75,
+              'unlocked': true,
+              'description':
+                  'Tokoh pewayangan yang menjadi simbol kesatria sejati. Wayang ini digunakan dalam pertunjukan wayang kulit.',
+              'location': 'Surakarta',
+              'rarity': 'Epic',
+            },
+            // 3 locked collectibles
+            {
+              'id': 'artifact_keris_1',
+              'name': 'Keris Majapahit',
+              'category': 'Senjata',
+              'imageUrl': null,
+              'xpEarned': 100,
+              'unlocked': false,
+              'description': 'Keris pusaka dari era Majapahit.',
+              'location': 'Jawa Timur',
+              'rarity': 'Legendary',
+            },
+            {
+              'id': 'artifact_angklung_1',
+              'name': 'Angklung',
+              'category': 'Alat Musik',
+              'imageUrl': null,
+              'xpEarned': 60,
+              'unlocked': false,
+              'description': 'Alat musik tradisional dari Jawa Barat.',
+              'location': 'Bandung',
+              'rarity': 'Rare',
+            },
+            {
+              'id': 'artifact_topeng_1',
+              'name': 'Topeng Cirebon',
+              'category': 'Topeng',
+              'imageUrl': null,
+              'xpEarned': 40,
+              'unlocked': false,
+              'description': 'Topeng tradisional dari Cirebon.',
+              'location': 'Cirebon',
+              'rarity': 'Common',
+            },
+          ];
           _isLoadingCollectibles = false;
         });
       }
@@ -402,45 +451,83 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         }
 
                         final collectible = _collectibles[index];
+                        final isUnlocked = collectible['unlocked'] == true;
+
                         return Flexible(
                           child: AspectRatio(
                             aspectRatio: 1.0,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.background,
-                                borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusM,
+                            child: GestureDetector(
+                              onTap:
+                                  isUnlocked
+                                      ? () {
+                                        _showCollectibleDetail(
+                                          context,
+                                          collectible,
+                                        );
+                                      }
+                                      : null,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      isUnlocked
+                                          ? AppColors.background
+                                          : AppColors.background.withOpacity(
+                                            0.3,
+                                          ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusM,
+                                  ),
+                                  border:
+                                      isUnlocked
+                                          ? null
+                                          : Border.all(
+                                            color: AppColors.background
+                                                .withOpacity(0.5),
+                                          ),
+                                  boxShadow:
+                                      isUnlocked
+                                          ? [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ]
+                                          : null,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 30,
-                                    color: AppColors.batik700,
-                                  ),
-                                  SizedBox(height: AppDimensions.spaceXS),
-                                  Text(
-                                    collectible['name'],
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: AppColors.batik700,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isUnlocked ? Icons.star : Icons.lock,
+                                      size: 30,
+                                      color:
+                                          isUnlocked
+                                              ? AppColors.batik700
+                                              : AppColors.background
+                                                  .withOpacity(0.7),
                                     ),
-                                    textAlign: TextAlign.center,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                                    SizedBox(height: AppDimensions.spaceXS),
+                                    Text(
+                                      isUnlocked ? collectible['name'] : '???',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color:
+                                            isUnlocked
+                                                ? AppColors.batik700
+                                                : AppColors.background
+                                                    .withOpacity(0.7),
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -754,6 +841,202 @@ class _NewProfileScreenState extends State<NewProfileScreen>
           ),
         );
       },
+    );
+  }
+
+  void _showCollectibleDetail(
+    BuildContext context,
+    Map<String, dynamic> collectible,
+  ) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AppColors.orangePinkGradient,
+                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Close button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+
+                  // Artifact Icon
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.background,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.star,
+                      size: 60,
+                      color: AppColors.batik700,
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceM),
+
+                  // Artifact Name
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    child: Text(
+                      collectible['name'] ?? 'Unknown Artifact',
+                      style: AppTextStyles.h3.copyWith(
+                        color: AppColors.background,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceXS),
+
+                  // Rarity Badge
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingM,
+                      vertical: AppDimensions.paddingXS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.background.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
+                    ),
+                    child: Text(
+                      collectible['rarity'] ?? 'Common',
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.background,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceL),
+
+                  // Info Container
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    padding: EdgeInsets.all(AppDimensions.paddingM),
+                    decoration: BoxDecoration(
+                      color: AppColors.background.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Category
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.category,
+                              color: AppColors.background,
+                              size: 20,
+                            ),
+                            SizedBox(width: AppDimensions.spaceS),
+                            Text(
+                              'Kategori: ${collectible['category'] ?? '-'}',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.background,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: AppDimensions.spaceS),
+
+                        // Location
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: AppColors.background,
+                              size: 20,
+                            ),
+                            SizedBox(width: AppDimensions.spaceS),
+                            Text(
+                              collectible['location'] ?? '-',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.background,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: AppDimensions.spaceS),
+
+                        // XP Earned
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star_border,
+                              color: AppColors.background,
+                              size: 20,
+                            ),
+                            SizedBox(width: AppDimensions.spaceS),
+                            Text(
+                              '+${collectible['xpEarned'] ?? 0} XP',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceL),
+
+                  // Description
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    child: Text(
+                      collectible['description'] ?? 'No description available.',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.background,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceL),
+                ],
+              ),
+            ),
+          ),
     );
   }
 

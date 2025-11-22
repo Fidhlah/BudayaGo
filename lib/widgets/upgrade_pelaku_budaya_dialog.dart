@@ -52,16 +52,30 @@ class UpgradeToPelakuBudayaDialog extends StatelessWidget {
               context,
               listen: false,
             );
+
+            // Show loading
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder:
+                  (context) => const Center(child: CircularProgressIndicator()),
+            );
+
             await profileProvider.upgradeToPelakuBudaya();
 
             if (context.mounted) {
+              // Close loading dialog
               Navigator.pop(context);
+              // Close upgrade dialog
+              Navigator.pop(context);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text(
                     'Selamat! Kamu sekarang Pelaku Budaya 🎉',
                   ),
                   backgroundColor: AppColors.success,
+                  duration: const Duration(seconds: 3),
                 ),
               );
             }
