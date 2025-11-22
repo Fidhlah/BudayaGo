@@ -7,15 +7,17 @@ import 'package:flutter/foundation.dart'; // Import for debugPrint
 class ChatService {
   static const String workerUrl = 'https://budayago.kiyahh.workers.dev/';
 
-  /// Sends a user message to the custom RAG endpoint and awaits the LLM response.
-  Future<String> sendMessage(String userMessage) async {
-    // 1. Prepare the URI
+  // 1. Prepare the URI
+  Future<String> sendMessage(
+    String userMessage, {
+    String character = 'timun mas',
+  }) async {
     final uri = Uri.parse(workerUrl);
 
-    // 2. Prepare the JSON body
+    // 2. Prepare the JSON body structure
     final bodyJson = jsonEncode(<String, String>{
-      // The Worker expects a JSON object with the key 'message'
       'message': userMessage,
+      'character': character, // Send the character key
     });
 
     try {
@@ -23,7 +25,6 @@ class ChatService {
       final response = await http.post(
         uri,
         headers: <String, String>{
-          // Ensure the request headers specify JSON content
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: bodyJson,
