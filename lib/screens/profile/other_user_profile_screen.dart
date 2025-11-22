@@ -7,12 +7,16 @@ class OtherUserProfileScreen extends StatelessWidget {
   final String userName;
   final Color userColor;
   final String? location;
+  final String? mascot;
+  final bool isPelakuBudaya;
 
   const OtherUserProfileScreen({
     super.key,
     required this.userName,
     required this.userColor,
     this.location,
+    this.mascot,
+    this.isPelakuBudaya = false,
   });
 
   @override
@@ -116,10 +120,16 @@ class OtherUserProfileScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.verified, size: 18, color: userColor),
+                        Icon(
+                          isPelakuBudaya ? Icons.verified : _getMascotIcon(),
+                          size: 18,
+                          color: userColor,
+                        ),
                         SizedBox(width: 8),
                         Text(
-                          '✨ Pelaku Budaya',
+                          isPelakuBudaya
+                              ? '✨ Pelaku Budaya'
+                              : _getMascotBadgeText(),
                           style: AppTextStyles.labelMedium.copyWith(
                             color: userColor,
                             fontWeight: FontWeight.bold,
@@ -161,39 +171,132 @@ class OtherUserProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: AppDimensions.spaceM),
 
-                  // Grid of karya (placeholder)
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 1,
+                  // List of karya cards with photo variations
+                  ...List.generate(4, (index) {
+                    // Variasi jumlah foto: 1, 2, 3, atau 4
+                    final photoCount = (index % 4) + 1;
+
+                    return Card(
+                      margin: EdgeInsets.only(bottom: AppDimensions.spaceL),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
                         ),
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          gradient: LinearGradient(
-                            colors: [
-                              userColor.withOpacity(0.6),
-                              userColor.withOpacity(0.3),
-                            ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header: Creator info
+                          Padding(
+                            padding: EdgeInsets.all(AppDimensions.paddingM),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: userColor,
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: AppColors.background,
+                                    size: 20,
+                                  ),
+                                ),
+                                SizedBox(width: AppDimensions.spaceS),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        userName,
+                                        style: AppTextStyles.labelLarge
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      Text(
+                                        location ?? 'Indonesia',
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.image,
-                            color: AppColors.background.withOpacity(0.7),
-                            size: 40,
+
+                          // Photo Grid (1-4 photos)
+                          _buildKaryaPhotoGrid(photoCount, userColor),
+
+                          // Content: Title + Description
+                          Padding(
+                            padding: EdgeInsets.all(AppDimensions.paddingM),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    style: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: '$userName ',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(text: 'Karya ${index + 1}'),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: AppDimensions.spaceXS),
+                                Text(
+                                  'Karya seni budaya yang menggambarkan keindahan tradisi Nusantara.',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+
+                          // Tag at bottom
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              AppDimensions.paddingM,
+                              0,
+                              AppDimensions.paddingM,
+                              AppDimensions.paddingM,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.local_offer,
+                                  size: 16,
+                                  color: userColor,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  index % 2 == 0 ? 'Seni Rupa' : 'Kerajinan',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: userColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -223,5 +326,134 @@ class OtherUserProfileScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // Helper methods untuk photo grid
+  Widget _buildKaryaPhotoGrid(int photoCount, Color userColor) {
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.zero,
+        child: Builder(
+          builder: (context) {
+            switch (photoCount) {
+              case 1:
+                return _buildSingleKaryaPhoto(0, userColor);
+              case 2:
+                return _buildTwoKaryaPhotos(0, userColor);
+              case 3:
+                return _buildThreeKaryaPhotos(0, userColor);
+              case 4:
+                return _buildFourKaryaPhotos(0, userColor);
+              default:
+                return _buildSingleKaryaPhoto(0, userColor);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSingleKaryaPhoto(int index, Color userColor) {
+    return _buildKaryaPhotoPlaceholder(userColor);
+  }
+
+  Widget _buildTwoKaryaPhotos(int index, Color userColor) {
+    return Row(
+      children: [
+        Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+        SizedBox(width: 2),
+        Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+      ],
+    );
+  }
+
+  Widget _buildThreeKaryaPhotos(int index, Color userColor) {
+    return Row(
+      children: [
+        Expanded(flex: 2, child: _buildKaryaPhotoPlaceholder(userColor)),
+        SizedBox(width: 2),
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+              SizedBox(height: 2),
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFourKaryaPhotos(int index, Color userColor) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+              SizedBox(width: 2),
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+            ],
+          ),
+        ),
+        SizedBox(height: 2),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+              SizedBox(width: 2),
+              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKaryaPhotoPlaceholder(Color userColor) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [userColor.withOpacity(0.6), userColor.withOpacity(0.3)],
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.image,
+          color: AppColors.background.withOpacity(0.7),
+          size: 40,
+        ),
+      ),
+    );
+  }
+
+  IconData _getMascotIcon() {
+    switch (mascot) {
+      case 'Komodo':
+        return Icons.pets;
+      case 'Harimau':
+        return Icons.shield;
+      case 'Garuda':
+        return Icons.flight;
+      case 'Merak':
+        return Icons.auto_awesome;
+      case 'Orangutan':
+        return Icons.favorite;
+      case 'Gajah':
+        return Icons.people;
+      case 'Banteng':
+        return Icons.flag;
+      default:
+        return Icons.star;
+    }
+  }
+
+  String _getMascotBadgeText() {
+    return mascot ?? 'User';
   }
 }

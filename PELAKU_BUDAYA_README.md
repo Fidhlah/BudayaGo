@@ -1,4 +1,4 @@
-# Fitur Pelaku Budaya - BudayaGo
+# Fitur Pelaku Budaya - Sembara
 
 ## 📋 Overview
 Sistem pelaku budaya memungkinkan user untuk upgrade akun mereka menjadi "Pelaku Budaya" yang dapat mengupload dan showcase hasil kerajinan budaya.
