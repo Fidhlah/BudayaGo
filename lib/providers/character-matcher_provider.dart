@@ -18,8 +18,11 @@ class PersonalityTestProvider with ChangeNotifier {
   // Getters
   List<TestQuestion> get questions => _questions;
   int get currentQuestionIndex => _currentQuestionIndex;
-  TestQuestion? get currentQuestion =>
-      _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
+  TestQuestion? get currentQuestion => _questions.isNotEmpty &&
+          _currentQuestionIndex >= 0 &&
+          _currentQuestionIndex < _questions.length
+      ? _questions[_currentQuestionIndex]
+      : null;
   TestResult? get testResult => _testResult;
   bool get isLoading => _isLoading;
   String? get error => _error;

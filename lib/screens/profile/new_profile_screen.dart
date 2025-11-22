@@ -1621,7 +1621,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   // Logout Button
                   ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context);
+                      // Show logout confirmation dialog
                       final shouldLogout = await showDialog<bool>(
                         context: context,
                         builder:
@@ -1648,6 +1648,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       );
 
                       if (shouldLogout == true && context.mounted) {
+                        print('🚪 Logout confirmed, starting logout process...');
+                        
+                        // Close the settings dialog first
+                        Navigator.pop(context);
+                        
                         // Get all providers
                         final authProvider = Provider.of<AuthProvider>(
                           context,
@@ -1662,19 +1667,32 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           listen: false,
                         );
 
+                        print('✅ Got all providers');
+
                         // Clear all state
+                        print('🧹 Clearing ProfileProvider...');
                         profileProvider.clear();
+                        print('🧹 Clearing HomeProvider...');
                         homeProvider.resetProgress();
+                        print('✅ Providers cleared');
 
                         // Sign out
+                        print('🔐 Calling authProvider.signOut()...');
                         await authProvider.signOut();
+                        print('✅ SignOut completed');
 
                         // FORCE navigate to login screen
                         if (context.mounted) {
+                          print('🚀 Navigating to /login...');
                           Navigator.of(
                             context,
                           ).pushNamedAndRemoveUntil('/login', (route) => false);
+                          print('✅ Navigation completed');
+                        } else {
+                          print('❌ Context not mounted, cannot navigate');
                         }
+                      } else {
+                        print('❌ Logout cancelled or context not mounted');
                       }
                     },
                     style: ElevatedButton.styleFrom(
