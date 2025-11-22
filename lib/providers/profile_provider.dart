@@ -366,10 +366,13 @@ class ProfileProvider extends ChangeNotifier {
       );
 
       debugPrint('✅ User upgraded to Pelaku Budaya');
+
+      // Notify listeners immediately after updating profile
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
       _error = 'Failed to upgrade: $e';
       debugPrint('❌ ProfileProvider.upgradeToPelakuBudaya error: $e');
-    } finally {
       _isLoading = false;
       notifyListeners();
     }

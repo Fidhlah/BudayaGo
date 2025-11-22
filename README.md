@@ -1,6 +1,6 @@
-# budayago
+# Sembara
 
-A new Flutter project.
+Aplikasi eksplorasi dan pelestarian budaya Indonesia.
 
 ## Getting Started
 
