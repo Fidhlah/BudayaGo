@@ -3,12 +3,13 @@
 import os
 import sys
 import time
+import requests
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 # --- Configuration ---
 # ⚠️ 1. Set the display name for your store
@@ -20,8 +21,32 @@ MIME_TYPE = 'application/json'
 # ---------------------
 
 
-def create_or_get_store(client: genai.Client) -> types.FileSearchStore:
-    """Finds an existing store by display name or creates a new one."""
+def delete_store(store_name: str, api_key: str) -> bool:
+    """Deletes a file search store using the REST API endpoint."""
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/{store_name}?key={api_key}&force=true"
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    try:
+        print(f"🗑️ Deleting existing store: {store_name}")
+        response = requests.delete(url, headers=headers)
+
+        if response.status_code == 200:
+            print(f"✅ Successfully deleted store: {store_name}")
+            return True
+        else:
+            print(f"❌ Failed to delete store. Status: {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
+    except Exception as e:
+        print(f"❌ Error deleting store: {e}")
+        return False
+
+
+def create_or_get_store(client: genai.Client, api_key: str) -> types.FileSearchStore:
+    """Finds an existing store by display name, deletes it, and creates a new one."""
 
     print(f"Checking for store: '{FILE_STORE_DISPLAY_NAME}'...")
 
@@ -30,10 +55,17 @@ def create_or_get_store(client: genai.Client) -> types.FileSearchStore:
     for store in existing_stores:
         if store.display_name == FILE_STORE_DISPLAY_NAME:
             print(f"✅ Found existing store: {store.name}")
-            return store
+            # Delete the existing store
+            if delete_store(store.name, api_key):
+                print("✅ Existing store deleted successfully")
+                # Add a small delay to ensure deletion is complete
+                time.sleep(2)
+            else:
+                print("❌ Failed to delete existing store, creating anyway...")
+            break
 
-    # If not found, create a new one
-    print("Store not found. Creating a new File Search Store...")
+    # Create a new store
+    print("Creating a new File Search Store...")
     new_store = client.file_search_stores.create(
         config={'display_name': FILE_STORE_DISPLAY_NAME}
     )
@@ -126,13 +158,13 @@ def main():
         client = genai.Client(api_key=api_key)
 
         # Step 1: Create or get the File Search Store
-        file_store = create_or_get_store(client)
+        file_store = create_or_get_store(client, api_key)
 
         # Step 2: Upload and process all JSON files
         upload_and_process_files(client, file_store.name)
 
         print(
-            f"\nSetup Complete! Use this store name in your Cloudflare Worker: **{file_store.name}**")
+            f"\nSetup Complete! Use this store name in your Cloudflare Worker: {file_store.name}")
 
     except Exception as e:
         print(
