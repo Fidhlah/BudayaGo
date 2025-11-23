@@ -1,12 +1,6 @@
 {
-    "application_name": "Budaya Nusantara Explorer",
-    "description": "suatu aplikasi yang dirancang untuk mengeksplorasi dan mempelajari berbagai budaya di Nusantara melalui teks, gambar, dan video.",
-    "locations": {
-        "/": "Home",
-        "/about": "About the Application",
-        "/explore": "Explore Cultures",
-        "/contact": "Contact Us"
-    },
+    "application_name": "Sembara",
+    "description": "Sembara adalah suatu aplikasi yang dirancang untuk mengeksplorasi dan mempelajari berbagai budaya di Nusantara melalui teks, gambar, dan video.",
     "features": [
         "QR Code Scanning untuk akses cepat ke konten budaya.",
         "Pencarian berbasis teks untuk menemukan informasi budaya tertentu.",
