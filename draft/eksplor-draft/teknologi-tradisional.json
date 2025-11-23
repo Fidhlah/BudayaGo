@@ -3,60 +3,70 @@
     "title": "Pinisi",
     "description": "Mahakarya teknologi pembuatan kapal kayu dari Bulukumba, Sulawesi Selatan. Kapal ini dibangun tanpa menggunakan paku besi, melainkan pasak kayu, namun mampu mengarungi samudra luas. Ciri khas teknologinya adalah penggunaan dua tiang utama dan tujuh helai layar yang memiliki makna filosofis. Proses pembuatannya menggabungkan teknik presisi arsitektur laut dengan ritual adat.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Sulawesi Selatan"
+    "region": "Sulawesi Selatan",
+    "image_url":"https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/kapal-pinisi-sea-safari-8_169.jpeg"
   },
   {
     "title": "Keris",
     "description": "Senjata tikam golongan belati yang dibuat dengan teknologi tempa logam tingkat tinggi. Seorang 'Empu' menyatukan lapisan besi dan nikel (batu meteor) yang dilipat ribuan kali untuk menciptakan motif 'Pamor' yang indah dan kuat. Selain sebagai senjata, teknologi pembuatan keris juga memperhitungkan keseimbangan, ergonomi, dan estetika spiritual.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Jawa Tengah"
+    "region": "Jawa Tengah",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/keris.jpg"
   },
   {
     "title": "Rumah Gadang",
     "description": "Arsitektur rumah adat Minangkabau yang dirancang tahan gempa. Tiang-tiang rumah ini tidak ditanam ke tanah, melainkan bertumpu di atas batu pipih agar bisa bergerak fleksibel saat guncangan. Sambungan kayunya tidak menggunakan paku, melainkan pasak kayu yang justru semakin kencang jika terjadi getaran. Atapnya yang runcing (Gonjong) didesain untuk melancarkan aliran air hujan.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Sumatera Barat"
+    "region": "Sumatera Barat",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/Rumah_Gadang.jpg"
   },
   {
     "title": "Noken",
     "description": "Tas tradisional masyarakat Papua yang dibuat dengan teknik anyaman atau simpul jaring dari serat kulit kayu (seperti pohon Manduam atau Nawa). Noken didesain sangat kuat dan elastis untuk membawa barang berat (hasil kebun, kayu bakar, bahkan anak babi), namun uniknya cara membawanya adalah dengan digantungkan di kepala (dahi), bukan di bahu.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Papua"
+    "region": "Papua",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/noken.jpg"
   },
   {
     "title": "Batik Tulis (Canting)",
     "description": "Teknologi pewarnaan kain menggunakan perintang malam (lilin panas). Alat utamanya adalah 'Canting', pena tembaga kecil berisi lilin cair untuk menggambar motif rumit di atas kain. Teknologi ini memanfaatkan sifat lilin yang menolak air/warna, sehingga bagian yang tertutup lilin akan tetap putih saat kain dicelup pewarna. Teknik ini diakui UNESCO sebagai warisan dunia.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "D.I. Yogyakarta"
+    "region": "D.I. Yogyakarta",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/macam%20canting%20batik%20(1).jpg"
   },
   {
     "title": "Perahu Sandeq",
     "description": "Perahu layar cadik khas Suku Mandar yang dikenal sebagai salah satu perahu layar tercepat di dunia di kelasnya. Desainnya sangat aerodinamis dengan lambung ramping dan cadik di kedua sisi (baratan) untuk keseimbangan. Teknologi pembuatannya memperhitungkan ketahanan terhadap ombak Selat Makassar dan kecepatan memanfaatkan angin.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Sulawesi Barat"
+    "region": "Sulawesi Barat",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/sandeq.jpeg"
   },
   {
     "title": "Sasando",
     "description": "Alat musik petik khas Pulau Rote yang memiliki teknologi resonansi unik. Wadah resonansinya terbuat dari daun lontar yang dilengkungkan (haik), yang berfungsi memantulkan suara senar sehingga terdengar nyaring dan merdu. Senarnya direntangkan pada tabung bambu di tengah. Desain ini memungkinkan Sasando menghasilkan nada yang khas dan berbeda dari alat musik dawai lainnya.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Nusa Tenggara Timur"
+    "region": "Nusa Tenggara Timur",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/sasando.png"
   },
   {
     "title": "Mandau",
     "description": "Senjata parang khas Suku Dayak yang dibuat dengan teknik metalurgi khusus. Bilah Mandau ditempa sedemikian rupa sehingga satu sisinya cembung dan sisi lainnya datar. Teknologi bentuk ini membuat hasil tebasan sangat efektif dan tidak mudah tersangkut pada kayu keras. Gagangnya diukir dari tanduk rusa dan sarungnya dihiasi anyaman rotan.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Kalimantan Tengah"
+    "region": "Kalimantan Tengah",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/mandau.jpg"
   },
   {
     "title": "Jembatan Akar",
     "description": "Teknologi rekayasa hayati (bio-engineering) yang luar biasa di Pesisir Selatan. Jembatan ini tidak dibangun dari semen atau kayu mati, melainkan dengan merajut akar hidup dua pohon beringin/kubang di sisi sungai yang berseberangan. Butuh waktu puluhan tahun untuk membentuknya. Semakin tua jembatan, akarnya semakin besar dan kuat menahan beban orang yang melintas.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Sumatera Barat"
+    "region": "Sumatera Barat",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/jembatan-akar-bayang-di-sumatera-barat.jpg"
   },
   {
     "title": "Angklung",
     "description": "Alat musik bambu yang memanfaatkan teknologi 'tabung getar'. Setiap tabung bambu dipotong dan diserut dengan presisi tinggi untuk menghasilkan nada tertentu saat digoyangkan (benturan antar tabung). Sambungan antar bambu menggunakan teknik ikat rotan yang fleksibel namun kuat. Pengetahuan memilih jenis bambu (bambu hitam/wulung) dan waktu penebangan juga menjadi bagian dari teknologi ini.",
     "cultural_element": "Teknologi Tradisional",
-    "region": "Jawa Barat"
+    "region": "Jawa Barat",
+    "image_url": "https://pxbpgqceblkoununhmos.supabase.co/storage/v1/object/public/eksplorasi/teknologi-tradisional/angklung.jpeg"
   }
 ]
