@@ -52,7 +52,7 @@ class _CulturalObjectDetailScreenState
   void _onScroll() {
     // Deteksi jika user sudah scroll 70% dari konten
     final threshold = _scrollController.position.maxScrollExtent * 0.7;
-    
+
     if (_scrollController.position.pixels >= threshold) {
       if (!_hasReadToBottom) {
         setState(() {
@@ -155,80 +155,91 @@ class _CulturalObjectDetailScreenState
                   // Hero Image dari database
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: widget.imageUrl != null
-                        ? Image.network(
-                            widget.imageUrl!,
-                            height: 250,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                height: 250,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      widget.categoryColor.withOpacity(0.3),
-                                      widget.categoryColor.withOpacity(0.1),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
+                    child:
+                        widget.imageUrl != null
+                            ? Image.network(
+                              widget.imageUrl!,
+                              height: 250,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  height: 250,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        widget.categoryColor.withOpacity(0.3),
+                                        widget.categoryColor.withOpacity(0.1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
                                   ),
-                                ),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                    color: widget.categoryColor,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                      color: widget.categoryColor,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              debugPrint('❌ Error loading image: $error');
-                              return Container(
-                                height: 250,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      widget.categoryColor.withOpacity(0.3),
-                                      widget.categoryColor.withOpacity(0.1),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                debugPrint('❌ Error loading image: $error');
+                                return Container(
+                                  height: 250,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        widget.categoryColor.withOpacity(0.3),
+                                        widget.categoryColor.withOpacity(0.1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
                                   ),
+                                  child: Icon(
+                                    widget.categoryIcon,
+                                    size: 100,
+                                    color: widget.categoryColor.withOpacity(
+                                      0.5,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                            : Container(
+                              height: 250,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    widget.categoryColor.withOpacity(0.3),
+                                    widget.categoryColor.withOpacity(0.1),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                                child: Icon(
-                                  widget.categoryIcon,
-                                  size: 100,
-                                  color: widget.categoryColor.withOpacity(0.5),
-                                ),
-                              );
-                            },
-                          )
-                        : Container(
-                            height: 250,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  widget.categoryColor.withOpacity(0.3),
-                                  widget.categoryColor.withOpacity(0.1),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              ),
+                              child: Icon(
+                                widget.categoryIcon,
+                                size: 100,
+                                color: widget.categoryColor.withOpacity(0.5),
                               ),
                             ),
-                            child: Icon(
-                              widget.categoryIcon,
-                              size: 100,
-                              color: widget.categoryColor.withOpacity(0.5),
-                            ),
-                          ),
                   ),
                   const SizedBox(height: 20),
 
@@ -321,7 +332,9 @@ class _CulturalObjectDetailScreenState
                                 color: Colors.black87,
                                 height: 1.6,
                               ),
-                              listBullet: TextStyle(color: widget.categoryColor),
+                              listBullet: TextStyle(
+                                color: widget.categoryColor,
+                              ),
                               strong: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -354,7 +367,9 @@ class _CulturalObjectDetailScreenState
                                         : '\u{1F4DC} Scroll ke bawah untuk membaca seluruh konten dan dapatkan XP',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: widget.categoryColor.withOpacity(0.9),
+                                      color: widget.categoryColor.withOpacity(
+                                        0.9,
+                                      ),
                                       height: 1.4,
                                     ),
                                   ),
@@ -366,7 +381,9 @@ class _CulturalObjectDetailScreenState
                       ),
                     ),
                   ),
-                  const SizedBox(height: 150), // Extra space untuk memastikan bisa scroll
+                  const SizedBox(
+                    height: 150,
+                  ), // Extra space untuk memastikan bisa scroll
                 ],
               ),
             ),

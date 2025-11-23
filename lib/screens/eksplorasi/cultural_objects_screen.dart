@@ -189,7 +189,10 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
                   region: provinceName,
                   description:
                       object['description'] ?? 'Deskripsi tidak tersedia',
-                  fullContent: object['full_content'] ?? object['description'] ?? 'Konten tidak tersedia',
+                  fullContent:
+                      object['full_content'] ??
+                      object['description'] ??
+                      'Konten tidak tersedia',
                   xp: object['xp_reward'] ?? 150,
                   categoryColor: widget.categoryColor,
                   categoryIcon: widget.categoryIcon,
