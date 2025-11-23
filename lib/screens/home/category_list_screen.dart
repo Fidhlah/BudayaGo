@@ -17,6 +17,7 @@ class CategoryListScreen extends StatelessWidget {
     final items = _getItemsForCategory(category);
 
     return Scaffold(
+      backgroundColor: Colors.orange.shade50,
       appBar: CustomGradientAppBar(title: category),
       body: ListView.builder(
         padding: const EdgeInsets.all(20),

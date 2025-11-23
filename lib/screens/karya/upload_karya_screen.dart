@@ -238,6 +238,7 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.orange50,
       appBar: CustomGradientAppBar(title: 'Upload Karya'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppDimensions.paddingM),

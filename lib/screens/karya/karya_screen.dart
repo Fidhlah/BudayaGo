@@ -142,6 +142,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.orange50,
       appBar: CustomGradientAppBar(title: 'Karya Pelaku Budaya'),
       body: Column(
         children: [

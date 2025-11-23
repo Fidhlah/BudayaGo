@@ -44,6 +44,8 @@ class CustomGradientAppBar extends StatelessWidget
                 onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
               )
               : leadingIcon,
+      centerTitle: false,
+      titleSpacing: 8,
       title: Text(
         title,
         style: AppTextStyles.h5.copyWith(

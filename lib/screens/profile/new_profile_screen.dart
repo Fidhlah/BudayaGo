@@ -155,6 +155,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         final isPelakuBudaya = profile?.isPelakuBudaya ?? false;
 
         return Scaffold(
+          backgroundColor: AppColors.orange50,
           appBar: CustomGradientAppBar(
             title: 'Profil Saya',
             actions: [
@@ -588,6 +589,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
           if ((_visitedLocations?.length ?? 0) == 0)
             Container(
+              width: double.infinity,
               padding: EdgeInsets.all(AppDimensions.paddingL),
               decoration: BoxDecoration(
                 color: AppColors.grey50,
@@ -603,6 +605,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -614,6 +617,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               final daysAgo = DateTime.now().difference(visitedAt).inDays;
 
               return Container(
+                width: double.infinity,
                 margin: EdgeInsets.only(bottom: AppDimensions.spaceM),
                 decoration: BoxDecoration(
                   color: AppColors.background,
@@ -709,10 +713,10 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+              crossAxisCount: 3,
+              childAspectRatio: 0.85,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
             ),
             itemCount: achievements.length,
             itemBuilder: (context, index) {
@@ -741,8 +745,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
                         color:
                             unlocked ? AppColors.batik700 : AppColors.grey300,
@@ -751,10 +755,10 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       child: Icon(
                         achievement['icon'] as IconData,
                         color: AppColors.background,
-                        size: 20,
+                        size: 26,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 6),
                     Flexible(
                       child: Text(
                         achievement['name'] as String,
@@ -764,14 +768,14 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                   ? AppColors.textPrimary
                                   : AppColors.textTertiary,
                           fontWeight: FontWeight.bold,
-                          fontSize: 9,
+                          fontSize: 11,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    SizedBox(height: 4),
                     Flexible(
                       child: Text(
                         achievement['desc'] as String,
@@ -780,7 +784,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               unlocked
                                   ? AppColors.textSecondary
                                   : AppColors.textTertiary,
-                          fontSize: 7,
+                          fontSize: 9,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
