@@ -53,7 +53,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'creatorName': creatorName,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
-                  'location': creator?['location'],
+                  'location': 'Indonesia', // Default location
                   'color': Color(item['color'] ?? AppColors.batik700.value),
                   'height':
                       200.0 +
@@ -66,7 +66,6 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'imageUrl': item['image_url'],
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
-                  'mascot': creator?['mascot'],
                   'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
                 };
               }).toList();
@@ -109,7 +108,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'creatorName': creatorName,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
-                  'location': creator?['location'],
+                  'location': 'Indonesia', // Default location
                   'color': Color(item['color'] ?? AppColors.batik700.value),
                   'height': 200.0 + (item['name'].toString().length % 3) * 40.0,
                   'icon': IconData(
@@ -119,7 +118,6 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'imageUrl': item['image_url'],
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
-                  'mascot': creator?['mascot'],
                   'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
                 };
               }).toList();
@@ -396,7 +394,6 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         item['creatorName'] as String,
                         item['color'] as Color,
                         item['location'] as String?,
-                        item['mascot'] as String?,
                         item['isPelakuBudaya'] as bool,
                       );
                     },
@@ -541,358 +538,138 @@ class _KaryaScreenState extends State<KaryaScreen> {
     );
   }
 
-  // Build photo grid (1-4 photos like Twitter/X)
+  // Build photo grid - display actual image from database
   Widget _buildPhotoGrid(BuildContext context, Map<String, dynamic> item) {
-    // Generate different number of photos based on item index for variation
-    // Get a pseudo-random number of photos (1-4) based on item properties
-    final int photoCount =
-        ((item['name'] as String).length + (item['tag'] as String).length) % 4 +
-        1;
-
-    // Create photo list with variations
-    final List<Map<String, dynamic>> photos = [];
-    final List<IconData> iconVariations = [
-      Icons.photo,
-      Icons.image,
-      Icons.collections,
-      Icons.wallpaper,
-    ];
-
-    for (int i = 0; i < photoCount; i++) {
-      photos.add({
-        'color': item['color'],
-        'icon':
-            i == 0 ? item['icon'] : iconVariations[i % iconVariations.length],
-      });
-    }
-
-    if (photoCount == 1) {
-      return _buildSinglePhoto(context, photos[0], 0, photos);
-    } else if (photoCount == 2) {
-      return _buildTwoPhotos(context, photos);
-    } else if (photoCount == 3) {
-      return _buildThreePhotos(context, photos);
-    } else {
-      return _buildFourPhotos(context, photos);
-    }
-  }
-
-  // Single photo layout
-  Widget _buildSinglePhoto(
-    BuildContext context,
-    Map<String, dynamic> photo,
-    int index,
-    List<Map<String, dynamic>> allPhotos,
-  ) {
-    return GestureDetector(
-      onTap: () => _showFullscreenPhoto(context, index, allPhotos),
-      child: Container(
+    final String? imageUrl = item['imageUrl'] as String?;
+    
+    // If no image, show placeholder
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return Container(
         width: double.infinity,
-        height: 400,
+        height: 300,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              (photo['color'] as Color).withOpacity(0.8),
-              (photo['color'] as Color).withOpacity(0.4),
+              (item['color'] as Color).withOpacity(0.8),
+              (item['color'] as Color).withOpacity(0.4),
             ],
           ),
         ),
         child: Center(
           child: Icon(
-            photo['icon'] as IconData,
-            size: 120,
+            item['icon'] as IconData,
+            size: 100,
             color: Colors.white.withOpacity(0.5),
           ),
+        ),
+      );
+    }
+    
+    // Display actual image
+    return GestureDetector(
+      onTap: () => _showFullscreenPhoto(context, imageUrl),
+      child: Container(
+        width: double.infinity,
+        height: 300,
+        color: AppColors.grey200,
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    (item['color'] as Color).withOpacity(0.8),
+                    (item['color'] as Color).withOpacity(0.4),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.broken_image,
+                      size: 64,
+                      color: Colors.white.withOpacity(0.5),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Gagal memuat gambar',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  // Two photos layout (side by side)
-  Widget _buildTwoPhotos(
-    BuildContext context,
-    List<Map<String, dynamic>> photos,
-  ) {
-    return SizedBox(
-      height: 300,
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showFullscreenPhoto(context, 0, photos),
-              child: Container(
-                margin: const EdgeInsets.only(right: 1),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      (photos[0]['color'] as Color).withOpacity(0.8),
-                      (photos[0]['color'] as Color).withOpacity(0.4),
-                    ],
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    photos[0]['icon'] as IconData,
-                    size: 80,
-                    color: Colors.white.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showFullscreenPhoto(context, 1, photos),
-              child: Container(
-                margin: const EdgeInsets.only(left: 1),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      (photos[1]['color'] as Color).withOpacity(0.8),
-                      (photos[1]['color'] as Color).withOpacity(0.4),
-                    ],
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    photos[1]['icon'] as IconData,
-                    size: 80,
-                    color: Colors.white.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // Three photos layout (left big, right 2 stacked)
-  Widget _buildThreePhotos(
-    BuildContext context,
-    List<Map<String, dynamic>> photos,
-  ) {
-    return SizedBox(
-      height: 300,
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () => _showFullscreenPhoto(context, 0, photos),
-              child: Container(
-                margin: const EdgeInsets.only(right: 1),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      (photos[0]['color'] as Color).withOpacity(0.8),
-                      (photos[0]['color'] as Color).withOpacity(0.4),
-                    ],
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    photos[0]['icon'] as IconData,
-                    size: 80,
-                    color: Colors.white.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 1, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 1, bottom: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[1]['color'] as Color).withOpacity(0.8),
-                            (photos[1]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[1]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 2, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 1, top: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[2]['color'] as Color).withOpacity(0.8),
-                            (photos[2]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[2]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Four photos layout (2x2 grid)
-  Widget _buildFourPhotos(
-    BuildContext context,
-    List<Map<String, dynamic>> photos,
-  ) {
-    return SizedBox(
-      height: 300,
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 0, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 1, bottom: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[0]['color'] as Color).withOpacity(0.8),
-                            (photos[0]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[0]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 1, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 1, bottom: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[1]['color'] as Color).withOpacity(0.8),
-                            (photos[1]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[1]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 2, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 1, top: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[2]['color'] as Color).withOpacity(0.8),
-                            (photos[2]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[2]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showFullscreenPhoto(context, 3, photos),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 1, top: 1),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            (photos[3]['color'] as Color).withOpacity(0.8),
-                            (photos[3]['color'] as Color).withOpacity(0.4),
-                          ],
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          photos[3]['icon'] as IconData,
-                          size: 60,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // Show fullscreen photo viewer
-  void _showFullscreenPhoto(
-    BuildContext context,
-    int initialIndex,
-    List<Map<String, dynamic>> photos,
-  ) {
+  void _showFullscreenPhoto(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
       barrierColor: Colors.black,
-      builder:
-          (context) => _FullscreenPhotoViewer(
-            photos: photos,
-            initialIndex: initialIndex,
-          ),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: Icon(Icons.close, color: Colors.white, size: 32),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -902,7 +679,6 @@ class _KaryaScreenState extends State<KaryaScreen> {
     String userName,
     Color userColor,
     String? location,
-    String? mascot,
     bool isPelakuBudaya,
   ) {
     Navigator.push(
@@ -913,7 +689,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
               userName: userName,
               userColor: userColor,
               location: location,
-              mascot: mascot,
+              mascot: null, // Mascot field no longer exists in database
               isPelakuBudaya: isPelakuBudaya,
             ),
       ),

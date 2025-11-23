@@ -323,7 +323,7 @@ class ProfileProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   /// Get collectibles data as Map for backward compatibility
   List<Map<String, dynamic>> get collectiblesAsMap {
     return _collectibles.map((c) => c.toJson()).toList();
@@ -379,7 +379,7 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   /// Add uploaded karya ID
-  void addUploadedKarya(String karyaId) {
+  Future<void> addUploadedKarya(String karyaId) async {
     if (_profile == null) return;
 
     final updatedIds = List<String>.from(_profile!.uploadedKaryaIds)
@@ -387,8 +387,20 @@ class ProfileProvider extends ChangeNotifier {
     _profile = _profile!.copyWith(uploadedKaryaIds: updatedIds);
     notifyListeners();
 
-    // TODO: Sync to Supabase
-    debugPrint('✅ Added karya: $karyaId');
+    // Sync to Supabase (now properly implemented)
+    try {
+      await SupabaseConfig.client
+          .from('users')
+          .update({
+            'uploaded_karya_ids': updatedIds,
+          })
+          .eq('id', _profile!.id);
+      
+      debugPrint('✅ Synced karya to database: $karyaId');
+    } catch (e) {
+      debugPrint('❌ Error syncing uploaded_karya_ids: $e');
+      // Note: Keep local state even if sync fails
+    }
   }
 
   /// Clear all data (for logout)

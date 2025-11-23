@@ -64,13 +64,14 @@ class AchievementService {
       debugPrint('🏆 Checking achievement $achievementId for user $userId');
 
       // Check if already achieved
-      final existing = await SupabaseConfig.client
-          .from('user_achievements')
-          .select()
-          .eq('user_id', userId)
-          .eq('achievement_id', achievementId)
-          .eq('is_completed', true)
-          .maybeSingle();
+      final existing =
+          await SupabaseConfig.client
+              .from('user_achievements')
+              .select()
+              .eq('user_id', userId)
+              .eq('achievement_id', achievementId)
+              .eq('is_completed', true)
+              .maybeSingle();
 
       if (existing != null) {
         debugPrint('⚠️ Achievement already unlocked');
@@ -78,34 +79,33 @@ class AchievementService {
       }
 
       // Get achievement details
-      final achievement = await SupabaseConfig.client
-          .from('achievements')
-          .select()
-          .eq('id', achievementId)
-          .single();
+      final achievement =
+          await SupabaseConfig.client
+              .from('achievements')
+              .select()
+              .eq('id', achievementId)
+              .single();
 
       // Insert or update user achievement
-      final userAchievement = await SupabaseConfig.client
-          .from('user_achievements')
-          .upsert({
-            'user_id': userId,
-            'achievement_id': achievementId,
-            'is_completed': true,
-            'achieved_at': DateTime.now().toIso8601String(),
-            'progress': progressData ?? {'current': 0},
-          })
-          .select()
-          .single();
+      final userAchievement =
+          await SupabaseConfig.client
+              .from('user_achievements')
+              .upsert({
+                'user_id': userId,
+                'achievement_id': achievementId,
+                'is_completed': true,
+                'achieved_at': DateTime.now().toIso8601String(),
+                'progress': progressData ?? {'current': 0},
+              })
+              .select()
+              .single();
 
       // Add XP reward to user
       final expReward = achievement['exp_reward'] as int? ?? 0;
       if (expReward > 0) {
         await SupabaseConfig.client.rpc(
           'add_user_exp',
-          params: {
-            'p_user_id': userId,
-            'p_exp': expReward,
-          },
+          params: {'p_user_id': userId, 'p_exp': expReward},
         );
       }
 
@@ -124,13 +124,11 @@ class AchievementService {
     required Map<String, dynamic> progressData,
   }) async {
     try {
-      await SupabaseConfig.client
-          .from('user_achievements')
-          .upsert({
-            'user_id': userId,
-            'achievement_id': achievementId,
-            'progress': progressData,
-          });
+      await SupabaseConfig.client.from('user_achievements').upsert({
+        'user_id': userId,
+        'achievement_id': achievementId,
+        'progress': progressData,
+      });
 
       debugPrint('✅ Achievement progress updated');
       return true;
@@ -141,7 +139,7 @@ class AchievementService {
   }
 
   /// Track specific events for achievements
-  /// 
+  ///
   /// Example usage:
   /// ```dart
   /// await AchievementService.trackEvent(
@@ -188,7 +186,9 @@ class AchievementService {
           if (unlockedCount >= 3) {
             await checkAndUnlockAchievement(
               userId: userId,
-              achievementId: await _getAchievementIdByAction('collectibles_unlocked'),
+              achievementId: await _getAchievementIdByAction(
+                'collectibles_unlocked',
+              ),
               progressData: {'collectibles_unlocked': unlockedCount},
             );
           }
@@ -216,11 +216,12 @@ class AchievementService {
   /// Helper to get achievement ID by criteria action
   static Future<String> _getAchievementIdByAction(String action) async {
     try {
-      final achievement = await SupabaseConfig.client
-          .from('achievements')
-          .select('id')
-          .contains('criteria', {'action': action})
-          .single();
+      final achievement =
+          await SupabaseConfig.client
+              .from('achievements')
+              .select('id')
+              .contains('criteria', {'action': action})
+              .single();
 
       return achievement['id'] as String;
     } catch (e) {
