@@ -47,13 +47,20 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   void _initializeTabController() {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
     final isPelakuBudaya = profileProvider.profile?.isPelakuBudaya ?? false;
-    
+
     // Initialize TabController for Pelaku Budaya and auto-open Karya tab
     if (isPelakuBudaya) {
       if (_tabController == null || _tabController!.length != 2) {
-        _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Start at Karya tab
+        _tabController = TabController(
+          length: 2,
+          vsync: this,
+          initialIndex: 1,
+        ); // Start at Karya tab
       }
     }
   }
@@ -845,8 +852,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 SizedBox(height: AppDimensions.spaceL),
                 Text(
                   'Gagal memuat karya',
-                  style:
-                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.h5.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 SizedBox(height: AppDimensions.spaceS),
                 Text(
@@ -877,8 +885,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 SizedBox(height: AppDimensions.spaceL),
                 Text(
                   'Belum ada karya',
-                  style:
-                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.h5.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 SizedBox(height: AppDimensions.spaceS),
                 Text(
@@ -917,28 +926,29 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KaryaDetailScreen(
-                          karya: {
-                            'id': karya['id'],
-                            'name': karya['name'],
-                            'description': karya['description'],
-                            'imageUrl': imageUrl,
-                            'tag': karya['tag'],
-                            'umkm': karya['umkm_category'],
-                            'creatorName': profile.displayName ?? 'Anonim',
-                            'location': profile.displayName ?? 'Indonesia',
-                            'color': Color(
-                              karya['color'] ?? AppColors.batik700.value,
+                        builder:
+                            (context) => KaryaDetailScreen(
+                              karya: {
+                                'id': karya['id'],
+                                'name': karya['name'],
+                                'description': karya['description'],
+                                'imageUrl': imageUrl,
+                                'tag': karya['tag'],
+                                'umkm': karya['umkm_category'],
+                                'creatorName': profile.displayName ?? 'Anonim',
+                                'location': profile.displayName ?? 'Indonesia',
+                                'color': Color(
+                                  karya['color'] ?? AppColors.batik700.value,
+                                ),
+                                'icon': IconData(
+                                  karya['icon_code_point'] ??
+                                      Icons.auto_awesome.codePoint,
+                                  fontFamily: 'MaterialIcons',
+                                ),
+                                'likes': karya['likes'] ?? 0,
+                                'views': karya['views'] ?? 0,
+                              },
                             ),
-                            'icon': IconData(
-                              karya['icon_code_point'] ??
-                                  Icons.auto_awesome.codePoint,
-                              fontFamily: 'MaterialIcons',
-                            ),
-                            'likes': karya['likes'] ?? 0,
-                            'views': karya['views'] ?? 0,
-                          },
-                        ),
                       ),
                     );
                   },
@@ -1053,7 +1063,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               ),
                             ),
                             if (karya['description'] != null &&
-                                (karya['description'] as String).isNotEmpty) ...[
+                                (karya['description'] as String)
+                                    .isNotEmpty) ...[
                               SizedBox(height: AppDimensions.spaceXS),
                               Text(
                                 karya['description'] as String,
@@ -1077,8 +1088,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         color: AppColors.batik700,
                                       ),
                                     ),
-                                    backgroundColor:
-                                        AppColors.batik700.withOpacity(0.1),
+                                    backgroundColor: AppColors.batik700
+                                        .withOpacity(0.1),
                                     side: BorderSide.none,
                                     padding: EdgeInsets.zero,
                                     materialTapTargetSize:
@@ -1092,8 +1103,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
-                                    backgroundColor:
-                                        AppColors.grey100.withOpacity(0.5),
+                                    backgroundColor: AppColors.grey100
+                                        .withOpacity(0.5),
                                     side: BorderSide.none,
                                     padding: EdgeInsets.zero,
                                     materialTapTargetSize:
@@ -1114,8 +1125,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       },
     );
   }
-
-
 
   void _showCollectibleDetail(
     BuildContext context,
@@ -1514,7 +1523,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   Widget _buildPelakuBudayaBody(UserProfile profile) {
     // Ensure TabController is initialized (already done in initState with Karya tab as default)
     if (_tabController == null || _tabController!.length != 2) {
-      _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Default to Karya tab
+      _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: 1,
+      ); // Default to Karya tab
     }
 
     return Column(

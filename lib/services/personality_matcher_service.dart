@@ -270,10 +270,7 @@ class PersonalityMatcherService {
     // Update users table
     await SupabaseConfig.client
         .from('users')
-        .update({
-          'character_id': bestCharacter['id'],
-          'quiz_completed': true,
-        })
+        .update({'character_id': bestCharacter['id'], 'quiz_completed': true})
         .eq('id', userId);
 
     debugPrint('✅ Character assigned: ${bestCharacter['name']}');

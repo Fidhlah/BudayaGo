@@ -122,7 +122,7 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
       if (_imageFile != null) {
         try {
           debugPrint('📤 Uploading image to Supabase Storage...');
-          
+
           // Create unique filename: userId/timestamp_originalname.jpg
           final timestamp = DateTime.now().millisecondsSinceEpoch;
           final extension = _imageFile!.path.split('.').last;

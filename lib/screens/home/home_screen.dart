@@ -8,10 +8,11 @@ import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/karya_service.dart';
 import '../../services/visit_service.dart';
+import '../../services/eksplorasi_service.dart';
 import '../../config/supabase_config.dart';
 import '../../widgets/custom_app_bar.dart';
-import 'category_list_screen.dart';
 import '../qr/qr_scanner_screen.dart';
+import '../eksplorasi/cultural_objects_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateToTab;
@@ -28,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 0;
   List<Map<String, dynamic>> _karyaItems = [];
   bool _isLoadingKarya = true;
+  List<Map<String, dynamic>> _eksplorasiCategories = [];
+  bool _isLoadingEksplorasi = true;
 
   // Load karya from database
   Future<void> _loadKaryaItems() async {
@@ -65,16 +68,75 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Load eksplorasi categories from database
+  Future<void> _loadEksplorasiCategories() async {
+    try {
+      final categories = await EksplorasiService.loadCategories();
+      if (mounted) {
+        setState(() {
+          _eksplorasiCategories =
+              categories.take(5).map((cat) {
+                return {
+                  'id': cat['id'],
+                  'name': cat['name'],
+                  'icon': _getIconFromString(cat['icon_name']),
+                  'color': _getColorFromHex(cat['color']),
+                };
+              }).toList();
+          _isLoadingEksplorasi = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading eksplorasi categories: $e');
+      if (mounted) {
+        setState(() => _isLoadingEksplorasi = false);
+      }
+    }
+  }
+
+  IconData _getIconFromString(String iconName) {
+    final iconMap = {
+      'record_voice_over': Icons.record_voice_over,
+      'auto_stories': Icons.auto_stories,
+      'people': Icons.people,
+      'celebration': Icons.celebration,
+      'book': Icons.book,
+      'engineering': Icons.engineering,
+      'palette': Icons.palette,
+      'translate': Icons.translate,
+      'sports_esports': Icons.sports_esports,
+      'sports_martial_arts': Icons.sports_martial_arts,
+    };
+    return iconMap[iconName] ?? Icons.category;
+  }
+
+  Color _getColorFromHex(String hexColor) {
+    final colorMap = {
+      '#9333EA': const Color(0xFF9333EA),
+      '#92400E': const Color(0xFF92400E),
+      '#4F46E5': const Color(0xFF4F46E5),
+      '#DC2626': const Color(0xFFDC2626),
+      '#10B981': const Color(0xFF10B981),
+      '#EA580C': const Color(0xFFEA580C),
+      '#EC4899': const Color(0xFFEC4899),
+      '#3B82F6': const Color(0xFF3B82F6),
+      '#A855F7': const Color(0xFFA855F7),
+      '#6366F1': const Color(0xFF6366F1),
+    };
+    return colorMap[hexColor] ?? AppColors.orange700;
+  }
+
   @override
   void initState() {
     super.initState();
     _startAutoScroll();
 
-    // Initialize HomeProvider and load karya
+    // Initialize HomeProvider and load data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final homeProvider = Provider.of<HomeProvider>(context, listen: false);
       homeProvider.initializeUserData();
       _loadKaryaItems();
+      _loadEksplorasiCategories();
     });
   }
 
@@ -105,14 +167,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = [
-      {'name': 'Pakaian Adat', 'icon': Icons.checkroom},
-      {'name': 'Tarian', 'icon': Icons.music_note},
-      {'name': 'Makanan', 'icon': Icons.restaurant},
-      {'name': 'Rumah Adat', 'icon': Icons.home},
-      {'name': 'Alat Musik', 'icon': Icons.piano},
-    ];
-
     return Scaffold(
       backgroundColor: AppColors.orange50,
       appBar: PreferredSize(
@@ -332,79 +386,89 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      height: 120,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 16),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => CategoryListScreen(
-                                          category: category['name'] as String,
-                                          onXPGained: (xp) {
-                                            Provider.of<HomeProvider>(
-                                              context,
-                                              listen: false,
-                                            ).claimXP(xp);
-                                          },
+                    _isLoadingEksplorasi
+                        ? const SizedBox(
+                          height: 120,
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                        : SizedBox(
+                          height: 120,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _eksplorasiCategories.length,
+                            itemBuilder: (context, index) {
+                              final category = _eksplorasiCategories[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => CulturalObjectsScreen(
+                                              categoryId:
+                                                  category['id'] as String,
+                                              categoryName:
+                                                  category['name'] as String,
+                                              categoryColor:
+                                                  category['color'] as Color,
+                                              categoryIcon:
+                                                  category['icon'] as IconData,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 110,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 2),
                                         ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: (category['color'] as Color)
+                                                .withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            category['icon'] as IconData,
+                                            color: category['color'] as Color,
+                                            size: 28,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          category['name'] as String,
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                width: 110,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
                                 ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.orange50,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        category['icon'] as IconData,
-                                        color: AppColors.orange700,
-                                        size: 28,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      category['name'] as String,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                              );
+                            },
+                          ),
+                        ),
                     const SizedBox(height: 32),
 
                     // Section: Karya Pelaku Budaya (From Database)
@@ -495,34 +559,64 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   child: Stack(
                                                     children: [
                                                       // Actual image or gradient placeholder
-                                                      if (item['imageUrl'] != null && (item['imageUrl'] as String).isNotEmpty)
+                                                      if (item['imageUrl'] !=
+                                                              null &&
+                                                          (item['imageUrl']
+                                                                  as String)
+                                                              .isNotEmpty)
                                                         ClipRRect(
                                                           borderRadius:
                                                               const BorderRadius.vertical(
-                                                                top: Radius.circular(16),
+                                                                top:
+                                                                    Radius.circular(
+                                                                      16,
+                                                                    ),
                                                               ),
                                                           child: Image.network(
-                                                            item['imageUrl'] as String,
-                                                            width: double.infinity,
+                                                            item['imageUrl']
+                                                                as String,
+                                                            width:
+                                                                double.infinity,
                                                             height: 120,
                                                             fit: BoxFit.cover,
-                                                            errorBuilder: (context, error, stackTrace) {
+                                                            errorBuilder: (
+                                                              context,
+                                                              error,
+                                                              stackTrace,
+                                                            ) {
                                                               return Container(
                                                                 decoration: BoxDecoration(
                                                                   gradient: LinearGradient(
-                                                                    begin: Alignment.topLeft,
-                                                                    end: Alignment.bottomRight,
+                                                                    begin:
+                                                                        Alignment
+                                                                            .topLeft,
+                                                                    end:
+                                                                        Alignment
+                                                                            .bottomRight,
                                                                     colors: [
-                                                                      (item['color'] as Color).withOpacity(0.8),
-                                                                      (item['color'] as Color).withOpacity(0.4),
+                                                                      (item['color']
+                                                                              as Color)
+                                                                          .withOpacity(
+                                                                            0.8,
+                                                                          ),
+                                                                      (item['color']
+                                                                              as Color)
+                                                                          .withOpacity(
+                                                                            0.4,
+                                                                          ),
                                                                     ],
                                                                   ),
                                                                 ),
                                                                 child: Center(
                                                                   child: Icon(
-                                                                    item['icon'] as IconData,
+                                                                    item['icon']
+                                                                        as IconData,
                                                                     size: 50,
-                                                                    color: Colors.white.withOpacity(0.4),
+                                                                    color: Colors
+                                                                        .white
+                                                                        .withOpacity(
+                                                                          0.4,
+                                                                        ),
                                                                   ),
                                                                 ),
                                                               );
@@ -533,19 +627,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         Container(
                                                           decoration: BoxDecoration(
                                                             gradient: LinearGradient(
-                                                              begin: Alignment.topLeft,
-                                                              end: Alignment.bottomRight,
+                                                              begin:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              end:
+                                                                  Alignment
+                                                                      .bottomRight,
                                                               colors: [
-                                                                (item['color'] as Color).withOpacity(0.8),
-                                                                (item['color'] as Color).withOpacity(0.4),
+                                                                (item['color']
+                                                                        as Color)
+                                                                    .withOpacity(
+                                                                      0.8,
+                                                                    ),
+                                                                (item['color']
+                                                                        as Color)
+                                                                    .withOpacity(
+                                                                      0.4,
+                                                                    ),
                                                               ],
                                                             ),
                                                           ),
                                                           child: Center(
                                                             child: Icon(
-                                                              item['icon'] as IconData,
+                                                              item['icon']
+                                                                  as IconData,
                                                               size: 50,
-                                                              color: Colors.white.withOpacity(0.4),
+                                                              color: Colors
+                                                                  .white
+                                                                  .withOpacity(
+                                                                    0.4,
+                                                                  ),
                                                             ),
                                                           ),
                                                         ),

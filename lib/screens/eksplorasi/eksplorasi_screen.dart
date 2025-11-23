@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/eksplorasi_service.dart';
-import 'category_detail_screen.dart';
 import 'cultural_objects_screen.dart';
 import '../../widgets/custom_app_bar.dart';
 
@@ -359,8 +358,9 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
             context,
             MaterialPageRoute(
               builder:
-                  (context) => CategoryDetailScreen(
+                  (context) => CulturalObjectsScreen(
                     categoryName: province['name'] as String,
+                    categoryId: province['id'] as String,
                     categoryColor: AppColors.batik600,
                     categoryIcon: Icons.location_on,
                   ),

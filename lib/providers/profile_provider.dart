@@ -360,10 +360,15 @@ class ProfileProvider extends ChangeNotifier {
       // Update in Supabase database
       await SupabaseConfig.client
           .from('users')
-          .update({'is_pelaku_budaya': true, 'updated_at': DateTime.now().toIso8601String()})
+          .update({
+            'is_pelaku_budaya': true,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
           .eq('id', _profile!.id);
 
-      debugPrint('✅ Database updated: is_pelaku_budaya = true for user ${_profile!.id}');
+      debugPrint(
+        '✅ Database updated: is_pelaku_budaya = true for user ${_profile!.id}',
+      );
 
       _profile = _profile!.copyWith(
         isPelakuBudaya: true,
@@ -396,11 +401,9 @@ class ProfileProvider extends ChangeNotifier {
     try {
       await SupabaseConfig.client
           .from('users')
-          .update({
-            'uploaded_karya_ids': updatedIds,
-          })
+          .update({'uploaded_karya_ids': updatedIds})
           .eq('id', _profile!.id);
-      
+
       debugPrint('✅ Synced karya to database: $karyaId');
     } catch (e) {
       debugPrint('❌ Error syncing uploaded_karya_ids: $e');

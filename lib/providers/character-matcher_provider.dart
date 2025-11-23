@@ -39,6 +39,9 @@ class PersonalityTestProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      // Reset scores from any previous test
+      _testService.resetTest();
+
       _questions = await _testService.loadQuestions();
       _currentQuestionIndex = 0;
       _isLoading = false;
@@ -67,7 +70,12 @@ class PersonalityTestProvider with ChangeNotifier {
     // Move to next question
     _currentQuestionIndex++;
 
-    debugPrint('➡️  Moving to question ${_currentQuestionIndex + 1}');
+    // Log next action
+    if (_currentQuestionIndex < _questions.length) {
+      debugPrint('➡️  Moving to question ${_currentQuestionIndex + 1}');
+    } else {
+      debugPrint('✅ All questions answered! Calculating result...');
+    }
     debugPrint('=' * 80 + '\n');
 
     // If test is complete, calculate result (await to finish before UI navigates)
