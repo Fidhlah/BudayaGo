@@ -52,7 +52,14 @@ class EksplorasiService {
       final content = await SupabaseConfig.client
           .from('cultural_content')
           .select('''
-          *,
+          id,
+          title,
+          description,
+          full_content,
+          image_url,
+          xp_reward,
+          created_at,
+          is_verified,
           cultural_categories (
             name,
             icon_name,
