@@ -56,90 +56,95 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppDimensions.paddingXL),
-              child: Column(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                    child: Image.asset(
-                      'assets/images/artifacts/kartu2.jpeg',
-                      width: 250,
-                      height: 250,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 250,
-                          height: 250,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            size: 100,
-                            color: AppColors.orange700,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXL + AppDimensions.spaceS),
-                  Text(
-                    'Selamat!',
-                    style: AppTextStyles.h2.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXS),
-                  Text(
-                    'Karakter kepribadianmu adalah',
-                    style: AppTextStyles.h5.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXS),
-                  Text(
-                    widget.characterName,
-                    style: AppTextStyles.h1.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: AppDimensions.buttonHeightL,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to MainScreen and remove all previous routes
-                        // User cannot go back to personality test
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                          (route) => false, // Remove all previous routes
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.orange700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          child: Padding(
+            padding: EdgeInsets.all(AppDimensions.paddingXL),
+            child: Column(
+              children: [
+                const Spacer(),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                  child: Image.asset(
+                    'assets/images/artifacts/kartu2.jpeg',
+                    width: 420,
+                    height: 420,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 420,
+                        height: 420,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Mulai Petualangan!',
-                        style: AppTextStyles.h5.copyWith(
-                          fontWeight: FontWeight.bold,
+                        child: Icon(
+                          Icons.person,
+                          size: 180,
+                          color: AppColors.orange700,
                         ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: AppDimensions.spaceXL * 2.5),
+                Text(
+                  'Selamat!',
+                  style: AppTextStyles.h2.copyWith(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: AppDimensions.spaceM + AppDimensions.spaceS),
+                Text(
+                  'Karakter kepribadianmu adalah',
+                  style: AppTextStyles.h5.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 22,
+                  ),
+                ),
+                SizedBox(height: AppDimensions.spaceM + AppDimensions.spaceS),
+                Text(
+                  widget.characterName,
+                  style: AppTextStyles.h1.copyWith(
+                    color: Colors.white,
+                    fontSize: 52,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  height: AppDimensions.buttonHeightL,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to MainScreen and remove all previous routes
+                      // User cannot go back to personality test
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainScreen(),
+                        ),
+                        (route) => false, // Remove all previous routes
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.orange700,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Mulai Petualangan!',
+                      style: AppTextStyles.h5.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
