@@ -55,7 +55,9 @@ class PersonalityTestProvider with ChangeNotifier {
     if (currentQuestion == null) return;
 
     debugPrint('\n' + '=' * 80);
-    debugPrint('📋 PERSONALITY TEST - Question ${_currentQuestionIndex + 1}/${_questions.length}');
+    debugPrint(
+      '📋 PERSONALITY TEST - Question ${_currentQuestionIndex + 1}/${_questions.length}',
+    );
     debugPrint('=' * 80);
     debugPrint('❓ Question: ${currentQuestion!.text.substring(0, 50)}...');
 
@@ -104,7 +106,9 @@ class PersonalityTestProvider with ChangeNotifier {
       // 6. Assign character with minimum distance
       // 7. Update assigned_character_id in personality_test_results
       debugPrint('📤 Submitting raw scores to database...');
-      debugPrint('⚙️  Python backend (personality_quiz.py + euclidean.py) will handle character matching');
+      debugPrint(
+        '⚙️  Python backend (personality_quiz.py + euclidean.py) will handle character matching',
+      );
 
       final result = await QuizService.submitTestResults(
         userId: userId,

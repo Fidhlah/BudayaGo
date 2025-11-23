@@ -101,7 +101,9 @@ class PersonalityTestService {
       final oldScore = _dimensionScores[dimension] ?? 0;
       _dimensionScores[dimension] = oldScore + weight;
       if (weight > 0) {
-        debugPrint('   ✅ $dimension: $oldScore + $weight = ${_dimensionScores[dimension]}');
+        debugPrint(
+          '   ✅ $dimension: $oldScore + $weight = ${_dimensionScores[dimension]}',
+        );
       }
     });
 

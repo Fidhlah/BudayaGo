@@ -144,12 +144,14 @@ class QuizService {
                 .single();
 
         characterId = testResult['assigned_character_id'];
-        
+
         if (characterId != null) {
-          debugPrint('✅ Character assigned by background service after ${attempts}s');
+          debugPrint(
+            '✅ Character assigned by background service after ${attempts}s',
+          );
           break;
         }
-        
+
         if (attempts % 5 == 0) {
           debugPrint('⏳ Still waiting... (${attempts}/${maxAttempts}s)');
         }

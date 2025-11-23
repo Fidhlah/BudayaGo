@@ -83,27 +83,6 @@ class CollectiblesService {
     }
   }
 
-  /// Get unlockable collectibles (yang bisa di-unlock berdasarkan XP)
-  static Future<List<Map<String, dynamic>>> getUnlockableCollectibles(
-    String userId,
-  ) async {
-    try {
-      debugPrint('🔓 Checking unlockable collectibles...');
-
-      final result = await SupabaseConfig.client.rpc(
-        'get_unlockable_collectibles',
-        params: {'p_user_id': userId},
-      );
-
-      debugPrint('✅ Found ${result.length} unlockable collectibles');
-
-      return List<Map<String, dynamic>>.from(result);
-    } catch (e) {
-      debugPrint('❌ Error getting unlockable collectibles: $e');
-      return [];
-    }
-  }
-
   /// Manually unlock a collectible (normally handled by trigger)
   static Future<void> unlockCollectible({
     required String userId,

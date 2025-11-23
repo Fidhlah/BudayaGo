@@ -18,12 +18,12 @@ import 'screens/personality_test/personality_test_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseConfig.initialize();
-  
+
   // 🤖 Start background personality matcher service
   PersonalityMatcherService.startPolling(
     interval: const Duration(seconds: 3), // Poll every 3 seconds
   );
-  
+
   runApp(const MyApp());
 }
 

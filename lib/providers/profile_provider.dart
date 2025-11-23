@@ -293,33 +293,28 @@ class ProfileProvider extends ChangeNotifier {
     try {
       final userId = _profile!.id;
 
-      // Fetch from Supabase
+      // Fetch ALL collectibles (both locked and unlocked) from Supabase
       final collectiblesData = await CollectiblesService.loadUserCollectibles(
         userId,
       );
 
-      // Convert to Collectible model
+      // Convert to Collectible model - include ALL items
       _collectibles =
-          collectiblesData
-              .where(
-                (item) => item['isUnlocked'] == true,
-              ) // Only include unlocked items
-              .map((item) {
-                return Collectible(
-                  id: item['id'],
-                  name: item['name'],
-                  category: 'Artifact', // Default category
-                  imageUrl: item['imageUrl'],
-                  collectedAt:
-                      item['unlockedAt'] != null
-                          ? DateTime.parse(item['unlockedAt'])
-                          : DateTime.now(),
-                  xpEarned: item['xpEarned'],
-                );
-              })
-              .toList();
+          collectiblesData.map((item) {
+            return Collectible(
+              id: item['id'],
+              name: item['name'],
+              category: 'Artifact', // Default category
+              imageUrl: item['imageUrl'],
+              collectedAt:
+                  item['unlockedAt'] != null
+                      ? DateTime.parse(item['unlockedAt'])
+                      : DateTime.now(),
+              xpEarned: item['xpEarned'],
+            );
+          }).toList();
 
-      debugPrint('✅ Loaded ${_collectibles.length} collectibles');
+      debugPrint('✅ Loaded ${_collectibles.length} collectibles (all items)');
     } catch (e) {
       _error = 'Failed to load collectibles: $e';
       debugPrint('❌ ProfileProvider.loadCollectibles error: $e');
@@ -327,6 +322,11 @@ class ProfileProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+  
+  /// Get collectibles data as Map for backward compatibility
+  List<Map<String, dynamic>> get collectiblesAsMap {
+    return _collectibles.map((c) => c.toJson()).toList();
   }
 
   /// Add a new collectible

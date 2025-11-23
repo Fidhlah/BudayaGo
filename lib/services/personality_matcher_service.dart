@@ -62,16 +62,21 @@ class PersonalityMatcherService {
       final pendingTests = response as List<dynamic>;
 
       // Filter out already processed
-      final newTests = pendingTests
-          .where((test) => !_processedTestIds.contains(test['id'] as String))
-          .toList();
+      final newTests =
+          pendingTests
+              .where(
+                (test) => !_processedTestIds.contains(test['id'] as String),
+              )
+              .toList();
 
       if (newTests.isEmpty) {
         // Quiet mode when no tests
         return;
       }
 
-      debugPrint('📥 Found ${newTests.length} new personality test(s) to process');
+      debugPrint(
+        '📥 Found ${newTests.length} new personality test(s) to process',
+      );
 
       for (var test in newTests) {
         try {
@@ -92,14 +97,13 @@ class PersonalityMatcherService {
   static Future<Map<String, int>> _calculateMaxScores() async {
     debugPrint('📊 Calculating max scores from quiz_answers...');
 
-    final response =
-        await SupabaseConfig.client.from('quiz_answers').select('*');
+    final response = await SupabaseConfig.client
+        .from('quiz_answers')
+        .select('*');
 
     final answers = response as List<dynamic>;
 
-    final maxScores = <String, int>{
-      for (var dim in dimensions) dim: 0,
-    };
+    final maxScores = <String, int>{for (var dim in dimensions) dim: 0};
 
     // Sum all positive weights for each dimension
     for (var answer in answers) {
@@ -159,9 +163,8 @@ class PersonalityMatcherService {
 
     final response = await SupabaseConfig.client.from('characters').select('*');
 
-    final characters = (response as List<dynamic>)
-        .cast<Map<String, dynamic>>()
-        .toList();
+    final characters =
+        (response as List<dynamic>).cast<Map<String, dynamic>>().toList();
 
     debugPrint('✅ Loaded ${characters.length} characters');
     return characters;
@@ -181,7 +184,9 @@ class PersonalityMatcherService {
       final distance = _calculateEuclideanDistance(userPercentages, char);
 
       final name = char['name'] as String;
-      debugPrint('   ${name.padRight(20)} Distance: ${distance.toStringAsFixed(4)}');
+      debugPrint(
+        '   ${name.padRight(20)} Distance: ${distance.toStringAsFixed(4)}',
+      );
 
       if (distance < minDistance) {
         minDistance = distance;
@@ -193,10 +198,7 @@ class PersonalityMatcherService {
       '\n🎯 Best match: ${bestMatch!['name']} (distance: ${minDistance.toStringAsFixed(4)})',
     );
 
-    return {
-      'character': bestMatch,
-      'distance': minDistance,
-    };
+    return {'character': bestMatch, 'distance': minDistance};
   }
 
   /// Process a single personality test
@@ -233,7 +235,9 @@ class PersonalityMatcherService {
     for (var entry in percentages.entries) {
       final dim = entry.key;
       final pct = entry.value;
-      debugPrint('   ${dim.padRight(15).capitalize()}: ${pct.toStringAsFixed(2).padLeft(6)}%');
+      debugPrint(
+        '   ${dim.padRight(15).capitalize()}: ${pct.toStringAsFixed(2).padLeft(6)}%',
+      );
     }
 
     // Step 4: Get all characters
@@ -248,22 +252,26 @@ class PersonalityMatcherService {
     debugPrint('\n💾 Updating database...');
 
     // Update personality_test_results
-    await SupabaseConfig.client.from('personality_test_results').update({
-      'norm_spirituality': percentages['spirituality'],
-      'norm_courage': percentages['courage'],
-      'norm_empathy': percentages['empathy'],
-      'norm_logic': percentages['logic'],
-      'norm_creativity': percentages['creativity'],
-      'norm_social': percentages['social'],
-      'norm_principle': percentages['principle'],
-      'assigned_character_id': bestCharacter['id'],
-      'euclidean_distance': distance,
-    }).eq('id', resultId);
+    await SupabaseConfig.client
+        .from('personality_test_results')
+        .update({
+          'norm_spirituality': percentages['spirituality'],
+          'norm_courage': percentages['courage'],
+          'norm_empathy': percentages['empathy'],
+          'norm_logic': percentages['logic'],
+          'norm_creativity': percentages['creativity'],
+          'norm_social': percentages['social'],
+          'norm_principle': percentages['principle'],
+          'assigned_character_id': bestCharacter['id'],
+          'euclidean_distance': distance,
+        })
+        .eq('id', resultId);
 
     // Update users table
-    await SupabaseConfig.client.from('users').update({
-      'character_id': bestCharacter['id'],
-    }).eq('id', userId);
+    await SupabaseConfig.client
+        .from('users')
+        .update({'character_id': bestCharacter['id']})
+        .eq('id', userId);
 
     debugPrint('✅ Character assigned: ${bestCharacter['name']}');
     debugPrint('✅ Updated user and test results in database');
