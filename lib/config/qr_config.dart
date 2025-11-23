@@ -4,7 +4,7 @@
 class QRConfig {
   /// Prefix untuk QR Code
   /// Ganti sesuai kebutuhan project
-  static const String qrPrefix = 'LANGKARA-o2o';
+  static const String qrPrefix = 'SEMBARA-o2o';
 
   /// Current QR Code version
   /// Increment jika ada breaking changes di format
