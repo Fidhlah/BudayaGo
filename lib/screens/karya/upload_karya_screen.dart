@@ -117,18 +117,42 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
     setState(() => _isUploading = true);
 
     try {
-      // TODO: Upload image to Supabase Storage if _imageFile is not null
+      // Upload image to Supabase Storage
       String? imageUrl;
       if (_imageFile != null) {
-        // For now, just use placeholder
-        // In production, upload to Supabase Storage:
-        // final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        // await SupabaseConfig.client.storage
-        //     .from('karya-images')
-        //     .upload(fileName, _imageFile!);
-        // imageUrl = SupabaseConfig.client.storage
-        //     .from('karya-images')
-        //     .getPublicUrl(fileName);
+        try {
+          debugPrint('📤 Uploading image to Supabase Storage...');
+          
+          // Create unique filename: userId/timestamp_originalname.jpg
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          final extension = _imageFile!.path.split('.').last;
+          final fileName = '$userId/${timestamp}_karya.$extension';
+
+          debugPrint('   File: $fileName');
+
+          // Upload to storage bucket 'karya-images'
+          await SupabaseConfig.client.storage
+              .from('karya-images')
+              .upload(fileName, _imageFile!);
+
+          // Get public URL
+          imageUrl = SupabaseConfig.client.storage
+              .from('karya-images')
+              .getPublicUrl(fileName);
+
+          debugPrint('✅ Image uploaded: $imageUrl');
+        } catch (uploadError) {
+          debugPrint('❌ Error uploading image: $uploadError');
+          // Continue without image if upload fails
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('⚠️ Gambar gagal diupload: $uploadError'),
+                backgroundColor: AppColors.warning,
+              ),
+            );
+          }
+        }
       }
 
       // Map tag to color and icon
@@ -181,7 +205,7 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
           context,
           listen: false,
         );
-        profileProvider.addUploadedKarya(result['id']);
+        await profileProvider.addUploadedKarya(result['id']);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

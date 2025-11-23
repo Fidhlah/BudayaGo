@@ -16,7 +16,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  
+
   // Data from database
   List<Map<String, dynamic>> _kulturalCategories = [];
   List<Map<String, dynamic>> _provinces = [];
@@ -61,29 +61,31 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
     try {
       final categories = await EksplorasiService.loadCategories();
       final provinces = await EksplorasiService.loadProvinces();
-      
+
       if (mounted) {
         setState(() {
-          _kulturalCategories = categories.map((cat) {
-            return {
-              'id': cat['id'],
-              'name': cat['name'],
-              'icon': _iconMapping[cat['icon_name']] ?? Icons.category,
-              'color': _colorMapping[cat['color']] ?? AppColors.orange,
-              'description': cat['description'] ?? '',
-              'count': cat['content_count'] ?? 0,
-            };
-          }).toList();
-          
-          _provinces = provinces.map((prov) {
-            return {
-              'id': prov['id'],
-              'name': prov['name'],
-              'icon': prov['icon_emoji'] ?? '🏝️',
-              'count': prov['content_count'] ?? 0,
-            };
-          }).toList();
-          
+          _kulturalCategories =
+              categories.map((cat) {
+                return {
+                  'id': cat['id'],
+                  'name': cat['name'],
+                  'icon': _iconMapping[cat['icon_name']] ?? Icons.category,
+                  'color': _colorMapping[cat['color']] ?? AppColors.orange,
+                  'description': cat['description'] ?? '',
+                  'count': cat['content_count'] ?? 0,
+                };
+              }).toList();
+
+          _provinces =
+              provinces.map((prov) {
+                return {
+                  'id': prov['id'],
+                  'name': prov['name'],
+                  'icon': prov['icon_emoji'] ?? '🏝️',
+                  'count': prov['content_count'] ?? 0,
+                };
+              }).toList();
+
           _isLoading = false;
         });
       }
@@ -107,16 +109,22 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   List<Map<String, dynamic>> get filteredKulturalCategories {
     if (_searchQuery.isEmpty) return _kulturalCategories;
     return _kulturalCategories
-        .where((cat) =>
-            cat['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (cat) => cat['name'].toString().toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ),
+        )
         .toList();
   }
 
   List<Map<String, dynamic>> get filteredProvinces {
     if (_searchQuery.isEmpty) return _provinces;
     return _provinces
-        .where((prov) =>
-            prov['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (prov) => prov['name'].toString().toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ),
+        )
         .toList();
   }
 
@@ -152,9 +160,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                       Positioned.fill(
                         child: Opacity(
                           opacity: 0.1,
-                          child: CustomPaint(
-                            painter: BatikPatternPainter(),
-                          ),
+                          child: CustomPaint(painter: BatikPatternPainter()),
                         ),
                       ),
                       // Content
@@ -215,10 +221,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                         icon: Icon(Icons.category, size: 20),
                         text: 'Objek Kebudayaan',
                       ),
-                      Tab(
-                        icon: Icon(Icons.map, size: 20),
-                        text: 'Provinsi',
-                      ),
+                      Tab(icon: Icon(Icons.map, size: 20), text: 'Provinsi'),
                     ],
                   ),
                 ),
@@ -240,16 +243,23 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                   hintStyle: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textHint,
                   ),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.batik600),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: AppColors.textSecondary),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
-                      : null,
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.batik600,
+                  ),
+                  suffixIcon:
+                      _searchQuery.isNotEmpty
+                          ? IconButton(
+                            icon: const Icon(
+                              Icons.clear,
+                              color: AppColors.textSecondary,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                          : null,
                   filled: true,
                   fillColor: AppColors.grey100,
                   border: OutlineInputBorder(
@@ -333,11 +343,12 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CategoryDetailScreen(
-                  categoryName: category['name'] as String,
-                  categoryColor: category['color'] as Color,
-                  categoryIcon: category['icon'] as IconData,
-                ),
+                builder:
+                    (context) => CategoryDetailScreen(
+                      categoryName: category['name'] as String,
+                      categoryColor: category['color'] as Color,
+                      categoryIcon: category['icon'] as IconData,
+                    ),
               ),
             );
           },
@@ -367,10 +378,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        category['name'] as String,
-                        style: AppTextStyles.h6,
-                      ),
+                      Text(category['name'] as String, style: AppTextStyles.h6),
                       const SizedBox(height: 4),
                       Text(
                         category['description'] as String,
@@ -401,10 +409,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                 ),
 
                 // Arrow Icon
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                ),
+                const Icon(Icons.chevron_right, color: AppColors.textHint),
               ],
             ),
           ),
@@ -424,11 +429,12 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CategoryDetailScreen(
-                categoryName: province['name'] as String,
-                categoryColor: AppColors.batik600,
-                categoryIcon: Icons.location_on,
-              ),
+              builder:
+                  (context) => CategoryDetailScreen(
+                    categoryName: province['name'] as String,
+                    categoryColor: AppColors.batik600,
+                    categoryIcon: Icons.location_on,
+                  ),
             ),
           );
         },
@@ -494,11 +500,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: AppColors.textHint,
-          ),
+          Icon(Icons.search_off, size: 64, color: AppColors.textHint),
           const SizedBox(height: 16),
           Text(
             message,
@@ -516,13 +518,14 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
 class BatikPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+    final paint =
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
 
     const spacing = 40.0;
-    
+
     // Draw diagonal lines pattern
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
@@ -531,7 +534,7 @@ class BatikPatternPainter extends CustomPainter {
         paint,
       );
     }
-    
+
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
         Offset(i, 0),

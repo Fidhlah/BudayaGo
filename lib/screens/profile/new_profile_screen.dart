@@ -5,6 +5,7 @@ import '../../providers/profile_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/supabase_config.dart';
 import '../../services/collectibles_service.dart';
+import '../../services/karya_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
@@ -12,6 +13,7 @@ import '../../widgets/custom_app_bar.dart';
 import '../../widgets/edit_display_name_dialog.dart';
 import '../../widgets/upgrade_pelaku_budaya_dialog.dart';
 import '../karya/upload_karya_screen.dart';
+import '../karya/karya_detail_screen.dart';
 
 class NewProfileScreen extends StatefulWidget {
   final String mascot;
@@ -66,7 +68,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       }
 
       // Load collectibles directly from service (includes lock status)
-      final collectiblesData = await CollectiblesService.loadUserCollectibles(userId);
+      final collectiblesData = await CollectiblesService.loadUserCollectibles(
+        userId,
+      );
 
       if (mounted) {
         setState(() {
@@ -74,20 +78,21 @@ class _NewProfileScreenState extends State<NewProfileScreen>
           _visitedLocations = [];
 
           // Use collectibles from service with all information
-          _collectibles = collectiblesData.map((item) {
-            return {
-              'id': item['id'],
-              'name': item['name'],
-              'description': item['description'] ?? '',
-              'imageUrl': item['imageUrl'],
-              'xpEarned': item['xpEarned'] ?? 0,
-              'unlocked': item['isUnlocked'] == true,
-              'category': 'Artifact',
-              'location': 'Indonesia',
-              'rarity': _getRarityFromXP(item['xpEarned'] ?? 0),
-            };
-          }).toList();
-          
+          _collectibles =
+              collectiblesData.map((item) {
+                return {
+                  'id': item['id'],
+                  'name': item['name'],
+                  'description': item['description'] ?? '',
+                  'imageUrl': item['imageUrl'],
+                  'xpEarned': item['xpEarned'] ?? 0,
+                  'unlocked': item['isUnlocked'] == true,
+                  'category': 'Artifact',
+                  'location': 'Indonesia',
+                  'rarity': _getRarityFromXP(item['xpEarned'] ?? 0),
+                };
+              }).toList();
+
           _isLoadingCollectibles = false;
         });
       }
@@ -801,178 +806,292 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildShowcaseTab(UserProfile profile) {
-    if (profile.uploadedKaryaIds.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.art_track,
-              size: AppDimensions.iconXL * 2,
-              color: AppColors.grey300,
-            ),
-            SizedBox(height: AppDimensions.spaceL),
-            Text(
-              'Belum ada karya',
-              style: AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
-            ),
-            SizedBox(height: AppDimensions.spaceS),
-            Text(
-              'Upload karya pertamamu!',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: KaryaService.getUserKarya(profile.id),
+      builder: (context, snapshot) {
+        // Loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    // Demo data dengan variasi jumlah foto
-    final demoKarya = List.generate(profile.uploadedKaryaIds.length, (index) {
-      // Variasi jumlah foto: 1, 2, 3, atau 4
-      final photoCount = (index % 4) + 1;
-      return {
-        'id': profile.uploadedKaryaIds[index],
-        'title': 'Karya ${index + 1}',
-        'description': 'Deskripsi karya budaya ${index + 1}',
-        'photoCount': photoCount,
-        'creator': profile.displayName ?? 'Penjelajah Budaya',
-        'tag': index % 2 == 0 ? 'Seni Rupa' : 'Kerajinan',
-      };
-    });
+        // Error state
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: AppDimensions.iconXL * 2,
+                  color: AppColors.error,
+                ),
+                SizedBox(height: AppDimensions.spaceL),
+                Text(
+                  'Gagal memuat karya',
+                  style:
+                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                ),
+                SizedBox(height: AppDimensions.spaceS),
+                Text(
+                  'Error: ${snapshot.error}',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(AppDimensions.paddingM),
-      itemCount: demoKarya.length,
-      itemBuilder: (context, index) {
-        final karya = demoKarya[index];
-        final photoCount = karya['photoCount'] as int;
+        final karyaList = snapshot.data ?? [];
 
-        return Card(
-          margin: EdgeInsets.only(bottom: AppDimensions.spaceL),
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header: Creator info
-              Padding(
-                padding: EdgeInsets.all(AppDimensions.paddingM),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: AppColors.orangePinkGradient,
+        // Empty state
+        if (karyaList.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.art_track,
+                  size: AppDimensions.iconXL * 2,
+                  color: AppColors.grey300,
+                ),
+                SizedBox(height: AppDimensions.spaceL),
+                Text(
+                  'Belum ada karya',
+                  style:
+                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                ),
+                SizedBox(height: AppDimensions.spaceS),
+                Text(
+                  'Upload karya pertamamu!',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Display karya list
+        return RefreshIndicator(
+          onRefresh: () async {
+            setState(() {}); // Trigger rebuild to reload data
+          },
+          child: ListView.builder(
+            padding: EdgeInsets.all(AppDimensions.paddingM),
+            itemCount: karyaList.length,
+            itemBuilder: (context, index) {
+              final karya = karyaList[index];
+              final imageUrl = karya['image_url'] as String?;
+              final hasImage = imageUrl != null && imageUrl.isNotEmpty;
+
+              return Card(
+                margin: EdgeInsets.only(bottom: AppDimensions.spaceL),
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    // Navigate to detail screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KaryaDetailScreen(
+                          karya: {
+                            'id': karya['id'],
+                            'name': karya['name'],
+                            'description': karya['description'],
+                            'imageUrl': imageUrl,
+                            'tag': karya['tag'],
+                            'umkm': karya['umkm_category'],
+                            'creatorName': profile.displayName ?? 'Anonim',
+                            'location': profile.displayName ?? 'Indonesia',
+                            'color': Color(
+                              karya['color'] ?? AppColors.batik700.value,
+                            ),
+                            'icon': IconData(
+                              karya['icon_code_point'] ??
+                                  Icons.auto_awesome.codePoint,
+                              fontFamily: 'MaterialIcons',
+                            ),
+                            'likes': karya['likes'] ?? 0,
+                            'views': karya['views'] ?? 0,
+                          },
                         ),
                       ),
-                      child: Icon(
-                        _getMascotIcon(),
-                        color: AppColors.background,
-                        size: 20,
-                      ),
-                    ),
-                    SizedBox(width: AppDimensions.spaceS),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            karya['creator'] as String,
-                            style: AppTextStyles.labelLarge.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Solo, Jawa Tengah',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Photo Grid (1-4 photos)
-              _buildKaryaPhotoGrid(photoCount, index),
-
-              // Content: Title + Description
-              Padding(
-                padding: EdgeInsets.all(AppDimensions.paddingM),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.textPrimary,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header: Creator info
+                      Padding(
+                        padding: EdgeInsets.all(AppDimensions.paddingM),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: AppColors.orangePinkGradient,
+                                ),
                               ),
-                              children: [
-                                TextSpan(
-                                  text: '${karya['creator']} ',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
+                              child: Icon(
+                                _getMascotIcon(),
+                                color: AppColors.background,
+                                size: 20,
+                              ),
+                            ),
+                            SizedBox(width: AppDimensions.spaceS),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    profile.displayName ?? 'Penjelajah Budaya',
+                                    style: AppTextStyles.labelLarge.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Indonesia',
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Image (if available)
+                      if (hasImage)
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.zero,
+                            topRight: Radius.zero,
+                            bottomLeft: Radius.zero,
+                            bottomRight: Radius.zero,
+                          ),
+                          child: Image.network(
+                            imageUrl,
+                            width: double.infinity,
+                            height: 300,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: double.infinity,
+                                height: 300,
+                                color: AppColors.grey100,
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 64,
+                                  color: AppColors.grey400,
+                                ),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: double.infinity,
+                                height: 300,
+                                color: AppColors.grey100,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
                                   ),
                                 ),
-                                TextSpan(text: karya['title'] as String),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
-                      ],
-                    ),
-                    if ((karya['description'] as String).isNotEmpty) ...[
-                      SizedBox(height: AppDimensions.spaceXS),
-                      Text(
-                        karya['description'] as String,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+
+                      // Content: Title + Description
+                      Padding(
+                        padding: EdgeInsets.all(AppDimensions.paddingM),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              karya['name'] ?? 'Untitled',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            if (karya['description'] != null &&
+                                (karya['description'] as String).isNotEmpty) ...[
+                              SizedBox(height: AppDimensions.spaceXS),
+                              Text(
+                                karya['description'] as String,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            SizedBox(height: AppDimensions.spaceS),
+                            // Tags
+                            Wrap(
+                              spacing: AppDimensions.spaceXS,
+                              children: [
+                                if (karya['tag'] != null)
+                                  Chip(
+                                    label: Text(
+                                      karya['tag'] as String,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.batik700,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        AppColors.batik700.withOpacity(0.1),
+                                    side: BorderSide.none,
+                                    padding: EdgeInsets.zero,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                if (karya['umkm_category'] != null)
+                                  Chip(
+                                    label: Text(
+                                      karya['umkm_category'] as String,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        AppColors.grey100.withOpacity(0.5),
+                                    side: BorderSide.none,
+                                    padding: EdgeInsets.zero,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-
-              // Tag at bottom
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  AppDimensions.paddingM,
-                  0,
-                  AppDimensions.paddingM,
-                  AppDimensions.paddingM,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.local_offer,
-                      size: 16,
-                      color: AppColors.batik700,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      karya['tag'] as String,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.batik700,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              );
+            },
           ),
         );
       },
