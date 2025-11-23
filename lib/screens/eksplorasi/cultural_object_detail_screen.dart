@@ -50,12 +50,15 @@ class _CulturalObjectDetailScreenState
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 100) {
+    // Deteksi jika user sudah scroll 70% dari konten
+    final threshold = _scrollController.position.maxScrollExtent * 0.7;
+
+    if (_scrollController.position.pixels >= threshold) {
       if (!_hasReadToBottom) {
         setState(() {
           _hasReadToBottom = true;
         });
+        debugPrint('✅ User has scrolled 70% of content');
       }
     }
   }
@@ -149,28 +152,94 @@ class _CulturalObjectDetailScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Hero Image
+                  // Hero Image dari database
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      height: 200,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            widget.categoryColor.withOpacity(0.3),
-                            widget.categoryColor.withOpacity(0.1),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Icon(
-                        widget.categoryIcon,
-                        size: 100,
-                        color: widget.categoryColor.withOpacity(0.5),
-                      ),
-                    ),
+                    child:
+                        widget.imageUrl != null
+                            ? Image.network(
+                              widget.imageUrl!,
+                              height: 250,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  height: 250,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        widget.categoryColor.withOpacity(0.3),
+                                        widget.categoryColor.withOpacity(0.1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                      color: widget.categoryColor,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                debugPrint('❌ Error loading image: $error');
+                                return Container(
+                                  height: 250,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        widget.categoryColor.withOpacity(0.3),
+                                        widget.categoryColor.withOpacity(0.1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    widget.categoryIcon,
+                                    size: 100,
+                                    color: widget.categoryColor.withOpacity(
+                                      0.5,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                            : Container(
+                              height: 250,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    widget.categoryColor.withOpacity(0.3),
+                                    widget.categoryColor.withOpacity(0.1),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Icon(
+                                widget.categoryIcon,
+                                size: 100,
+                                color: widget.categoryColor.withOpacity(0.5),
+                              ),
+                            ),
                   ),
                   const SizedBox(height: 20),
 
@@ -226,7 +295,7 @@ class _CulturalObjectDetailScreenState
                   ),
                   const SizedBox(height: 24),
 
-                  // Full Content with Markdown
+                  // Full Content with Markdown + Extra Padding untuk Scroll
                   Card(
                     elevation: 0,
                     color: Colors.white,
@@ -235,41 +304,86 @@ class _CulturalObjectDetailScreenState
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: MarkdownBody(
-                        data: widget.fullContent,
-                        styleSheet: MarkdownStyleSheet(
-                          h1: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MarkdownBody(
+                            data: widget.fullContent,
+                            styleSheet: MarkdownStyleSheet(
+                              h1: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                              h2: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: widget.categoryColor,
+                                height: 2.0,
+                              ),
+                              h3: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                                height: 1.8,
+                              ),
+                              p: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.black87,
+                                height: 1.6,
+                              ),
+                              listBullet: TextStyle(
+                                color: widget.categoryColor,
+                              ),
+                              strong: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
-                          h2: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: widget.categoryColor,
-                            height: 2.0,
+                          const SizedBox(height: 24),
+                          // Info untuk scroll
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: widget.categoryColor.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: widget.categoryColor.withOpacity(0.2),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                  color: widget.categoryColor,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _hasReadToBottom
+                                        ? '\u2705 Scroll selesai! Tekan tombol untuk klaim XP'
+                                        : '\u{1F4DC} Scroll ke bawah untuk membaca seluruh konten dan dapatkan XP',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: widget.categoryColor.withOpacity(
+                                        0.9,
+                                      ),
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          h3: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                            height: 1.8,
-                          ),
-                          p: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.black87,
-                            height: 1.6,
-                          ),
-                          listBullet: TextStyle(color: widget.categoryColor),
-                          strong: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 100), // Space for button
+                  const SizedBox(
+                    height: 150,
+                  ), // Extra space untuk memastikan bisa scroll
                 ],
               ),
             ),

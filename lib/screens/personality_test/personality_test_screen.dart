@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/character-matcher_provider.dart' as character_matcher;
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_dimensions.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../mascot_result/mascot_result_screen.dart';
 
 class PersonalityTestScreen extends StatefulWidget {
@@ -71,14 +75,9 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
       builder: (context, testProvider, _) {
         if (testProvider.isLoading) {
           return Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              automaticallyImplyLeading: false, // Remove back button
-              title: const Text(
-                'Tes Kepribadian',
-                style: TextStyle(color: Colors.black87),
-              ),
+            backgroundColor: AppColors.orange50,
+            appBar: const CustomGradientAppBar(
+              title: 'Tes Kepribadian',
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
@@ -86,24 +85,22 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
 
         if (testProvider.error != null) {
           return Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              automaticallyImplyLeading: false, // Remove back button
-              title: const Text(
-                'Tes Kepribadian',
-                style: TextStyle(color: Colors.black87),
-              ),
+            backgroundColor: AppColors.orange50,
+            appBar: const CustomGradientAppBar(
+              title: 'Tes Kepribadian',
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Error: ${testProvider.error}'),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppDimensions.spaceM),
                   ElevatedButton(
                     onPressed: () => testProvider.loadTest(),
-                    child: const Text('Retry'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                    ),
+                    child: const Text('Coba Lagi'),
                   ),
                 ],
               ),
@@ -120,8 +117,9 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
 
         // Show loading if test is complete and processing
         if (testProvider.isTestComplete) {
-          return const Scaffold(
-            body: Center(
+          return Scaffold(
+            backgroundColor: AppColors.orange50,
+            body: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -137,121 +135,114 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
         final progress = testProvider.progress;
 
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            automaticallyImplyLeading:
-                false, // Remove back button - user must complete test
-            title: const Text(
-              'Tes Kepribadian',
-              style: TextStyle(color: Colors.black87),
-            ),
+          backgroundColor: AppColors.orange50,
+          appBar: const CustomGradientAppBar(
+            title: 'Tes Kepribadian',
           ),
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.orange.shade50, Colors.white],
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    LinearProgressIndicator(
-                      value: progress,
-                      backgroundColor: Colors.orange.shade100,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.orange.shade600,
-                      ),
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
+          body: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(AppDimensions.paddingL),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: AppColors.batik100,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.batik700,
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Pertanyaan ${testProvider.currentQuestionIndex + 1}/${testProvider.totalQuestions}',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
-                      ),
+                    minHeight: 8,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                  ),
+                  SizedBox(height: AppDimensions.spaceS),
+                  Text(
+                    'Pertanyaan ${testProvider.currentQuestionIndex + 1}/${testProvider.totalQuestions}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
                     ),
-                    const SizedBox(height: 32),
-                    Text(
-                      currentQuestion!.text,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceXL),
+                  Text(
+                    currentQuestion!.text,
+                    style: AppTextStyles.h5.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 32),
-                    Expanded(
-                      child: ListView(
-                        children:
-                            currentQuestion.options.entries.map((entry) {
-                              final optionKey = entry.key;
-                              final option = entry.value;
+                  ),
+                  SizedBox(height: AppDimensions.spaceXL),
+                  Expanded(
+                    child: ListView(
+                      children:
+                          currentQuestion.options.entries.map((entry) {
+                            final optionKey = entry.key;
+                            final option = entry.value;
 
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Material(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: InkWell(
-                                    onTap: () => _selectAnswer(optionKey),
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.orange.shade200,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(16),
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: AppDimensions.spaceM,
+                              ),
+                              child: Material(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusL,
+                                ),
+                                elevation: 2,
+                                child: InkWell(
+                                  onTap: () => _selectAnswer(optionKey),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusL,
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.all(
+                                      AppDimensions.paddingM,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: AppColors.batik200,
+                                        width: 2,
                                       ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: Colors.orange.shade50,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                optionKey,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.orange.shade700,
-                                                ),
-                                              ),
-                                            ),
+                                      borderRadius: BorderRadius.circular(
+                                        AppDimensions.radiusL,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.batik50,
+                                            shape: BoxShape.circle,
                                           ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
+                                          child: Center(
                                             child: Text(
-                                              option.text,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black87,
+                                              optionKey,
+                                              style: AppTextStyles.labelLarge.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.batik700,
                                               ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        SizedBox(width: AppDimensions.spaceM),
+                                        Expanded(
+                                          child: Text(
+                                            option.text,
+                                            style: AppTextStyles.bodyMedium.copyWith(
+                                              color: AppColors.textPrimary,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                      ),
+                              ),
+                            );
+                          }).toList(),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
