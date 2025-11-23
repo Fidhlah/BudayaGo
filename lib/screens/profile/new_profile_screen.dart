@@ -31,6 +31,35 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   bool _isLoadingCollectibles = true;
   List<Map<String, dynamic>>? _visitedLocations;
 
+  // Helper method to get constant icons for tree shaking
+  IconData _getIconFromCodePoint(int? codePoint) {
+    // Map common code points to predefined constant icons
+    switch (codePoint) {
+      case 0xe838: // star
+        return Icons.star;
+      case 0xe7f2: // favorite
+        return Icons.favorite;
+      case 0xe55c: // home
+        return Icons.home;
+      case 0xe3af: // location_on
+        return Icons.location_on;
+      case 0xe3c7: // person
+        return Icons.person;
+      case 0xe3e4: // settings
+        return Icons.settings;
+      case 0xe3f4: // shopping_cart
+        return Icons.shopping_cart;
+      case 0xe1d8: // camera_alt
+        return Icons.camera_alt;
+      case 0xe3f7: // share
+        return Icons.share;
+      case 0xe3e6: // search
+        return Icons.search;
+      default:
+        return Icons.auto_awesome; // Default fallback icon
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -820,11 +849,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                 'color': Color(
                                   karya['color'] ?? AppColors.batik700.value,
                                 ),
-                                'icon': IconData(
-                                  karya['icon_code_point'] ??
-                                      Icons.auto_awesome.codePoint,
-                                  fontFamily: 'MaterialIcons',
-                                ),
+                                'icon': _getIconFromCodePoint(karya['icon_code_point']),
                                 'likes': karya['likes'] ?? 0,
                                 'views': karya['views'] ?? 0,
                               },
@@ -1003,384 +1028,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
           ),
         );
       },
-    );
-  }
-
-  void _showCollectibleDetail(
-    BuildContext context,
-    Map<String, dynamic> collectible,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: AppColors.orangePinkGradient,
-                ),
-                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Close button
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-
-                  // Artifact Icon
-                  SizedBox(
-                    width: 120,
-                    height: 120,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Background circle
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        // Progress ring
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                          child: CircularProgressIndicator(
-                            value: 1.0,
-                            strokeWidth: 6,
-                            backgroundColor: Colors.white.withOpacity(0.2),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        ),
-                        // Artifact image in center
-                        Image.asset(
-                          'assets/images/artifacts/timun.png',
-                          width: 70,
-                          height: 70,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceM),
-
-                  // Artifact Name
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingL,
-                    ),
-                    child: Text(
-                      collectible['name'] ?? 'Unknown Artifact',
-                      style: AppTextStyles.h3.copyWith(
-                        color: AppColors.background,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXS),
-
-                  // Rarity Badge
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingM,
-                      vertical: AppDimensions.paddingXS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.background.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusL,
-                      ),
-                    ),
-                    child: Text(
-                      collectible['rarity'] ?? 'Common',
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.background,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceL),
-
-                  // Info Container
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingL,
-                    ),
-                    padding: EdgeInsets.all(AppDimensions.paddingM),
-                    decoration: BoxDecoration(
-                      color: AppColors.background.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusL,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Category
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.category,
-                              color: AppColors.background,
-                              size: 20,
-                            ),
-                            SizedBox(width: AppDimensions.spaceS),
-                            Text(
-                              'Kategori: ${collectible['category'] ?? '-'}',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.background,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: AppDimensions.spaceS),
-
-                        // Location
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              color: AppColors.background,
-                              size: 20,
-                            ),
-                            SizedBox(width: AppDimensions.spaceS),
-                            Text(
-                              collectible['location'] ?? '-',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.background,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: AppDimensions.spaceS),
-
-                        // XP Earned
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star_border,
-                              color: AppColors.background,
-                              size: 20,
-                            ),
-                            SizedBox(width: AppDimensions.spaceS),
-                            Text(
-                              '+${collectible['xpEarned'] ?? 0} XP',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.background,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceL),
-
-                  // Description
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingL,
-                    ),
-                    child: Text(
-                      collectible['description'] ?? 'No description available.',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.background,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceL),
-                ],
-              ),
-            ),
-          ),
-    );
-  }
-
-  void _showCharacterCard(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => Dialog(
-            backgroundColor: Colors.transparent,
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: AppColors.orangePinkGradient,
-                ),
-                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Consumer<ProfileProvider>(
-                builder: (context, profileProvider, _) {
-                  final profile = profileProvider.profile;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Close button
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-
-                      // Character Icon
-                      Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.background,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          _getMascotIcon(),
-                          size: 80,
-                          color: AppColors.batik700,
-                        ),
-                      ),
-                      SizedBox(height: AppDimensions.spaceL),
-
-                      // Character Name
-                      Text(
-                        widget.mascot,
-                        style: AppTextStyles.h3.copyWith(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: AppDimensions.spaceS),
-
-                      // Display Name
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDimensions.paddingM,
-                          vertical: AppDimensions.paddingXS,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.background.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusL,
-                          ),
-                        ),
-                        child: Text(
-                          profile?.displayName ?? 'Penjelajah Budaya',
-                          style: AppTextStyles.h5.copyWith(
-                            color: AppColors.background,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: AppDimensions.spaceXL),
-
-                      // Stats
-                      Consumer<HomeProvider>(
-                        builder: (context, homeProvider, _) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: AppDimensions.paddingXL,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildStatItem(
-                                  'Level',
-                                  '${homeProvider.userLevel}',
-                                  Icons.stars,
-                                ),
-                                _buildStatItem(
-                                  'XP',
-                                  '${homeProvider.userXP}',
-                                  Icons.bolt,
-                                ),
-                                _buildStatItem(
-                                  'Artifacts',
-                                  '2/5',
-                                  Icons.inventory_2,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      SizedBox(height: AppDimensions.spaceXL),
-
-                      // Footer
-                      Text(
-                        'Sembara Explorer Card',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.background.withOpacity(0.7),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      SizedBox(height: AppDimensions.paddingL),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: AppColors.background, size: 32),
-        SizedBox(height: AppDimensions.spaceXS),
-        Text(
-          value,
-          style: AppTextStyles.h4.copyWith(
-            color: AppColors.background,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.background.withOpacity(0.8),
-          ),
-        ),
-      ],
     );
   }
 

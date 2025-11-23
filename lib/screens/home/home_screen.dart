@@ -32,6 +32,35 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _eksplorasiCategories = [];
   bool _isLoadingEksplorasi = true;
 
+  // Helper method to get constant icons for tree shaking
+  IconData _getIconFromCodePoint(int? codePoint) {
+    // Map common code points to predefined constant icons
+    switch (codePoint) {
+      case 0xe838: // star
+        return Icons.star;
+      case 0xe7f2: // favorite
+        return Icons.favorite;
+      case 0xe55c: // home
+        return Icons.home;
+      case 0xe3af: // location_on
+        return Icons.location_on;
+      case 0xe3c7: // person
+        return Icons.person;
+      case 0xe3e4: // settings
+        return Icons.settings;
+      case 0xe3f4: // shopping_cart
+        return Icons.shopping_cart;
+      case 0xe1d8: // camera_alt
+        return Icons.camera_alt;
+      case 0xe3f7: // share
+        return Icons.share;
+      case 0xe3e6: // search
+        return Icons.search;
+      default:
+        return Icons.auto_awesome; // Default fallback icon
+    }
+  }
+
   // Load karya from database
   Future<void> _loadKaryaItems() async {
     try {
@@ -50,10 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
                   'color': Color(item['color'] ?? AppColors.batik700.value),
-                  'icon': IconData(
-                    item['icon_code_point'] ?? Icons.auto_awesome.codePoint,
-                    fontFamily: 'MaterialIcons',
-                  ),
+                  'icon': _getIconFromCodePoint(item['icon_code_point']),
                   'imageUrl': item['image_url'],
                 };
               }).toList();
