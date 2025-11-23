@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Bahasa Jawa (Unggah-Ungguh)",
+    "description": "Bahasa Jawa memiliki sistem tata krama bahasa yang sangat kompleks yang disebut 'Unggah-Ungguh'. Sistem ini membedakan kosakata berdasarkan status sosial lawan bicara. Ada tingkat 'Ngoko' (kasar/akrab) untuk teman sebaya, dan 'Krama' (halus) untuk orang yang lebih tua atau dihormati. Bahasa Jawa juga memiliki aksara sendiri yang disebut Aksara Jawa (Hanacaraka) yang merupakan turunan dari aksara Brahmi.",
+    "cultural_element": "Bahasa",
+    "region": "Jawa Tengah"
+  },
+  {
+    "title": "Bahasa Minangkabau (Kato Nan Ampek)",
+    "description": "Bahasa Minang dikenal dengan kekayaan peribahasa (pepatah petitih) dan seni sindiran yang halus. Dalam penggunaannya, diatur oleh etika komunikasi 'Kato Nan Ampek' (Empat Kata): Kato Mandaki (untuk orang tua/dihormati), Kato Manurun (untuk yang lebih muda), Kato Mandata (untuk teman sebaya), dan Kato Malereng (bahasa kiasan untuk orang yang disegani/ipar).",
+    "cultural_element": "Bahasa",
+    "region": "Sumatera Barat"
+  },
+  {
+    "title": "Aksara Lontara (Bahasa Bugis)",
+    "description": "Masyarakat Bugis-Makassar memiliki sistem tulisan kuno bernama Lontara. Bentuk hurufnya unik, disebut 'Sulapa Eppa' (segi empat) yang melambangkan empat unsur alam (api, air, angin, tanah) dan filosofi kesempurnaan manusia. Aksara ini secara tradisional ditulis di atas daun lontar dan digunakan untuk menulis naskah sastra I La Galigo serta catatan harian kerajaan.",
+    "cultural_element": "Bahasa",
+    "region": "Sulawesi Selatan"
+  },
+  {
+    "title": "Bahasa Sunda (Undak Usuk)",
+    "description": "Bahasa Sunda dikenal dengan intonasinya yang mendayu dan lembut. Seperti bahasa Jawa, Sunda juga memiliki tingkatan bahasa (Undak Usuk) untuk menghormati lawan bicara, mulai dari bahasa loma (akrab), lemes (halus untuk orang lain), hingga lemes pisan (sangat halus/tinggi). Bahasa ini menjadi identitas utama masyarakat Tatar Pasundan.",
+    "cultural_element": "Bahasa",
+    "region": "Jawa Barat"
+  },
+  {
+    "title": "Bahasa Melayu Riau (Aksara Arab Melayu)",
+    "description": "Bahasa Melayu Riau (khususnya dialek Kepulauan) adalah cikal bakal Bahasa Indonesia yang kita gunakan saat ini. Bahasa ini memiliki tradisi tulis yang kuat menggunakan Aksara Arab Melayu (Jawi/Pegon), yaitu huruf Arab yang dimodifikasi agar sesuai dengan bunyi bahasa Melayu. Warisan ini sangat kental dalam naskah-naskah kuno di Pulau Penyengat.",
+    "cultural_element": "Bahasa",
+    "region": "Kepulauan Riau"
+  },
+  {
+    "title": "Surat Batak",
+    "description": "Sistem tulisan tradisional suku Batak yang disebut 'Surat Batak'. Aksara ini memiliki beberapa varian (Toba, Karo, Simalungun, Mandailing, Pakpak). Secara tradisional, aksara ini digoreskan pada kulit kayu (laklak), bambu, atau tulang kerbau. Dahulu, aksara ini banyak digunakan oleh para Datu (dukun/tabib) untuk menulis ilmu pengobatan, kalender (porhalaan), dan mantra.",
+    "cultural_element": "Bahasa",
+    "region": "Sumatera Utara"
+  },
+  {
+    "title": "Aksara Kaganga (Rejang)",
+    "description": "Masyarakat suku Rejang di Bengkulu memiliki aksara asli yang disebut Aksara Kaganga (atau Aksara Rejang). Aksara ini merupakan turunan dari aksara Pallawa dan berkerabat dengan aksara Rencong. Tulisan ini memiliki bentuk garis-garis tajam dan miring, biasanya ditulis pada bilah bambu, gelondongan kayu, atau kulit kayu menggunakan pisau raut.",
+    "cultural_element": "Bahasa",
+    "region": "Bengkulu"
+  },
+  {
+    "title": "Bahasa Bali (Sor Singgih)",
+    "description": "Bahasa Bali memiliki tingkatan bahasa yang disebut 'Sor Singgih Basa', yang sejarahnya berkaitan dengan sistem kasta (Tri Wangsa) di masa lalu. Ada Bahasa Bali Alus (Singgih) untuk bicara dengan pendeta atau bangsawan, Bahasa Bali Lumrah/Kepara untuk percakapan sehari-hari, dan Bahasa Bali Kasar. Meski sistem kasta memudar, penggunaan bahasa halus tetap dijaga sebagai bentuk kesopanan.",
+    "cultural_element": "Bahasa",
+    "region": "Bali"
+  },
+  {
+    "title": "Bahasa Banjar",
+    "description": "Bahasa Banjar berfungsi sebagai 'Lingua Franca' (bahasa perhubungan/perdagangan) di pulau Kalimantan. Bahasa ini unik karena penyebarannya yang luas melampaui wilayah aslinya. Terbagi menjadi dua dialek utama: Banjar Hulu (pedalaman) dan Banjar Kuala (pesisir/muara). Bahasa ini banyak menyerap kosakata dari bahasa Jawa Kuno dan Melayu.",
+    "cultural_element": "Bahasa",
+    "region": "Kalimantan Selatan"
+  },
+  {
+    "title": "Bahasa Dani",
+    "description": "Salah satu bahasa paling dominan di wilayah Pegunungan Papua. Keunikan bahasa ini mencerminkan pola pikir masyarakatnya yang pragmatis, misalnya dalam sistem hitungan. Bahasa Dani tradisional memiliki sistem hitungan dasar yang sederhana namun filosofis, mengandalkan anggota tubuh (jari tangan dan kaki) untuk menghitung jumlah ternak atau mas kawin.",
+    "cultural_element": "Bahasa",
+    "region": "Papua Pegunungan"
+  }
+]

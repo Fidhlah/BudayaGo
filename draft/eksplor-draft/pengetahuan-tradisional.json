@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Subak",
+    "description": "Sistem irigasi pertanian tradisional yang diwariskan turun-temurun oleh masyarakat Bali. Subak bukan sekadar teknologi pengairan, melainkan sebuah sistem organisasi sosial-religius yang berlandaskan filosofi 'Tri Hita Karana' (keseimbangan antara manusia, alam, dan Tuhan). Pengetahuan ini mengatur pembagian air yang adil bagi setiap petani dan jadwal tanam serentak untuk mengendalikan hama.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Bali"
+  },
+  {
+    "title": "Jamu",
+    "description": "Pengetahuan pengobatan herbal warisan leluhur Jawa yang memanfaatkan berbagai tanaman rimpang (seperti jahe, kunyit, temulawak) dan rempah-rempah. Pengetahuan ini mencakup cara meracik bahan alami untuk menjaga kebugaran tubuh, menyembuhkan penyakit, hingga perawatan kecantikan. Tradisi minum jamu (seperti beras kencur atau kunyit asam) telah menjadi bagian tak terpisahkan dari gaya hidup sehat masyarakat Indonesia.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Jawa Tengah"
+  },
+  {
+    "title": "Pranata Mangsa",
+    "description": "Sistem penanggalan atau kalender pertanian yang digunakan oleh petani Jawa sejak ribuan tahun lalu. Pengetahuan ini membaca tanda-tanda alam (posisi rasi bintang, arah angin, perilaku hewan, dan musim bunga) untuk menentukan waktu yang tepat dalam bercocok tanam (mulai membajak, menebar benih, hingga panen) guna menghindari gagal panen dan serangan hama.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Jawa Tengah"
+  },
+  {
+    "title": "Sasi",
+    "description": "Hukum adat konservasi alam yang berlaku di Maluku dan Papua. 'Sasi' adalah pengetahuan mengenai larangan mengambil hasil alam (laut atau darat) di wilayah tertentu dalam jangka waktu tertentu. Tujuannya adalah memberi kesempatan pada biota laut atau tanaman untuk berkembang biak dan memulihkan diri, sehingga ketersediaan sumber daya alam tetap terjaga secara berkelanjutan.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Maluku"
+  },
+  {
+    "title": "Smong",
+    "description": "Pengetahuan mitigasi bencana tsunami berbasis kearifan lokal masyarakat Pulau Simeulue, Aceh. Melalui syair dan cerita lisan, leluhur mereka mengajarkan: 'Jika terjadi gempa kuat diikuti air laut surut mendadak, segeralah lari ke bukit, jangan menunggu'. Pengetahuan ini terbukti menyelamatkan puluhan ribu nyawa warga Simeulue saat tsunami dahsyat melanda Aceh pada tahun 2004.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Aceh"
+  },
+  {
+    "title": "Lubuk Larangan",
+    "description": "Kearifan lokal masyarakat Mandailing dan sekitarnya dalam mengelola ekosistem sungai. Bagian sungai tertentu ditetapkan sebagai zona terlarang untuk mengambil ikan dalam periode waktu tertentu (biasanya satu tahun). Pengetahuan ini menjaga populasi ikan agar tidak punah. Saat masa larangan berakhir ('buka lubuk'), warga akan panen ikan bersama-sama dalam suasana pesta rakyat.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Sumatera Utara"
+  },
+  {
+    "title": "Pikukuh Baduy",
+    "description": "Pedoman hidup dan pengetahuan ekologis masyarakat Baduy (Kanekes) dalam menjaga alam. Salah satu prinsip utamanya berbunyi: 'Gunung teu meunang dilebur, lebak teu meunang dirusak' (Gunung tidak boleh dihancurkan, lembah tidak boleh dirusak). Pengetahuan ini melarang penggunaan bahan kimia, mengubah kontur tanah, atau membelokkan aliran air, menjadikan alam Baduy sangat lestari.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Banten"
+  },
+  {
+    "title": "Minyak Sumbawa",
+    "description": "Pengetahuan tradisional dalam meracik minyak obat khas Sumbawa yang dipercaya ampuh mengobati patah tulang, luka bakar, dan berbagai penyakit dalam. Keunikan pengetahuannya terletak pada proses pembuatannya yang sakral: hanya boleh dibuat pada bulan Muharram, menggunakan puluhan jenis akar-akaran dan rempah, serta diiringi doa-doa khusus oleh para 'Sandro' (tabib).",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Nusa Tenggara Barat"
+  },
+  {
+    "title": "Navigasi Pinisi",
+    "description": "Selain teknik pembuatan kapal, masyarakat Bugis-Makassar memiliki pengetahuan navigasi laut yang luar biasa tanpa alat modern (GPS). Mereka membaca alam ('Pananrang') dengan memperhatikan posisi bintang, arah angin, arus ombak, hingga perilaku burung laut untuk menentukan arah berlayar melintasi samudra hingga ke Madagaskar dan Australia.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Sulawesi Selatan"
+  },
+  {
+    "title": "Pengobatan Cimande",
+    "description": "Aliran pencak silat tertua di Jawa Barat yang juga memiliki sistem pengetahuan pengobatan tulang yang sangat terkenal (Balur Cimande). Para praktisi Cimande memiliki keahlian anatomi tubuh manusia secara tradisional dan resep minyak khusus (terbuat dari tebu dan rempah) untuk menyembuhkan patah tulang atau keseleo tanpa operasi.",
+    "cultural_element": "Pengetahuan Tradisional",
+    "region": "Jawa Barat"
+  }
+]

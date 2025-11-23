@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Tari Saman",
+    "description": "Tarian suku Gayo yang sangat fenomenal karena mengandalkan kekompakan dan kecepatan gerakan tangan tanpa iringan alat musik. Musiknya murni berasal dari suara penari (tepukan tangan ke dada dan paha) serta nyanyian syair dakwah. Tarian ini dimainkan oleh laki-laki dalam posisi duduk berbanjar. UNESCO telah mengakuinya sebagai Warisan Budaya Takbenda yang Memerlukan Perlindungan Mendesak.",
+    "cultural_element": "Seni",
+    "region": "Aceh"
+  },
+  {
+    "title": "Wayang Kulit",
+    "description": "Seni pertunjukan teater bayangan boneka kulit yang paling populer di Jawa. Dimainkan oleh seorang Dalang di balik layar putih (kelir) dengan sorotan lampu (blencong). Cerita yang dibawakan biasanya bersumber dari epik Mahabharata atau Ramayana yang disisipi kritik sosial dan filosofi hidup. Iringan gamelan dan tembang sinden menjadi satu kesatuan yang tak terpisahkan dari seni ini.",
+    "cultural_element": "Seni",
+    "region": "Jawa Tengah"
+  },
+  {
+    "title": "Tari Kecak",
+    "description": "Seni tari pertunjukan dramatik khas Bali yang diciptakan pada tahun 1930-an. Tarian ini unik karena tidak menggunakan alat musik, melainkan paduan suara dari puluhan hingga ratusan laki-laki yang menyerukan 'cak-cak-cak' secara ritmis sambil mengangkat tangan. Tarian ini biasanya mengisahkan cerita Ramayana, khususnya saat pasukan kera membantu Rama melawan Rahwana.",
+    "cultural_element": "Seni",
+    "region": "Bali"
+  },
+  {
+    "title": "Reog Ponorogo",
+    "description": "Seni pertunjukan topeng yang spektakuler dan bernuansa mistis. Tokoh utamanya adalah Singa Barong, topeng kepala singa berhias bulu merak raksasa yang beratnya bisa mencapai 50 kg. Hebatnya, topeng seberat itu dibawa oleh penari hanya dengan menggunakan kekuatan gigitan gigi tanpa disangga tangan. Pertunjukan ini juga melibatkan tokoh Warok dan Jathilan.",
+    "cultural_element": "Seni",
+    "region": "Jawa Timur"
+  },
+  {
+    "title": "Ukiran Asmat",
+    "description": "Seni rupa ukir kayu yang mendunia dari Suku Asmat. Bagi orang Asmat, mengukir bukan sekadar seni, melainkan ritual penghubung dengan roh leluhur. Motif-motifnya rumit, naturalis, dan ekspresif, seringkali menggambarkan figur manusia, burung, atau perahu arwah. Setiap ukiran memiliki nama dan dipercaya memiliki kekuatan magis.",
+    "cultural_element": "Seni",
+    "region": "Papua Selatan"
+  },
+  {
+    "title": "Tari Piring",
+    "description": "Tarian dinamis dan akrobatik dari Minangkabau yang menggunakan piring keramik sebagai properti utama. Penari mengayunkan piring di telapak tangan dengan gerakan cepat tanpa terjatuh, diiringi bunyi 'ting-ting' dari cincin yang diketukkan ke piring. Tarian ini awalnya merupakan ritual syukur panen, namun kini menjadi seni pertunjukan yang atraktif, seringkali diakhiri dengan menari di atas pecahan kaca.",
+    "cultural_element": "Seni",
+    "region": "Sumatera Barat"
+  },
+  {
+    "title": "Ondel-Ondel",
+    "description": "Boneka raksasa setinggi sekitar 2,5 meter yang menjadi ikon seni budaya Betawi. Kerangkanya terbuat dari anyaman bambu dan dihiasi pakaian warna-warni serta kembang kelapa di kepala. Wajah ondel-ondel laki-laki biasanya merah (melambangkan semangat/keberanian) dan perempuan putih (kesucian). Awalnya berfungsi sebagai penolak bala, kini ondel-ondel menjadi seni pertunjukan jalanan yang menghibur.",
+    "cultural_element": "Seni",
+    "region": "DKI Jakarta"
+  },
+  {
+    "title": "Kolintang",
+    "description": "Seni musik ansambel dari Minahasa yang alat musiknya terbuat dari kayu khusus (seperti kayu telur atau bandaran). Alat musik ini dimainkan dengan cara dipukul (membranofon). Keunikan Kolintang terletak pada harmonisasi nada yang lengkap (bass, melodi, ritem) yang dimainkan secara bersama-sama, menghasilkan irama yang ceria dan semangat.",
+    "cultural_element": "Seni",
+    "region": "Sulawesi Utara"
+  },
+  {
+    "title": "Mamanda",
+    "description": "Seni teater rakyat tradisional dari Kalimantan Selatan (budaya Banjar). Mirip dengan Lenong di Jakarta, Mamanda bersifat improvisasi dan interaktif dengan penonton. Ceritanya seringkali tentang kerajaan (Raja, Perdana Menteri, Wazir) namun dibawakan dengan humor dan sindiran halus terhadap isu-isu sosial terkini. Pakaian para pemainnya gemerlap menyerupai pakaian adat kerajaan.",
+    "cultural_element": "Seni",
+    "region": "Kalimantan Selatan"
+  },
+  {
+    "title": "Sape",
+    "description": "Alat musik petik tradisional Suku Dayak (khususnya Dayak Kenyah/Kayan). Bentuknya seperti perahu dengan ukiran motif khas Dayak yang indah. Sape dimainkan dengan cara dipetik, menghasilkan nada-nada pentatonis yang mendayu-dayu, tenang, dan mistis. Musik Sape sering digunakan untuk mengiringi tarian atau upacara adat di dalam rumah panjang (Lamin).",
+    "cultural_element": "Seni",
+    "region": "Kalimantan Timur"
+  }
+]
