@@ -32,7 +32,9 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
 
   Future<void> _loadContent() async {
     try {
-      final contents = await EksplorasiService.loadContentByCategory(widget.categoryId);
+      final contents = await EksplorasiService.loadContentByCategory(
+        widget.categoryId,
+      );
       if (mounted) {
         setState(() {
           _contents = contents;
@@ -107,46 +109,45 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
           // Content
           _contents.isEmpty
               ? SliverFillRemaining(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          widget.categoryIcon,
-                          size: 80,
-                          color: Colors.grey.shade300,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        widget.categoryIcon,
+                        size: 80,
+                        color: Colors.grey.shade300,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Belum ada konten',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Belum ada konten',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )
+                ),
+              )
               : SliverPadding(
-                  padding: const EdgeInsets.all(16.0),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = _contents[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CulturalObjectDetailScreen(
+                padding: const EdgeInsets.all(16.0),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final item = _contents[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => CulturalObjectDetailScreen(
                                     objectName: item['title'],
                                     region: item['province_name'] ?? '',
                                     description: item['description'],
@@ -156,134 +157,137 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                                     categoryIcon: widget.categoryIcon,
                                     imageUrl: item['image_url'],
                                   ),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Image
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(16),
-                                  ),
-                                  child: item['image_url'] != null
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Image
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                              child:
+                                  item['image_url'] != null
                                       ? Image.network(
-                                          item['image_url'],
-                                          height: 180,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              height: 180,
-                                              width: double.infinity,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    widget.categoryColor
-                                                        .withOpacity(0.3),
-                                                    widget.categoryColor
-                                                        .withOpacity(0.1),
-                                                  ],
-                                                ),
+                                        item['image_url'],
+                                        height: 180,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) {
+                                          return Container(
+                                            height: 180,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  widget.categoryColor
+                                                      .withOpacity(0.3),
+                                                  widget.categoryColor
+                                                      .withOpacity(0.1),
+                                                ],
                                               ),
-                                              child: Icon(
-                                                widget.categoryIcon,
-                                                size: 80,
-                                                color: widget.categoryColor
-                                                    .withOpacity(0.5),
-                                              ),
-                                            );
-                                          },
-                                        )
+                                            ),
+                                            child: Icon(
+                                              widget.categoryIcon,
+                                              size: 80,
+                                              color: widget.categoryColor
+                                                  .withOpacity(0.5),
+                                            ),
+                                          );
+                                        },
+                                      )
                                       : Container(
-                                          height: 180,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                widget.categoryColor
-                                                    .withOpacity(0.3),
-                                                widget.categoryColor
-                                                    .withOpacity(0.1),
-                                              ],
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            widget.categoryIcon,
-                                            size: 80,
-                                            color: widget.categoryColor
-                                                .withOpacity(0.5),
+                                        height: 180,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              widget.categoryColor.withOpacity(
+                                                0.3,
+                                              ),
+                                              widget.categoryColor.withOpacity(
+                                                0.1,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                ),
+                                        child: Icon(
+                                          widget.categoryIcon,
+                                          size: 80,
+                                          color: widget.categoryColor
+                                              .withOpacity(0.5),
+                                        ),
+                                      ),
+                            ),
 
-                                // Content
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            // Content
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['title'] as String,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  if (item['province_name'] != null)
+                                    Text(
+                                      item['province_name'] as String,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    item['description'] as String,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
                                     children: [
+                                      const Icon(
+                                        Icons.stars,
+                                        size: 18,
+                                        color: Colors.amber,
+                                      ),
+                                      const SizedBox(width: 4),
                                       Text(
-                                        item['title'] as String,
+                                        '+${item['xp_reward'] ?? 150} XP',
                                         style: const TextStyle(
-                                          fontSize: 20,
                                           fontWeight: FontWeight.bold,
+                                          color: Colors.amber,
                                         ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      if (item['province_name'] != null)
-                                        Text(
-                                          item['province_name'] as String,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade600,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        item['description'] as String,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey.shade700,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.stars,
-                                            size: 18,
-                                            color: Colors.amber,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '+${item['xp_reward'] ?? 150} XP',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.amber,
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      childCount: _contents.length,
-                    ),
-                  ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }, childCount: _contents.length),
                 ),
+              ),
         ],
       ),
     );

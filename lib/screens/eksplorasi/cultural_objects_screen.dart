@@ -34,8 +34,9 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
 
   Future<void> _loadContent() async {
     try {
-      final contents =
-          await EksplorasiService.loadContentByCategory(widget.categoryId);
+      final contents = await EksplorasiService.loadContentByCategory(
+        widget.categoryId,
+      );
       if (mounted) {
         setState(() {
           _contents = contents;
@@ -67,9 +68,7 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
           title: widget.categoryName,
           showBackButton: true,
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -79,33 +78,34 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
         title: widget.categoryName,
         showBackButton: true,
       ),
-      body: _contents.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    widget.categoryIcon,
-                    size: 80,
-                    color: Colors.grey.shade300,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Belum ada konten',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
+      body:
+          _contents.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      widget.categoryIcon,
+                      size: 80,
+                      color: Colors.grey.shade300,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Text(
+                      'Belum ada konten',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: _buildMasonryLayout(context, _contents),
+                ),
               ),
-            )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: _buildMasonryLayout(context, _contents),
-              ),
-            ),
     );
   }
 
@@ -187,7 +187,8 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
                 (context) => CulturalObjectDetailScreen(
                   objectName: object['title'] ?? 'Objek Budaya',
                   region: provinceName,
-                  description: object['description'] ?? 'Deskripsi tidak tersedia',
+                  description:
+                      object['description'] ?? 'Deskripsi tidak tersedia',
                   fullContent: object['description'] ?? 'Konten tidak tersedia',
                   xp: object['xp_reward'] ?? 150,
                   categoryColor: widget.categoryColor,
@@ -209,53 +210,54 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
               ),
-              child: object['image_url'] != null
-                  ? Image.network(
-                      object['image_url'],
-                      height: _getCardHeight(index),
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: _getCardHeight(index),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                widget.categoryColor.withOpacity(0.3),
-                                widget.categoryColor.withOpacity(0.1),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+              child:
+                  object['image_url'] != null
+                      ? Image.network(
+                        object['image_url'],
+                        height: _getCardHeight(index),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: _getCardHeight(index),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  widget.categoryColor.withOpacity(0.3),
+                                  widget.categoryColor.withOpacity(0.1),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                             ),
+                            child: Icon(
+                              widget.categoryIcon,
+                              size: 50,
+                              color: widget.categoryColor.withOpacity(0.5),
+                            ),
+                          );
+                        },
+                      )
+                      : Container(
+                        height: _getCardHeight(index),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              widget.categoryColor.withOpacity(0.3),
+                              widget.categoryColor.withOpacity(0.1),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          child: Icon(
-                            widget.categoryIcon,
-                            size: 50,
-                            color: widget.categoryColor.withOpacity(0.5),
-                          ),
-                        );
-                      },
-                    )
-                  : Container(
-                      height: _getCardHeight(index),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            widget.categoryColor.withOpacity(0.3),
-                            widget.categoryColor.withOpacity(0.1),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                        ),
+                        child: Icon(
+                          widget.categoryIcon,
+                          size: 50,
+                          color: widget.categoryColor.withOpacity(0.5),
                         ),
                       ),
-                      child: Icon(
-                        widget.categoryIcon,
-                        size: 50,
-                        color: widget.categoryColor.withOpacity(0.5),
-                      ),
-                    ),
             ),
             // Content
             Padding(
