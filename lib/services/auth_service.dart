@@ -44,6 +44,7 @@ class AuthService {
       data: {
         'full_name': fullName,
       },
+      emailRedirectTo: 'budayago://auth-callback', // 🔥 FIX: Deep link untuk email verification
     );
   }
 
@@ -69,6 +70,7 @@ class AuthService {
     await _supabase.auth.resend(
       type: OtpType.signup,
       email: email,
+      emailRedirectTo: 'budayago://auth-callback', // 🔥 FIX: Deep link untuk email verification
     );
   }
 }

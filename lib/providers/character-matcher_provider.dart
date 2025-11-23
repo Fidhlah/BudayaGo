@@ -19,7 +19,11 @@ class PersonalityTestProvider with ChangeNotifier {
   List<TestQuestion> get questions => _questions;
   int get currentQuestionIndex => _currentQuestionIndex;
   TestQuestion? get currentQuestion =>
-      _questions.isNotEmpty ? _questions[_currentQuestionIndex] : null;
+      _questions.isNotEmpty &&
+              _currentQuestionIndex >= 0 &&
+              _currentQuestionIndex < _questions.length
+          ? _questions[_currentQuestionIndex]
+          : null;
   TestResult? get testResult => _testResult;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -50,11 +54,21 @@ class PersonalityTestProvider with ChangeNotifier {
   Future<void> submitAnswer(String selectedOption) async {
     if (currentQuestion == null) return;
 
+    debugPrint('\n' + '=' * 80);
+    debugPrint(
+      '📋 PERSONALITY TEST - Question ${_currentQuestionIndex + 1}/${_questions.length}',
+    );
+    debugPrint('=' * 80);
+    debugPrint('❓ Question: ${currentQuestion!.text.substring(0, 50)}...');
+
     // Record answer
     _testService.recordAnswer(selectedOption, currentQuestion!);
 
     // Move to next question
     _currentQuestionIndex++;
+
+    debugPrint('➡️  Moving to question ${_currentQuestionIndex + 1}');
+    debugPrint('=' * 80 + '\n');
 
     // If test is complete, calculate result (await to finish before UI navigates)
     if (isTestComplete) {
@@ -83,13 +97,18 @@ class PersonalityTestProvider with ChangeNotifier {
       // Get local test result (for display purposes)
       _testResult = _testService.calculateResult(userId);
 
-      // Submit to database - akan otomatis:
-      // 1. Save raw scores ke personality_test_results
-      // 2. Trigger process_personality_test() function
-      // 3. Normalisasi skor jadi persentase
-      // 4. Hitung Euclidean Distance dengan semua karakter
-      // 5. Assign karakter dengan jarak terdekat ke user
-      debugPrint('📤 Submitting to database for character matching...');
+      // Submit raw scores to database - Python backend will:
+      // 1. Read raw scores from personality_test_results
+      // 2. Calculate max scores from quiz_answers
+      // 3. Normalize scores to percentages (raw/max * 100)
+      // 4. Load all characters from Supabase
+      // 5. Calculate Euclidean Distance with all characters
+      // 6. Assign character with minimum distance
+      // 7. Update assigned_character_id in personality_test_results
+      debugPrint('📤 Submitting raw scores to database...');
+      debugPrint(
+        '⚙️  Python backend (personality_quiz.py + euclidean.py) will handle character matching',
+      );
 
       final result = await QuizService.submitTestResults(
         userId: userId,

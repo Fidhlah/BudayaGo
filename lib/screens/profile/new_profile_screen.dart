@@ -4,6 +4,7 @@ import '../../providers/home_provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/supabase_config.dart';
+import '../../services/collectibles_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
@@ -64,95 +65,29 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         await profileProvider.loadProfile(userId);
       }
 
-      // Load collectibles
-      await profileProvider.loadCollectibles();
+      // Load collectibles directly from service (includes lock status)
+      final collectiblesData = await CollectiblesService.loadUserCollectibles(userId);
 
       if (mounted) {
         setState(() {
-          // Demo visited locations (nanti bisa dari database)
-          _visitedLocations = [
-            {
-              'uuid': '550e8400-e29b-41d4-a716-446655440002',
-              'name': 'Candi Borobudur',
-              'description': 'Candi Buddha terbesar di dunia',
-              'visitedAt': DateTime.now().subtract(const Duration(days: 2)),
-            },
-            {
-              'uuid': '550e8400-e29b-41d4-a716-446655440003',
-              'name': 'Candi Prambanan',
-              'description': 'Candi Hindu terbesar di Indonesia',
-              'visitedAt': DateTime.now().subtract(const Duration(days: 5)),
-            },
-            {
-              'uuid': '550e8400-e29b-41d4-a716-446655440004',
-              'name': 'Keraton Yogyakarta',
-              'description': 'Istana resmi Kesultanan Yogyakarta',
-              'visitedAt': DateTime.now().subtract(const Duration(days: 10)),
-            },
-          ];
+          // TODO: Load visited locations from user_visits table
+          _visitedLocations = [];
 
-          // Fixed 5 collectibles: mix of locked and unlocked
-          _collectibles = [
-            // 2 unlocked collectibles for demo clickable feature
-            {
-              'id': 'artifact_batik_1',
-              'name': 'Batik Parang',
-              'category': 'Kain',
-              'imageUrl': null,
-              'xpEarned': 50,
-              'unlocked': true,
-              'description':
-                  'Motif batik klasik yang melambangkan kekuatan dan ketangguhan. Berasal dari Jawa Tengah.',
-              'location': 'Yogyakarta',
-              'rarity': 'Rare',
-            },
-            {
-              'id': 'artifact_wayang_1',
-              'name': 'Wayang Arjuna',
-              'category': 'Wayang',
-              'imageUrl': null,
-              'xpEarned': 75,
-              'unlocked': true,
-              'description':
-                  'Tokoh pewayangan yang menjadi simbol kesatria sejati. Wayang ini digunakan dalam pertunjukan wayang kulit.',
-              'location': 'Surakarta',
-              'rarity': 'Epic',
-            },
-            // 3 locked collectibles
-            {
-              'id': 'artifact_keris_1',
-              'name': 'Keris Majapahit',
-              'category': 'Senjata',
-              'imageUrl': null,
-              'xpEarned': 100,
-              'unlocked': false,
-              'description': 'Keris pusaka dari era Majapahit.',
-              'location': 'Jawa Timur',
-              'rarity': 'Legendary',
-            },
-            {
-              'id': 'artifact_angklung_1',
-              'name': 'Angklung',
-              'category': 'Alat Musik',
-              'imageUrl': null,
-              'xpEarned': 60,
-              'unlocked': false,
-              'description': 'Alat musik tradisional dari Jawa Barat.',
-              'location': 'Bandung',
-              'rarity': 'Rare',
-            },
-            {
-              'id': 'artifact_topeng_1',
-              'name': 'Topeng Cirebon',
-              'category': 'Topeng',
-              'imageUrl': null,
-              'xpEarned': 40,
-              'unlocked': false,
-              'description': 'Topeng tradisional dari Cirebon.',
-              'location': 'Cirebon',
-              'rarity': 'Common',
-            },
-          ];
+          // Use collectibles from service with all information
+          _collectibles = collectiblesData.map((item) {
+            return {
+              'id': item['id'],
+              'name': item['name'],
+              'description': item['description'] ?? '',
+              'imageUrl': item['imageUrl'],
+              'xpEarned': item['xpEarned'] ?? 0,
+              'unlocked': item['isUnlocked'] == true,
+              'category': 'Artifact',
+              'location': 'Indonesia',
+              'rarity': _getRarityFromXP(item['xpEarned'] ?? 0),
+            };
+          }).toList();
+          
           _isLoadingCollectibles = false;
         });
       }
@@ -164,6 +99,20 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         });
       }
     }
+  }
+
+  String _getRarityFromXP(int xp) {
+    // Match new EASIER level system:
+    // Level 2 (100 XP) = Common
+    // Level 4 (600 XP) = Uncommon
+    // Level 6 (1,500 XP) = Rare
+    // Level 8 (3,600 XP) = Epic
+    // Level 10 (4,500 XP) = Legendary
+    if (xp >= 4500) return 'Legendary';
+    if (xp >= 3600) return 'Epic';
+    if (xp >= 1500) return 'Rare';
+    if (xp >= 600) return 'Uncommon';
+    return 'Common';
   }
 
   @override
@@ -1655,7 +1604,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   // Logout Button
                   ElevatedButton(
                     onPressed: () async {
-                      Navigator.pop(context);
+                      // Show logout confirmation dialog
                       final shouldLogout = await showDialog<bool>(
                         context: context,
                         builder:
@@ -1682,7 +1631,15 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       );
 
                       if (shouldLogout == true && context.mounted) {
-                        // Get all providers
+                        print(
+                          '🚪 Logout confirmed, starting logout process...',
+                        );
+
+                        // Get navigator and providers BEFORE closing dialog
+                        final navigator = Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        );
                         final authProvider = Provider.of<AuthProvider>(
                           context,
                           listen: false,
@@ -1696,19 +1653,32 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           listen: false,
                         );
 
+                        print('✅ Got navigator and all providers');
+
+                        // Close the settings dialog
+                        Navigator.pop(context);
+
                         // Clear all state
+                        print('🧹 Clearing ProfileProvider...');
                         profileProvider.clear();
+                        print('🧹 Clearing HomeProvider...');
                         homeProvider.resetProgress();
+                        print('✅ Providers cleared');
 
                         // Sign out
+                        print('🔐 Calling authProvider.signOut()...');
                         await authProvider.signOut();
+                        print('✅ SignOut completed');
 
-                        // FORCE navigate to login screen
-                        if (context.mounted) {
-                          Navigator.of(
-                            context,
-                          ).pushNamedAndRemoveUntil('/login', (route) => false);
-                        }
+                        // Navigate to login screen using saved navigator
+                        print('🚀 Navigating to /login...');
+                        navigator.pushNamedAndRemoveUntil(
+                          '/login',
+                          (route) => false,
+                        );
+                        print('✅ Navigation completed');
+                      } else {
+                        print('❌ Logout cancelled or context not mounted');
                       }
                     },
                     style: ElevatedButton.styleFrom(

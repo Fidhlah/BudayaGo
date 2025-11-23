@@ -92,9 +92,22 @@ class PersonalityTestService {
     // Store answer
     _userAnswers[question.id] = selectedOption;
 
+    debugPrint('\n📝 Question ${question.id} answered:');
+    debugPrint('   Selected: Option $selectedOption');
+    debugPrint('   Text: ${option.text}');
+    debugPrint('   Weights: ${option.weights}');
+
     option.weights.forEach((dimension, weight) {
-      _dimensionScores[dimension] = (_dimensionScores[dimension] ?? 0) + weight;
+      final oldScore = _dimensionScores[dimension] ?? 0;
+      _dimensionScores[dimension] = oldScore + weight;
+      if (weight > 0) {
+        debugPrint(
+          '   ✅ $dimension: $oldScore + $weight = ${_dimensionScores[dimension]}',
+        );
+      }
     });
+
+    debugPrint('   Current Total Scores: $_dimensionScores');
   }
 
   /// Calculate final test result

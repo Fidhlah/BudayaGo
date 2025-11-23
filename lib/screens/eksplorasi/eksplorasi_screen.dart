@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../services/eksplorasi_service.dart';
 import 'category_detail_screen.dart';
 
 class EksplorasiScreen extends StatefulWidget {
@@ -15,123 +16,85 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  
+  // Data from database
+  List<Map<String, dynamic>> _kulturalCategories = [];
+  List<Map<String, dynamic>> _provinces = [];
+  bool _isLoading = true;
 
-  // 10 Objek Pemajuan Kebudayaan (OPK)
-  final List<Map<String, dynamic>> _kulturalCategories = [
-    {
-      'name': 'Tradisi Lisan',
-      'icon': Icons.record_voice_over,
-      'color': AppColors.purple,
-      'description': 'Cerita rakyat, dongeng, legenda',
-      'count': 156,
-    },
-    {
-      'name': 'Manuskrip',
-      'icon': Icons.auto_stories,
-      'color': AppColors.brown,
-      'description': 'Naskah kuno & aksara tradisional',
-      'count': 89,
-    },
-    {
-      'name': 'Adat Istiadat',
-      'icon': Icons.people,
-      'color': AppColors.indigo,
-      'description': 'Tradisi & kebiasaan masyarakat',
-      'count': 234,
-    },
-    {
-      'name': 'Ritus',
-      'icon': Icons.celebration,
-      'color': AppColors.red,
-      'description': 'Upacara & ritual keagamaan',
-      'count': 112,
-    },
-    {
-      'name': 'Pengetahuan Tradisional',
-      'icon': Icons.book,
-      'color': AppColors.green,
-      'description': 'Kearifan lokal & filosofi hidup',
-      'count': 178,
-    },
-    {
-      'name': 'Teknologi Tradisional',
-      'icon': Icons.engineering,
-      'color': AppColors.orange700,
-      'description': 'Alat & metode tradisional',
-      'count': 92,
-    },
-    {
-      'name': 'Seni',
-      'icon': Icons.palette,
-      'color': AppColors.pink400,
-      'description': 'Tari, musik, teater, rupa',
-      'count': 301,
-    },
-    {
-      'name': 'Bahasa',
-      'icon': Icons.translate,
-      'color': AppColors.blue,
-      'description': 'Bahasa daerah & dialek',
-      'count': 718,
-    },
-    {
-      'name': 'Permainan Rakyat',
-      'icon': Icons.sports_esports,
-      'color': AppColors.purple,
-      'description': 'Permainan tradisional anak',
-      'count': 145,
-    },
-    {
-      'name': 'Olahraga Tradisional',
-      'icon': Icons.sports_martial_arts,
-      'color': AppColors.indigo,
-      'description': 'Seni bela diri & olahraga',
-      'count': 67,
-    },
-  ];
+  // Icon mapping untuk categories
+  final Map<String, IconData> _iconMapping = {
+    'record_voice_over': Icons.record_voice_over,
+    'auto_stories': Icons.auto_stories,
+    'people': Icons.people,
+    'celebration': Icons.celebration,
+    'book': Icons.book,
+    'engineering': Icons.engineering,
+    'palette': Icons.palette,
+    'translate': Icons.translate,
+    'sports_esports': Icons.sports_esports,
+    'sports_martial_arts': Icons.sports_martial_arts,
+  };
 
-  // 34 Provinsi Indonesia
-  final List<Map<String, dynamic>> _provinces = [
-    {'name': 'Aceh', 'icon': '🕌', 'count': 127},
-    {'name': 'Sumatera Utara', 'icon': '🏔️', 'count': 156},
-    {'name': 'Sumatera Barat', 'icon': '🏛️', 'count': 143},
-    {'name': 'Riau', 'icon': '🌴', 'count': 98},
-    {'name': 'Kepulauan Riau', 'icon': '🏝️', 'count': 76},
-    {'name': 'Jambi', 'icon': '🌳', 'count': 84},
-    {'name': 'Sumatera Selatan', 'icon': '🏞️', 'count': 112},
-    {'name': 'Bangka Belitung', 'icon': '⛰️', 'count': 67},
-    {'name': 'Bengkulu', 'icon': '🌊', 'count': 71},
-    {'name': 'Lampung', 'icon': '🌋', 'count': 89},
-    {'name': 'DKI Jakarta', 'icon': '🏙️', 'count': 145},
-    {'name': 'Banten', 'icon': '🏰', 'count': 102},
-    {'name': 'Jawa Barat', 'icon': '🎭', 'count': 234},
-    {'name': 'Jawa Tengah', 'icon': '🏯', 'count': 267},
-    {'name': 'DI Yogyakarta', 'icon': '👑', 'count': 189},
-    {'name': 'Jawa Timur', 'icon': '⛩️', 'count': 298},
-    {'name': 'Bali', 'icon': '🌺', 'count': 312},
-    {'name': 'Nusa Tenggara Barat', 'icon': '🏖️', 'count': 134},
-    {'name': 'Nusa Tenggara Timur', 'icon': '🗿', 'count': 156},
-    {'name': 'Kalimantan Barat', 'icon': '🦜', 'count': 123},
-    {'name': 'Kalimantan Tengah', 'icon': '🌲', 'count': 98},
-    {'name': 'Kalimantan Selatan', 'icon': '🛶', 'count': 107},
-    {'name': 'Kalimantan Timur', 'icon': '🦧', 'count': 89},
-    {'name': 'Kalimantan Utara', 'icon': '🌴', 'count': 67},
-    {'name': 'Sulawesi Utara', 'icon': '🏔️', 'count': 112},
-    {'name': 'Sulawesi Tengah', 'icon': '🌊', 'count': 94},
-    {'name': 'Sulawesi Selatan', 'icon': '⛵', 'count': 187},
-    {'name': 'Sulawesi Tenggara', 'icon': '🏝️', 'count': 101},
-    {'name': 'Gorontalo', 'icon': '🐟', 'count': 73},
-    {'name': 'Sulawesi Barat', 'icon': '⛰️', 'count': 68},
-    {'name': 'Maluku', 'icon': '🏝️', 'count': 145},
-    {'name': 'Maluku Utara', 'icon': '🌋', 'count': 98},
-    {'name': 'Papua', 'icon': '🦜', 'count': 234},
-    {'name': 'Papua Barat', 'icon': '🏔️', 'count': 178},
-  ];
+  // Color mapping untuk categories
+  final Map<String, Color> _colorMapping = {
+    '#9333EA': AppColors.purple,
+    '#92400E': AppColors.brown,
+    '#4F46E5': AppColors.indigo,
+    '#DC2626': AppColors.red,
+    '#10B981': AppColors.green,
+    '#EA580C': AppColors.orange700,
+    '#EC4899': AppColors.pink400,
+    '#3B82F6': AppColors.blue,
+    '#A855F7': AppColors.purple,
+    '#6366F1': AppColors.indigo,
+  };
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final categories = await EksplorasiService.loadCategories();
+      final provinces = await EksplorasiService.loadProvinces();
+      
+      if (mounted) {
+        setState(() {
+          _kulturalCategories = categories.map((cat) {
+            return {
+              'id': cat['id'],
+              'name': cat['name'],
+              'icon': _iconMapping[cat['icon_name']] ?? Icons.category,
+              'color': _colorMapping[cat['color']] ?? AppColors.orange,
+              'description': cat['description'] ?? '',
+              'count': cat['content_count'] ?? 0,
+            };
+          }).toList();
+          
+          _provinces = provinces.map((prov) {
+            return {
+              'id': prov['id'],
+              'name': prov['name'],
+              'icon': prov['icon_emoji'] ?? '🏝️',
+              'count': prov['content_count'] ?? 0,
+            };
+          }).toList();
+          
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading eksplorasi data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
