@@ -3,6 +3,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/eksplorasi_service.dart';
 import 'category_detail_screen.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class EksplorasiScreen extends StatefulWidget {
   const EksplorasiScreen({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  
+
   // Data from database
   List<Map<String, dynamic>> _kulturalCategories = [];
   List<Map<String, dynamic>> _provinces = [];
@@ -61,29 +62,31 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
     try {
       final categories = await EksplorasiService.loadCategories();
       final provinces = await EksplorasiService.loadProvinces();
-      
+
       if (mounted) {
         setState(() {
-          _kulturalCategories = categories.map((cat) {
-            return {
-              'id': cat['id'],
-              'name': cat['name'],
-              'icon': _iconMapping[cat['icon_name']] ?? Icons.category,
-              'color': _colorMapping[cat['color']] ?? AppColors.orange,
-              'description': cat['description'] ?? '',
-              'count': cat['content_count'] ?? 0,
-            };
-          }).toList();
-          
-          _provinces = provinces.map((prov) {
-            return {
-              'id': prov['id'],
-              'name': prov['name'],
-              'icon': prov['icon_emoji'] ?? '🏝️',
-              'count': prov['content_count'] ?? 0,
-            };
-          }).toList();
-          
+          _kulturalCategories =
+              categories.map((cat) {
+                return {
+                  'id': cat['id'],
+                  'name': cat['name'],
+                  'icon': _iconMapping[cat['icon_name']] ?? Icons.category,
+                  'color': _colorMapping[cat['color']] ?? AppColors.orange,
+                  'description': cat['description'] ?? '',
+                  'count': cat['content_count'] ?? 0,
+                };
+              }).toList();
+
+          _provinces =
+              provinces.map((prov) {
+                return {
+                  'id': prov['id'],
+                  'name': prov['name'],
+                  'icon': prov['icon_emoji'] ?? '🏝️',
+                  'count': prov['content_count'] ?? 0,
+                };
+              }).toList();
+
           _isLoading = false;
         });
       }
@@ -107,175 +110,109 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   List<Map<String, dynamic>> get filteredKulturalCategories {
     if (_searchQuery.isEmpty) return _kulturalCategories;
     return _kulturalCategories
-        .where((cat) =>
-            cat['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (cat) => cat['name'].toString().toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ),
+        )
         .toList();
   }
 
   List<Map<String, dynamic>> get filteredProvinces {
     if (_searchQuery.isEmpty) return _provinces;
     return _provinces
-        .where((prov) =>
-            prov['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (prov) => prov['name'].toString().toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ),
+        )
         .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.grey50,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            // Custom AppBar dengan Library Theme
-            SliverAppBar(
-              expandedHeight: 200,
-              floating: false,
-              pinned: true,
-              backgroundColor: AppColors.batik700,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.batik800,
-                        AppColors.batik600,
-                        AppColors.batikGold,
-                      ],
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Pattern Background
-                      Positioned.fill(
-                        child: Opacity(
-                          opacity: 0.1,
-                          child: CustomPaint(
-                            painter: BatikPatternPainter(),
-                          ),
-                        ),
-                      ),
-                      // Content
-                      SafeArea(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.local_library,
-                                    color: Colors.white,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      'Perpustakaan Budaya',
-                                      style: AppTextStyles.h3.copyWith(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Jelajahi kekayaan budaya Indonesia',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(48),
-                child: Container(
-                  color: AppColors.batik700,
-                  child: TabBar(
-                    controller: _tabController,
-                    indicatorColor: Colors.white,
-                    indicatorWeight: 3,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white.withOpacity(0.7),
-                    labelStyle: AppTextStyles.labelLarge,
-                    tabs: const [
-                      Tab(
-                        icon: Icon(Icons.category, size: 20),
-                        text: 'Objek Kebudayaan',
-                      ),
-                      Tab(
-                        icon: Icon(Icons.map, size: 20),
-                        text: 'Provinsi',
-                      ),
-                    ],
-                  ),
-                ),
+      backgroundColor: AppColors.orange50,
+      appBar: CustomGradientAppBar(title: 'Eksplorasi'),
+      body: Column(
+        children: [
+          // Tab Bar
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: AppColors.grey200, width: 1),
               ),
             ),
-          ];
-        },
-        body: Column(
-          children: [
-            // Search Bar
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.white,
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _searchQuery = value),
-                decoration: InputDecoration(
-                  hintText: 'Cari budaya Indonesia...',
-                  hintStyle: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textHint,
-                  ),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.batik600),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: AppColors.textSecondary),
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: AppColors.batik700,
+              indicatorWeight: 3,
+              labelColor: AppColors.batik700,
+              unselectedLabelColor: AppColors.textSecondary,
+              labelStyle: AppTextStyles.labelLarge,
+              dividerColor: Colors.transparent,
+              tabs: const [
+                Tab(
+                  icon: Icon(Icons.category, size: 20),
+                  text: 'Objek Kebudayaan',
+                ),
+                Tab(icon: Icon(Icons.map, size: 20), text: 'Provinsi'),
+              ],
+            ),
+          ),
+
+          // Search Bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Colors.white,
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: InputDecoration(
+                hintText: 'Cari budaya Indonesia...',
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textHint,
+                ),
+                prefixIcon: const Icon(Icons.search, color: AppColors.batik600),
+                suffixIcon:
+                    _searchQuery.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            color: AppColors.textSecondary,
+                          ),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
                           },
                         )
-                      : null,
-                  filled: true,
-                  fillColor: AppColors.grey100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        : null,
+                filled: true,
+                fillColor: AppColors.grey100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
+          ),
 
-            // TabBarView
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // Tab 1: Objek Pemajuan Kebudayaan
-                  _buildKulturalCategoriesTab(),
+          // TabBarView
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: Objek Pemajuan Kebudayaan
+                _buildKulturalCategoriesTab(),
 
-                  // Tab 2: Provinsi
-                  _buildProvincesTab(),
-                ],
-              ),
+                // Tab 2: Provinsi
+                _buildProvincesTab(),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -333,11 +270,12 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CategoryDetailScreen(
-                  categoryName: category['name'] as String,
-                  categoryColor: category['color'] as Color,
-                  categoryIcon: category['icon'] as IconData,
-                ),
+                builder:
+                    (context) => CategoryDetailScreen(
+                      categoryName: category['name'] as String,
+                      categoryColor: category['color'] as Color,
+                      categoryIcon: category['icon'] as IconData,
+                    ),
               ),
             );
           },
@@ -367,10 +305,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        category['name'] as String,
-                        style: AppTextStyles.h6,
-                      ),
+                      Text(category['name'] as String, style: AppTextStyles.h6),
                       const SizedBox(height: 4),
                       Text(
                         category['description'] as String,
@@ -401,10 +336,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                 ),
 
                 // Arrow Icon
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                ),
+                const Icon(Icons.chevron_right, color: AppColors.textHint),
               ],
             ),
           ),
@@ -424,11 +356,12 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CategoryDetailScreen(
-                categoryName: province['name'] as String,
-                categoryColor: AppColors.batik600,
-                categoryIcon: Icons.location_on,
-              ),
+              builder:
+                  (context) => CategoryDetailScreen(
+                    categoryName: province['name'] as String,
+                    categoryColor: AppColors.batik600,
+                    categoryIcon: Icons.location_on,
+                  ),
             ),
           );
         },
@@ -494,11 +427,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: AppColors.textHint,
-          ),
+          Icon(Icons.search_off, size: 64, color: AppColors.textHint),
           const SizedBox(height: 16),
           Text(
             message,
@@ -516,13 +445,14 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
 class BatikPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+    final paint =
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
 
     const spacing = 40.0;
-    
+
     // Draw diagonal lines pattern
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
@@ -531,7 +461,7 @@ class BatikPatternPainter extends CustomPainter {
         paint,
       );
     }
-    
+
     for (double i = -size.height; i < size.width + size.height; i += spacing) {
       canvas.drawLine(
         Offset(i, 0),
