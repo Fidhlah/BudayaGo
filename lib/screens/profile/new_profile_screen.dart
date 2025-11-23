@@ -369,9 +369,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                 margin: EdgeInsets.symmetric(horizontal: 4),
                                 decoration: BoxDecoration(
                                   color: AppColors.background.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusM,
-                                  ),
+                                  shape: BoxShape.circle,
                                   border: Border.all(
                                     color: AppColors.background.withOpacity(
                                       0.5,
@@ -426,13 +424,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                 decoration: BoxDecoration(
                                   color:
                                       isUnlocked
-                                          ? AppColors.background
+                                          ? Colors.transparent
                                           : AppColors.background.withOpacity(
                                             0.3,
                                           ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusM,
-                                  ),
+                                  shape: BoxShape.circle,
                                   border:
                                       isUnlocked
                                           ? null
@@ -440,47 +436,59 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                             color: AppColors.background
                                                 .withOpacity(0.5),
                                           ),
-                                  boxShadow:
-                                      isUnlocked
-                                          ? [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.2,
-                                              ),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ]
-                                          : null,
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      isUnlocked ? Icons.star : Icons.lock,
-                                      size: 30,
-                                      color:
-                                          isUnlocked
-                                              ? AppColors.batik700
-                                              : AppColors.background
-                                                  .withOpacity(0.7),
-                                    ),
-                                    SizedBox(height: AppDimensions.spaceXS),
-                                    Text(
-                                      isUnlocked ? collectible['name'] : '???',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color:
-                                            isUnlocked
-                                                ? AppColors.batik700
-                                                : AppColors.background
-                                                    .withOpacity(0.7),
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
+                                    if (isUnlocked)
+                                      SizedBox(
+                                        width: 60,
+                                        height: 60,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            // Background circle
+                                            Container(
+                                              width: 60,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.amber.shade400.withOpacity(0.3),
+                                              ),
+                                            ),
+                                            // Progress indicator
+                                            SizedBox(
+                                              width: 60,
+                                              height: 60,
+                                              child: CircularProgressIndicator(
+                                                value: 0,
+                                                strokeWidth: 4,
+                                                backgroundColor: Colors.amber.shade400.withOpacity(0.2),
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.amber.shade400),
+                                              ),
+                                            ),
+                                            // Artifact image in center
+                                            Image.asset(
+                                              'assets/images/artifacts/timun.png',
+                                              width: 40,
+                                              height: 40,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      SizedBox(
+                                        width: 50,
+                                        height: 50,
+                                        child: Icon(
+                                          Icons.lock,
+                                          size: 40,
+                                          color: AppColors.background
+                                              .withOpacity(0.7),
+                                        ),
                                       ),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
                                   ],
                                 ),
                               ),
@@ -1170,24 +1178,40 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   ),
 
                   // Artifact Icon
-                  Container(
+                  SizedBox(
                     width: 120,
                     height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.background,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 5),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Background circle
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                        // Progress ring
+                        SizedBox(
+                          width: 120,
+                          height: 120,
+                          child: CircularProgressIndicator(
+                            value: 1.0,
+                            strokeWidth: 6,
+                            backgroundColor: Colors.white.withOpacity(0.2),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                        // Artifact image in center
+                        Image.asset(
+                          'assets/images/artifacts/timun.png',
+                          width: 70,
+                          height: 70,
+                          fit: BoxFit.contain,
                         ),
                       ],
-                    ),
-                    child: Icon(
-                      Icons.star,
-                      size: 60,
-                      color: AppColors.batik700,
                     ),
                   ),
                   SizedBox(height: AppDimensions.spaceM),
