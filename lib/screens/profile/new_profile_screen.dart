@@ -42,7 +42,20 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     // Load data after build is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadProfileData();
+      _initializeTabController();
     });
+  }
+
+  void _initializeTabController() {
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final isPelakuBudaya = profileProvider.profile?.isPelakuBudaya ?? false;
+    
+    // Initialize TabController for Pelaku Budaya and auto-open Karya tab
+    if (isPelakuBudaya) {
+      if (_tabController == null || _tabController!.length != 2) {
+        _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Start at Karya tab
+      }
+    }
   }
 
   Future<void> _loadProfileData() async {
@@ -1102,122 +1115,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     );
   }
 
-  Widget _buildKaryaPhotoGrid(int photoCount, int karyaIndex) {
-    return AspectRatio(
-      aspectRatio: 1.0,
-      child: Container(
-        color: AppColors.grey100,
-        child:
-            photoCount == 1
-                ? _buildSingleKaryaPhoto(karyaIndex, 0)
-                : photoCount == 2
-                ? _buildTwoKaryaPhotos(karyaIndex)
-                : photoCount == 3
-                ? _buildThreeKaryaPhotos(karyaIndex)
-                : _buildFourKaryaPhotos(karyaIndex),
-      ),
-    );
-  }
 
-  Widget _buildSingleKaryaPhoto(int karyaIndex, int photoIndex) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.batik300, AppColors.batik700],
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.image, size: 80, color: AppColors.background),
-            SizedBox(height: AppDimensions.spaceS),
-            Text(
-              'Foto ${photoIndex + 1}',
-              style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.background,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTwoKaryaPhotos(int karyaIndex) {
-    return Row(
-      children: [
-        Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 0)),
-        SizedBox(width: 2),
-        Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 1)),
-      ],
-    );
-  }
-
-  Widget _buildThreeKaryaPhotos(int karyaIndex) {
-    return Row(
-      children: [
-        Expanded(flex: 2, child: _buildKaryaPhotoPlaceholder(karyaIndex, 0)),
-        SizedBox(width: 2),
-        Expanded(
-          child: Column(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 1)),
-              SizedBox(height: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 2)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFourKaryaPhotos(int karyaIndex) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 0)),
-              SizedBox(width: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 1)),
-            ],
-          ),
-        ),
-        SizedBox(height: 2),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 2)),
-              SizedBox(width: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(karyaIndex, 3)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildKaryaPhotoPlaceholder(int karyaIndex, int photoIndex) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.batik300, AppColors.batik700],
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.image,
-          size: 40,
-          color: AppColors.background.withOpacity(0.7),
-        ),
-      ),
-    );
-  }
 
   void _showCollectibleDetail(
     BuildContext context,
@@ -1614,9 +1512,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildPelakuBudayaBody(UserProfile profile) {
-    // Initialize TabController for Pelaku Budaya
+    // Ensure TabController is initialized (already done in initState with Karya tab as default)
     if (_tabController == null || _tabController!.length != 2) {
-      _tabController = TabController(length: 2, vsync: this);
+      _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Default to Karya tab
     }
 
     return Column(

@@ -480,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                // Image with gradient
+                                                // Image with actual photo or gradient fallback
                                                 Container(
                                                   height: 120,
                                                   decoration: BoxDecoration(
@@ -490,30 +490,65 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             16,
                                                           ),
                                                         ),
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                      colors: [
-                                                        (item['color'] as Color)
-                                                            .withOpacity(0.8),
-                                                        (item['color'] as Color)
-                                                            .withOpacity(0.4),
-                                                      ],
-                                                    ),
+                                                    color: AppColors.grey200,
                                                   ),
                                                   child: Stack(
                                                     children: [
-                                                      // Decorative icon
-                                                      Center(
-                                                        child: Icon(
-                                                          item['icon']
-                                                              as IconData,
-                                                          size: 50,
-                                                          color: Colors.white
-                                                              .withOpacity(0.4),
+                                                      // Actual image or gradient placeholder
+                                                      if (item['imageUrl'] != null && (item['imageUrl'] as String).isNotEmpty)
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              const BorderRadius.vertical(
+                                                                top: Radius.circular(16),
+                                                              ),
+                                                          child: Image.network(
+                                                            item['imageUrl'] as String,
+                                                            width: double.infinity,
+                                                            height: 120,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return Container(
+                                                                decoration: BoxDecoration(
+                                                                  gradient: LinearGradient(
+                                                                    begin: Alignment.topLeft,
+                                                                    end: Alignment.bottomRight,
+                                                                    colors: [
+                                                                      (item['color'] as Color).withOpacity(0.8),
+                                                                      (item['color'] as Color).withOpacity(0.4),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Icon(
+                                                                    item['icon'] as IconData,
+                                                                    size: 50,
+                                                                    color: Colors.white.withOpacity(0.4),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        )
+                                                      else
+                                                        Container(
+                                                          decoration: BoxDecoration(
+                                                            gradient: LinearGradient(
+                                                              begin: Alignment.topLeft,
+                                                              end: Alignment.bottomRight,
+                                                              colors: [
+                                                                (item['color'] as Color).withOpacity(0.8),
+                                                                (item['color'] as Color).withOpacity(0.4),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                            child: Icon(
+                                                              item['icon'] as IconData,
+                                                              size: 50,
+                                                              color: Colors.white.withOpacity(0.4),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
                                                       // Tag at bottom
                                                       Positioned(
                                                         bottom: 8,

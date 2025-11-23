@@ -357,8 +357,13 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Update in Supabase
-      await Future.delayed(const Duration(milliseconds: 300));
+      // Update in Supabase database
+      await SupabaseConfig.client
+          .from('users')
+          .update({'is_pelaku_budaya': true, 'updated_at': DateTime.now().toIso8601String()})
+          .eq('id', _profile!.id);
+
+      debugPrint('✅ Database updated: is_pelaku_budaya = true for user ${_profile!.id}');
 
       _profile = _profile!.copyWith(
         isPelakuBudaya: true,
