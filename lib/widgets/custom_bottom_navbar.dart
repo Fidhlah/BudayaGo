@@ -33,6 +33,9 @@ class CustomBottomNavBar extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: () => onTap(index),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
