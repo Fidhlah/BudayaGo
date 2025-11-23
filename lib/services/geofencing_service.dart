@@ -1,176 +1,155 @@
 import 'package:geolocator/geolocator.dart';
-import 'dart:math';
-import '../models/qr_code_model.dart';
 import '../config/qr_config.dart';
-import '../config/supabase_config.dart';
+import '../models/qr_code_model.dart';
+import 'location_service.dart';
 
-/// Service untuk handle geofencing logic
 class GeofencingService {
-  /// Get current user location
+  GeofencingService() {
+    // Print service info saat diinisialisasi
+    LocationService.printServiceInfo();
+  }
+
+  /// Get current location with permission handling
   Future<Position?> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print('❌ Location services are disabled');
+      return null;
+    }
+
+    // Check location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print('❌ Location permissions are denied');
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print('❌ Location permissions are permanently denied');
+      return null;
+    }
+
+    // Get current position
     try {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+      print('✅ Got position: ${position.latitude}, ${position.longitude}');
       return position;
     } catch (e) {
-      print('Error getting location: $e');
+      print('❌ Error getting position: $e');
       return null;
     }
   }
 
-  /// Validate QR Code dengan geofencing
-  ///
-  /// Process:
-  /// 1. Decode QR string ke QRCodeModel
-  /// 2. Validate UUID exists di database/test_locations
-  /// 3. Check user location dalam radius
+  /// Validate QR code and check geofencing
   Future<Map<String, dynamic>> validateQRCode({
     required String qrString,
     required Position userPosition,
   }) async {
     try {
-      print('🔍 Validating QR Code');
-      print('   Raw QR: "$qrString"');
+      print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      print('🔍 VALIDATE QR CODE - START');
+      print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      // Parse QR
+      final qrCode = QRCodeModel.decode(qrString: qrString);
+      print('✅ QR Decoded - UUID: ${qrCode.uuid}, Version: ${qrCode.version}');
 
-      // Step 1: Decode QR Code
-      QRCodeModel qrCode;
-      try {
-        // Decode otomatis pakai QRConfig.qrPrefix
-        qrCode = QRCodeModel.decode(
-          qrString: qrString.trim(),
-          // ✅ Tidak perlu specify expectedPrefix, otomatis pakai config!
-        );
-        print('✅ QR decoded successfully');
-        print('   UUID: ${qrCode.uuid}');
-        print('   Version: ${qrCode.version}');
-      } on QRCodePrefixException catch (e) {
-        return {
-          'valid': false,
-          'error': 'INVALID_PREFIX',
-          'message': 'QR Code tidak valid.\n\nIni bukan QR Code BudayaGo!',
-          'details': e.message,
-        };
-      } on QRCodeFormatException catch (e) {
-        return {
-          'valid': false,
-          'error': 'INVALID_FORMAT',
-          'message':
-              'Format QR Code tidak valid.\n\nPastikan QR Code dalam kondisi baik.',
-          'details': e.message,
-        };
-      }
-
-      // Step 2: Check version compatibility
+      // Check version
       if (!QRConfig.isVersionSupported(qrCode.version)) {
+        print('❌ Unsupported version: ${qrCode.version}');
         return {
           'valid': false,
           'error': 'UNSUPPORTED_VERSION',
-          'message':
-              'Versi QR Code tidak didukung.\n\nSilakan update aplikasi ke versi terbaru.',
-          'qrVersion': qrCode.version,
-          'supportedVersions': QRConfig.supportedVersions,
+          'message': 'Versi QR code (${qrCode.version}) tidak didukung',
         };
       }
 
-      // Step 3: Check if UUID exists in database (fetch from Supabase)
-      final locationData =
-          await SupabaseConfig.client
-              .from('cultural_partners')
-              .select()
-              .eq('id', qrCode.uuid)
-              .maybeSingle();
-
-      if (locationData == null) {
-        print('❌ UUID not found in database');
+      // Lookup location via LocationService
+      print('🔍 Looking up UUID: "${qrCode.uuid}"');
+      
+      final response = await LocationService.getLocationByUUID(qrCode.uuid);
+      
+      if (response == null) {
+        print('❌ LOCATION NOT FOUND');
+        print('   Searched UUID: "${qrCode.uuid}"');
+        
+        // Debug: Show all available locations
+        await LocationService.debugPrintAllLocations();
+        
         return {
           'valid': false,
           'error': 'LOCATION_NOT_FOUND',
-          'message':
-              'Lokasi tidak ditemukan.\n\nQR Code mungkin sudah tidak aktif.',
-          'uuid': qrCode.uuid,
+          'message': 'Lokasi wisata tidak ditemukan',
+          'details': 'UUID: ${qrCode.uuid}',
         };
       }
 
-      // Step 4: Get target location data
-      print('✅ Location found: ${locationData['name']}');
+      final locationName = response['name'] as String;
+      final targetLat = response['latitude'] as double;
+      final targetLng = response['longitude'] as double;
+      final radius = (response['geofence_radius'] ?? 100) as int;
 
-      // Step 5: Calculate distance
-      double distanceInMeters = calculateDistance(
-        userLat: userPosition.latitude,
-        userLng: userPosition.longitude,
-        targetLat: locationData['latitude'],
-        targetLng: locationData['longitude'],
+      print('📍 LOCATION FOUND:');
+      print('   Name: $locationName');
+      print('   Coords: $targetLat, $targetLng');
+      print('   Radius: $radius m');
+
+      // Calculate distance
+      final distance = Geolocator.distanceBetween(
+        userPosition.latitude,
+        userPosition.longitude,
+        targetLat,
+        targetLng,
       );
 
-      // Default radius if not set
-      final radius = locationData['radius'] ?? 200.0;
+      print('📏 DISTANCE CHECK:');
+      print('   User: ${userPosition.latitude}, ${userPosition.longitude}');
+      print('   Target: $targetLat, $targetLng');
+      print('   Distance: ${distance.toStringAsFixed(1)} m');
+      print('   Allowed: $radius m');
+      print('   Result: ${distance <= radius ? '✅ WITHIN RANGE' : '❌ OUT OF RANGE'}');
 
-      print('📏 Distance: ${distanceInMeters.toStringAsFixed(2)}m');
-      print('📏 Max radius: ${radius}m');
-
-      // Step 6: Check if within radius
-      if (distanceInMeters <= radius) {
-        return {
-          'valid': true,
-          'uuid': qrCode.uuid,
-          'qrVersion': qrCode.version,
-          'locationName': locationData['name'],
-          'locationId': locationData['id'],
-          'description': locationData['description'] ?? '',
-          'distance': distanceInMeters,
-          'radius': radius,
-          'coordinates': {
-            'lat': locationData['latitude'],
-            'lng': locationData['longitude'],
-          },
-        };
-      } else {
+      if (distance > radius) {
         return {
           'valid': false,
           'error': 'OUT_OF_RANGE',
-          'message':
-              'Anda terlalu jauh dari lokasi.\n\nMohon datang ke lokasi terlebih dahulu.',
-          'locationName': locationData['name'],
-          'distance': distanceInMeters,
+          'message': 'Anda terlalu jauh dari $locationName',
+          'distance': distance,
           'radius': radius,
         };
       }
-    } catch (e) {
-      print('❌ Error validating QR: $e');
+
+      print('✅ VALIDATION SUCCESS!');
+      print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+      return {
+        'valid': true,
+        'uuid': qrCode.uuid,
+        'locationName': locationName,
+        'description': response['description'],
+        'distance': distance,
+        'radius': radius,
+      };
+    } catch (e, stackTrace) {
+      print('❌ EXCEPTION in validateQRCode:');
+      print('   Error: $e');
+      print('   Stack: $stackTrace');
+      print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
       return {
         'valid': false,
-        'error': 'UNKNOWN_ERROR',
-        'message': 'Terjadi kesalahan.\n\nSilakan coba lagi.',
-        'details': e.toString(),
+        'error': 'EXCEPTION',
+        'message': 'Error: ${e.toString()}',
       };
     }
-  }
-
-  /// Calculate distance between two coordinates (Haversine formula)
-  double calculateDistance({
-    required double userLat,
-    required double userLng,
-    required double targetLat,
-    required double targetLng,
-  }) {
-    const earthRadius = 6371000; // meter
-
-    final dLat = _toRadians(targetLat - userLat);
-    final dLng = _toRadians(targetLng - userLng);
-
-    final a =
-        sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(userLat)) *
-            cos(_toRadians(targetLat)) *
-            sin(dLng / 2) *
-            sin(dLng / 2);
-
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  double _toRadians(double degree) {
-    return degree * pi / 180;
   }
 }

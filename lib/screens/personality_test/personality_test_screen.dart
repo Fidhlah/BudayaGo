@@ -182,7 +182,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                     Text(
                       currentQuestion!.text,
                       style: const TextStyle(
-                        fontSize: 24,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),

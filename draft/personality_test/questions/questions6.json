@@ -1,0 +1,168 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "text": "Saat malam berkabut, seorang tetua menyalakan obor dari daun kelapa. Asap cendana membentuk bayangan burung besar di langit. Apa responmu?",
+      "options": {
+        "A": { "text": "Mengamati bayangan sambil menenangkan napas.", "weights": {"logic": 1} },
+        "B": { "text": "Mendekat mencari sumber bayangan.", "weights": {"courage": 1} },
+        "C": { "text": "Menikmati aroma cendana dan ketenangannya.", "weights": {"spirituality": 1} },
+        "D": { "text": "Membayangkan cerita di balik bayangan itu.", "weights": {"creativity": 1} }
+      }
+    },
+
+    {
+      "id": 2,
+      "text": "Di lembah berkabut, penabuh gendang memanggilmu ke ritual panen. Gema gamelan memenuhi udara. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Mendekat dan bergabung di tepi lingkaran.", "weights": {"social": 1} },
+        "B": { "text": "Mengamati ritme sebelum ikut masuk.", "weights": {"logic": 1, "creativity": 1} },
+        "C": { "text": "Mengikuti langkah mereka perlahan.", "weights": {"principle": 1} },
+        "D": { "text": "Mengetuk ritme kecil tanpa mengganggu.", "weights": {"creativity": 1, "social": 1} }
+      }
+    },
+
+    {
+      "id": 3,
+      "text": "Di batas hutan tua, seorang nenek penjaga memegang lesung bergetar. Tatapannya menilai hatimu. Apa responmu?",
+      "options": {
+        "A": { "text": "Membaca pola getarannya.", "weights": {"logic": 1} },
+        "B": { "text": "Mendekat dan menawarkan bantuan.", "weights": {"empathy": 1, "social": 1} },
+        "C": { "text": "Menjaga jarak sopan dan mundur pelan.", "weights": {"principle": 1} },
+        "D": { "text": "Berhati-hati agar tak melanggar ruang sakral.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 4,
+      "text": "Di hutan masa lampau, pengembara tua meminta bantuan. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Memberi arah dengan contoh dari alam.", "weights": {"creativity": 1} },
+        "B": { "text": "Menemaninya ke tempat aman.", "weights": {"empathy": 1} },
+        "C": { "text": "Menggambar jalur di tanah.", "weights": {"principle": 1} },
+        "D": { "text": "Mengantar lewat jalur cepat meski berisiko.", "weights": {"courage": 1} }
+      }
+    },
+
+    {
+      "id": 5,
+      "text": "Penjaga hutan menawarkan kemampuan langka, tapi kamu harus meninggalkan satu hal berharga. Pilihanmu?",
+      "options": {
+        "A": { "text": "Menerimanya demi kebaikan banyak orang.", "weights": {"courage": 1} },
+        "B": { "text": "Menolak demi menjaga nilai yang kamu pegang.", "weights": {"principle": 1, "empathy": 1} },
+        "C": { "text": "Bertanya rinci tentang akibatnya.", "weights": {"logic": 1} },
+        "D": { "text": "Memohon restu alam sebelum memutuskan.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 6,
+      "text": "Kawanmu hilang di rimba Kalimantan saat kabut yang turun dengan cepat. Warga pun cemas. Apa langkahmu?",
+      "options": {
+        "A": { "text": "Masuk rimba sambil menenangkan warga.", "weights": {"courage": 1, "empathy": 1} },
+        "B": { "text": "Menenangkan warga dulu sebelum bergerak.", "weights": {"empathy": 1} },
+        "C": { "text": "Mengikuti intuisi yang muncul dari ketenangan.", "weights": {"spirituality": 1} },
+        "D": { "text": "Mengamati jejak dan pola kabut.", "weights": {"logic": 1} }
+      }
+    },
+
+    {
+      "id": 7,
+      "text": "Sekelompok pelancong berdebat tentang arah. Mereka meminta pandanganmu sebagai orang luar. Apa responmu?",
+      "options": {
+        "A": { "text": "Memberi jawaban tegas.", "weights": {"courage": 1} },
+        "B": { "text": "Menengahi dan menurunkan ketegangan.", "weights": {"social": 1, "empathy": 1} },
+        "C": { "text": "Mengumpulkan fakta sebelum memberi saran.", "weights": {"logic": 1} },
+        "D": { "text": "Menolak mendukung keputusan yang merugikan.", "weights": {"principle": 1} }
+      }
+    },
+
+    {
+      "id": 8,
+      "text": "Badai dari laut selatan menggulung pondok nelayan tempatmu berteduh. Apa yang kamu lakukan?",
+      "options": {
+        "A": { "text": "Memperkuat pondok sambil menenangkan teman.", "weights": {"principle": 1, "empathy": 1} },
+        "B": { "text": "Mencari tempat alam yang lebih kokoh.", "weights": {"logic": 1} },
+        "C": { "text": "Membangun perlindungan baru.", "weights": {"creativity": 1} },
+        "D": { "text": "Berdiam dan menunggu dengan tenang.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 9,
+      "text": "Di pegunungan, kamu menemukan sungai deras, hutan rapat, jalan berbatu, dan lembah luas. Arahmu?",
+      "options": {
+        "A": { "text": "Menyeberangi sungai deras.", "weights": {"courage": 1} },
+        "B": { "text": "Masuk hutan rapat dengan hati-hati.", "weights": {"empathy": 1} },
+        "C": { "text": "Menyusuri lembah untuk mencari inspirasi.", "weights": {"creativity": 1} },
+        "D": { "text": "Menapaki jalan berbatu dengan teratur.", "weights": {"principle": 1} }
+      }
+    },
+
+    {
+      "id": 10,
+      "text": "Warga desa mengenangmu setelah perjalananmu usai. Apa yang ingin mereka ingat?",
+      "options": {
+        "A": { "text": "Keberanianmu membantu orang lain.", "weights": {"courage": 1, "empathy": 1} },
+        "B": { "text": "Kemampuanmu memecahkan masalah.", "weights": {"logic": 1} },
+        "C": { "text": "Caramu menenangkan orang-orang.", "weights": {"empathy": 1} },
+        "D": { "text": "Keadilan dan konsistensimu.", "weights": {"principle": 1} }
+      }
+    },
+
+    {
+      "id": 11,
+      "text": "Seorang bangsawan membuat keputusan yang merugikan rakyat. Warga menatapmu berharap. Apa tindakanmu?",
+      "options": {
+        "A": { "text": "Menentangnya dengan lantang.", "weights": {"courage": 1} },
+        "B": { "text": "Membela warga dan menenangkan mereka.", "weights": {"principle": 1, "empathy": 1} },
+        "C": { "text": "Menengahi agar tak terjadi konflik.", "weights": {"empathy": 1, "social": 1} },
+        "D": { "text": "Merenung sejenak sebelum bertindak.", "weights": {"spirituality": 1} }
+      }
+    },
+
+    {
+      "id": 12,
+      "text": "Di perayaan desa asing, musik tradisional dan tarian memenuhi udara. Apa yang paling menarik perhatianmu?",
+      "options": {
+        "A": { "text": "Ritme dan gerakan tarian.", "weights": {"creativity": 1} },
+        "B": { "text": "Cerita di balik lagu-lagu.", "weights": {"logic": 1} },
+        "C": { "text": "Energi kebersamaan warganya.", "weights": {"spirituality": 1} },
+        "D": { "text": "Menyapa dan mengenal warga.", "weights": {"social": 1, "empathy": 1} }
+      }
+    },
+
+    {
+      "id": 13,
+      "text": "Seorang tetua menawarkan empat benda untuk perjalananmu. Mana yang kamu pilih?",
+      "options": {
+        "A": { "text": "Kompas kayu tua.", "weights": {"principle": 1} },
+        "B": { "text": "Botol air tempurung.", "weights": {"empathy": 1} },
+        "C": { "text": "Lampu minyak tradisional.", "weights": {"spirituality": 1} },
+        "D": { "text": "Pisau kecil berukir.", "weights": {"courage": 1} }
+      }
+    },
+
+    {
+      "id": 14,
+      "text": "Di alun-alun kerajaan, bangsawan menantangmu di depan banyak orang. Apa responmu?",
+      "options": {
+        "A": { "text": "Membalas tantangan dengan tenang.", "weights": {"courage": 1, "social": 1} },
+        "B": { "text": "Menegaskan prinsip tanpa marah.", "weights": {"principle": 1} },
+        "C": { "text": "Diam sejenak menstabilkan diri.", "weights": {"spirituality": 1} },
+        "D": { "text": "Tersenyum ringan untuk meredakan suasana.", "weights": {"social": 1} }
+      }
+    },
+
+    {
+      "id": 15,
+      "text": "Di tepi sungai saat senja, kamu merenungkan perjalananmu. Apa yang ingin kamu sadari tentang dirimu?",
+      "options": {
+        "A": { "text": "Ingin meninggalkan kebaikan.", "weights": {"empathy": 1, "social": 1} },
+        "B": { "text": "Siap menghadapi tantangan tanpa meninggalkan prinsip.", "weights": {"courage": 1, "principle": 1} },
+        "C": { "text": "Pentingnya belajar dari pengalaman.", "weights": {"logic": 1, "creativity": 1} },
+        "D": { "text": "Merasa lebih tenang dan memahami diri.", "weights": {"spirituality": 1, "empathy": 1} }
+      }
+    }
+  ]
+}

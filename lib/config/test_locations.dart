@@ -4,14 +4,7 @@ class TestLocations {
   // STRUKTUR BARU: Map UUID -> Location Data
   static Map<String, Map<String, dynamic>> locations = {
     // UUID dari Supabase (contoh)
-    '650d8400-e29b-41d4-a716-446655430001': {
-      'name': 'FPSD',
-      'lat': -6.85963446868329,   
-      'lng': 107.59305953158156,
-      'radius': 200,
-      'description': 'FPSDD',
-      // 'qrCode': 'fpmipa01', // Legacy support
-    },
+    
     '650e8400-e29b-41d4-a716-446655430001': {
       'name': 'Daarut Tauhid',
       'lat': -6.863543801365466,  
@@ -29,11 +22,11 @@ class TestLocations {
       // 'qrCode': 'fpmipa01', // Legacy support
     },
     '550e8400-e29b-41d4-a716-446655440001': {
-      'name': 'Rumah Hafidh',
-      'lat': -6.93415426659206,
-      'lng': 107.61479739897182,
-      'radius': 100,
-      'description': 'Rumah untuk testing',
+      'name': 'Museum Sri Baduga',
+      'lat': -6.867079388531097, 
+      'lng': 107.57573977306863,
+      'radius': 200,
+      'description': 'Museum Sri Baduga adalah museum tentang sejarah dan budaya Sunda, yang memamerkan koleksi mulai dari sejarah alam hingga kebudayaan tradisional Jawa Barat. Koleksi museum ini mencakup berbagai macam artefak, lukisan, pakaian tradisional, alat musik, senjata kuno, kerajinan tangan, dan ukiran kayu yang dikelompokkan dalam 10 klasifikasi, seperti geologika, biologika, etnografika, dan lainnya. ',
       // 'qrCode': 'hafidh01', // Legacy support
     },
     '550e8400-e29b-41d4-a716-446655440002': {
