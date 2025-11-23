@@ -8,6 +8,7 @@ import '../../theme/app_dimensions.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/karya_service.dart';
 import '../../config/supabase_config.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class UploadKaryaScreen extends StatefulWidget {
   const UploadKaryaScreen({Key? key}) : super(key: key);
@@ -213,7 +214,7 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Upload Karya')),
+      appBar: CustomGradientAppBar(title: 'Upload Karya'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppDimensions.paddingM),
         child: Form(

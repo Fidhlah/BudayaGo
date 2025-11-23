@@ -25,16 +25,25 @@ class KaryaService {
           users!karya_creator_id_fkey (
             id,
             display_name,
-            username
+            username,
+            mascot,
+            is_pelaku_budaya,
+            location
           )
         ''')
           .order('created_at', ascending: false);
 
       debugPrint('✅ Loaded ${karyaData.length} karya items');
+      if (karyaData.isEmpty) {
+        debugPrint(
+          '⚠️ No karya found in database. Make sure to upload some karya first.',
+        );
+      }
 
       return List<Map<String, dynamic>>.from(karyaData);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('❌ Error loading karya: $e');
+      debugPrint('Stack trace: $stackTrace');
       return [];
     }
   }
@@ -61,7 +70,10 @@ class KaryaService {
           users!karya_creator_id_fkey (
             id,
             display_name,
-            username
+            username,
+            mascot,
+            is_pelaku_budaya,
+            location
           )
         ''')
           .eq('tag', tag)
@@ -100,7 +112,10 @@ class KaryaService {
           users!karya_creator_id_fkey (
             id,
             display_name,
-            username
+            username,
+            mascot,
+            is_pelaku_budaya,
+            location
           )
         ''')
           .eq('umkm_category', category)
@@ -139,7 +154,10 @@ class KaryaService {
           users!karya_creator_id_fkey (
             id,
             display_name,
-            username
+            username,
+            mascot,
+            is_pelaku_budaya,
+            location
           )
         ''')
           .or('name.ilike.%$query%,description.ilike.%$query%')
@@ -151,6 +169,54 @@ class KaryaService {
     } catch (e) {
       debugPrint('❌ Error searching karya: $e');
       return [];
+    }
+  }
+
+  /// Create sample/dummy karya data for testing (Only use in development)
+  static Future<void> createSampleKarya(String creatorId) async {
+    try {
+      debugPrint('🎨 Creating sample karya data...');
+
+      final samples = [
+        {
+          'creator_id': creatorId,
+          'name': 'Batik Parang Klasik',
+          'description':
+              'Batik dengan motif parang klasik yang elegan, dibuat dengan teknik tulis tradisional.',
+          'tag': 'Batik',
+          'umkm_category': 'Batik Nusantara',
+          'color': 0xFF8B4513,
+          'icon_code_point': 0xe3b7, // Icons.palette
+        },
+        {
+          'creator_id': creatorId,
+          'name': 'Kursi Ukir Jepara',
+          'description':
+              'Furniture kayu jati dengan ukiran detail khas Jepara, hasil karya pengrajin lokal.',
+          'tag': 'Furniture',
+          'umkm_category': 'Kerajinan Kayu',
+          'color': 0xFF6B4423,
+          'icon_code_point': 0xe8cc, // Icons.chair
+        },
+        {
+          'creator_id': creatorId,
+          'name': 'Gerabah Kasongan',
+          'description':
+              'Vas dan peralatan rumah tangga dari tanah liat khas Kasongan, Yogyakarta.',
+          'tag': 'Keramik',
+          'umkm_category': 'Gerabah Tradisional',
+          'color': 0xFFD2691E,
+          'icon_code_point': 0xe3b8, // Icons.vase
+        },
+      ];
+
+      for (var sample in samples) {
+        await SupabaseConfig.client.from('karya').insert(sample);
+      }
+
+      debugPrint('✅ Sample karya created successfully');
+    } catch (e) {
+      debugPrint('❌ Error creating sample karya: $e');
     }
   }
 

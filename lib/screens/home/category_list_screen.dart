@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'detail_item_screen.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class CategoryListScreen extends StatelessWidget {
   final String category;
@@ -16,12 +17,7 @@ class CategoryListScreen extends StatelessWidget {
     final items = _getItemsForCategory(category);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(category),
-        backgroundColor: Colors.orange.shade600,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: CustomGradientAppBar(title: category),
       body: ListView.builder(
         padding: const EdgeInsets.all(20),
         itemCount: items.length,

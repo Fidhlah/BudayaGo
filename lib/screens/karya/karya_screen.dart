@@ -4,6 +4,7 @@ import '../../theme/app_dimensions.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/karya_service.dart';
 import '../profile/other_user_profile_screen.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class KaryaScreen extends StatefulWidget {
   const KaryaScreen({Key? key}) : super(key: key);
@@ -143,7 +144,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Karya Pelaku Budaya')),
+      appBar: CustomGradientAppBar(title: 'Karya Pelaku Budaya'),
       body: Column(
         children: [
           // Search bar
