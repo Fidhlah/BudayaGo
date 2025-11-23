@@ -3,6 +3,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/eksplorasi_service.dart';
 import 'category_detail_screen.dart';
+import 'cultural_objects_screen.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class EksplorasiScreen extends StatefulWidget {
@@ -271,8 +272,9 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
               context,
               MaterialPageRoute(
                 builder:
-                    (context) => CategoryDetailScreen(
+                    (context) => CulturalObjectsScreen(
                       categoryName: category['name'] as String,
+                      categoryId: category['id'] as String,
                       categoryColor: category['color'] as Color,
                       categoryIcon: category['icon'] as IconData,
                     ),
