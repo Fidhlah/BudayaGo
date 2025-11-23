@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // Import for debugPrint
+import '../config/supabase_config.dart'; // Import for current user access
 
 /// A service class to handle all communication with the customized
 /// Gemini RAG API endpoint (your Cloudflare Worker).
@@ -11,15 +12,24 @@ class ChatService {
   Future<String> sendMessage(
     String userMessage, {
     String character = 'timun mas', // TODO: ubah jadi dinamis
-    String username = 'heykeyeah', // TODO: ubah jadi pake username dari auth
+    String? username, // Made optional, will be auto-detected from auth
   }) async {
     final uri = Uri.parse(workerUrl);
+
+    // Get current user dynamically if username not provided
+    final currentUser = SupabaseConfig.currentUser;
+    final sessionId =
+        username ?? currentUser?.id ?? currentUser?.email ?? 'anonymous_user';
+
+    debugPrint('🔐 ChatService: Using sessionId: $sessionId');
+    debugPrint('   User ID: ${currentUser?.id}');
+    debugPrint('   User Email: ${currentUser?.email}');
 
     // 2. Prepare the JSON body structure
     final bodyJson = jsonEncode(<String, String>{
       'message': userMessage,
       'character': character,
-      'sessionId': username,
+      'sessionId': sessionId,
     });
 
     try {

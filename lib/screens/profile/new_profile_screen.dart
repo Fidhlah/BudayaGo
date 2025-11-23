@@ -217,7 +217,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     BuildContext context,
     UserProfile? profile,
     bool isPelakuBudaya,
-    bool hideProgress,
   ) {
     return Container(
       width: double.infinity,
@@ -229,46 +228,50 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         children: [
           // Character Card (kiri) + 5 Artifacts (kanan)
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Spacer(flex: 1),
               // Character Card (Timun Mas)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                child: Image.asset(
-                  'images/artifacts/kartu2.jpeg',
-                  width: 250,
-                  height: 370,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    print('❌ Error loading kartu: $error');
-                    return Container(
-                      width: 250,
-                      height: 370,
-                      color: Colors.red.shade100,
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image_not_supported,
-                            size: 50,
-                            color: Colors.red,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Kartu tidak ditemukan',
-                            style: TextStyle(color: Colors.red, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+              Flexible(
+                flex: 3,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  child: Image.asset(
+                    'assets/images/artifacts/kartu2.jpeg',
+                    width: 200,
+                    height: 300,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      print('❌ Error loading kartu: $error');
+                      return Container(
+                        width: 200,
+                        height: 300,
+                        color: Colors.red.shade100,
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.image_not_supported,
+                              size: 50,
+                              color: Colors.red,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Kartu tidak ditemukan',
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-              SizedBox(width: AppDimensions.spaceM),
+              SizedBox(width: AppDimensions.spaceS),
 
               // 5 Artifacts tersusun vertikal
-              Expanded(
+              Flexible(
+                flex: 2,
                 child:
                     _isLoadingCollectibles
                         ? const Center(
@@ -306,8 +309,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                           }
                                           : null,
                                   child: Container(
-                                    width: 80,
-                                    height: 80,
+                                    width: 60,
+                                    height: 60,
                                     decoration: BoxDecoration(
                                       color:
                                           isUnlocked
@@ -328,9 +331,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         isUnlocked
                                             ? ClipOval(
                                               child: Image.asset(
-                                                'images/artifacts/artifact$artifactNumber.png',
-                                                width: 80,
-                                                height: 80,
+                                                'assets/images/artifacts/artifact$artifactNumber.png',
+                                                width: 60,
+                                                height: 60,
                                                 fit: BoxFit.cover,
                                                 errorBuilder: (
                                                   context,
@@ -339,7 +342,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                                 ) {
                                                   return Icon(
                                                     Icons.broken_image,
-                                                    size: 30,
+                                                    size: 24,
                                                     color: AppColors.error,
                                                   );
                                                 },
@@ -347,7 +350,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                             )
                                             : Icon(
                                               Icons.lock,
-                                              size: 30,
+                                              size: 24,
                                               color: AppColors.background
                                                   .withOpacity(0.7),
                                             ),
@@ -358,7 +361,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           },
                         ),
               ),
-              const Spacer(flex: 1),
             ],
           ),
 
@@ -399,9 +401,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             ],
           ),
 
-          // Progress Bar (if not hidden and not pelaku budaya with hide option)
-          if (!hideProgress) ...[
-            Consumer<HomeProvider>(
+          // Progress Bar
+          Consumer<HomeProvider>(
               builder: (context, homeProvider, _) {
                 return Column(
                   children: [
@@ -440,41 +441,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 );
               },
             ),
-          ],
-
-          // Hide Progress Toggle (for Pelaku Budaya)
-          if (isPelakuBudaya) ...[
-            SizedBox(height: AppDimensions.spaceM),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sembunyikan Progress',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.background,
-                  ),
-                ),
-                SizedBox(width: AppDimensions.spaceS),
-                Theme(
-                  data: ThemeData(useMaterial3: false),
-                  child: Switch(
-                    value: hideProgress,
-                    onChanged: (value) {
-                      final provider = Provider.of<ProfileProvider>(
-                        context,
-                        listen: false,
-                      );
-                      provider.updateProfile(hideProgress: value);
-                    },
-                    activeColor: AppColors.batik700,
-                    inactiveThumbColor: AppColors.grey400,
-                    activeTrackColor: AppColors.batik200,
-                    inactiveTrackColor: AppColors.grey200,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -1426,7 +1392,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             context,
             Provider.of<ProfileProvider>(context).profile,
             false,
-            false,
           ),
           _buildProgressTab(),
         ],
@@ -1444,30 +1409,35 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       ); // Default to Karya tab
     }
 
-    return Column(
-      children: [
-        // Profile Header
-        _buildProfileHeader(context, profile, true, profile.hideProgress),
-        // Tab Bar (non-sticky)
-        Container(
-          color: AppColors.background,
-          child: TabBar(
-            controller: _tabController,
-            labelColor: AppColors.batik700,
-            unselectedLabelColor: AppColors.textSecondary,
-            indicatorColor: AppColors.batik700,
-            dividerColor: AppColors.batik700,
-            tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverToBoxAdapter(
+            child: _buildProfileHeader(
+              context,
+              profile,
+              true,
+            ),
           ),
-        ),
-        // Tab Views
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [_buildProgressTab(), _buildShowcaseTab(profile)],
+          SliverToBoxAdapter(
+            child: Container(
+              color: AppColors.background,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: AppColors.batik700,
+                unselectedLabelColor: AppColors.textSecondary,
+                indicatorColor: AppColors.batik700,
+                dividerColor: AppColors.batik700,
+                tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
+              ),
+            ),
           ),
-        ),
-      ],
+        ];
+      },
+      body: TabBarView(
+        controller: _tabController,
+        children: [_buildProgressTab(), _buildShowcaseTab(profile)],
+      ),
     );
   }
 
