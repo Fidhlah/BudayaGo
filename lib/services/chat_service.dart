@@ -10,14 +10,16 @@ class ChatService {
   // 1. Prepare the URI
   Future<String> sendMessage(
     String userMessage, {
-    String character = 'timun mas',
+    String character = 'timun mas', // TODO: ubah jadi dinamis
+    String username = 'heykeyeah', // TODO: ubah jadi pake username dari auth
   }) async {
     final uri = Uri.parse(workerUrl);
 
     // 2. Prepare the JSON body structure
     final bodyJson = jsonEncode(<String, String>{
       'message': userMessage,
-      'character': character, // Send the character key
+      'character': character,
+      'sessionId': username,
     });
 
     try {

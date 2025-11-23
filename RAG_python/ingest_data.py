@@ -81,15 +81,16 @@ def upload_and_process_files(client: genai.Client, store_name: str):
         return
 
     json_files = [f for f in os.listdir(DATA_DIRECTORY) if f.endswith('.json')]
-    if not json_files:
-        print(
-            f"⚠️ No JSON files found in '{DATA_DIRECTORY}'. Nothing to upload.")
+    txt_files = [f for f in os.listdir(DATA_DIRECTORY) if f.endswith('.txt')]
+    if not json_files and not txt_files:
+        print(f"❌ No JSON or TXT files found in '{DATA_DIRECTORY}'.")
         return
 
-    print(
-        f"\nFound {len(json_files)} JSON files. Starting upload and indexing...")
+    print(f"\nFound {len(json_files)} JSON files.")
+    print(f"\nFound {len(txt_files)} TXT files.")
+    print("Starting upload and indexing...")
 
-    for filename in json_files:
+    for filename in json_files + txt_files:
         file_path = os.path.join(DATA_DIRECTORY, filename)
 
         print(f"\n--- Processing {filename} ---")
