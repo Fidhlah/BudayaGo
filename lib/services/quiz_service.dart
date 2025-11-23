@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../config/supabase_config.dart';
+import 'personality_matcher_service.dart';
 import '../models/character-matcher_questions_model.dart';
 
 /// Service untuk handle quiz/personality test integration dengan Supabase
@@ -124,72 +125,51 @@ class QuizService {
               .single();
 
       debugPrint('✅ Test results saved with ID: ${resultData['id']}');
-      debugPrint('⏳ Background service will process character matching...');
+      debugPrint('🎯 Processing character matching with Dart service...');
 
-      // Wait for background service to assign character (polling with timeout)
-      final maxAttempts = 30; // 30 seconds max
-      int attempts = 0;
-      String? characterId;
+      // Process personality test using Dart (not PostgreSQL)
+      // This will:
+      // 1. Calculate max scores from quiz_answers
+      // 2. Normalize scores (raw/max * 100)
+      // 3. Calculate Euclidean distance with all characters
+      // 4. Assign character with minimum distance
+      // 5. Update users.character_id and users.quiz_completed = true
+      await PersonalityMatcherService.processPersonalityTest(resultData);
 
-      while (attempts < maxAttempts) {
-        await Future.delayed(const Duration(seconds: 1));
-        attempts++;
+      debugPrint('✅ Character matching completed (Dart)');
 
-        // Check if character has been assigned by background service
-        final testResult =
-            await SupabaseConfig.client
-                .from('personality_test_results')
-                .select('assigned_character_id')
-                .eq('user_id', userId)
-                .single();
-
-        characterId = testResult['assigned_character_id'];
-        
-        if (characterId != null) {
-          debugPrint('✅ Character assigned by background service after ${attempts}s');
-          break;
-        }
-        
-        if (attempts % 5 == 0) {
-          debugPrint('⏳ Still waiting... (${attempts}/${maxAttempts}s)');
-        }
-      }
-
-      if (characterId == null) {
-        throw Exception(
-          'Character matching timeout. Background service did not assign character within 30 seconds. '
-          'Please check if PersonalityMatcherService is running.',
-        );
-      }
-
-      // Get assigned character details
+      // Get assigned character details (character_id already set by Dart service)
       final characterData =
           await SupabaseConfig.client
-              .from('characters')
+              .from('users')
               .select('''
-            id,
-            name,
-            description,
-            lore,
-            archetype,
-            image_url,
-            personality_traits
+            character_id,
+            characters (
+              id,
+              name,
+              description,
+              lore,
+              archetype,
+              image_url,
+              personality_traits
+            )
           ''')
-              .eq('id', characterId)
+              .eq('id', userId)
               .single();
 
-      debugPrint('✅ Character assigned: ${characterData['name']}');
+      final character = characterData['characters'];
+      debugPrint('✅ Character retrieved: ${character['name']}');
 
       return {
         'success': true,
         'character': {
-          'id': characterData['id'],
-          'name': characterData['name'],
-          'description': characterData['description'],
-          'lore': characterData['lore'],
-          'archetype': characterData['archetype'],
-          'image_url': characterData['image_url'],
-          'personality_traits': characterData['personality_traits'] ?? [],
+          'id': character['id'],
+          'name': character['name'],
+          'description': character['description'],
+          'lore': character['lore'],
+          'archetype': character['archetype'],
+          'image_url': character['image_url'],
+          'personality_traits': character['personality_traits'] ?? [],
         },
         'testResultId': resultData['id'],
       };

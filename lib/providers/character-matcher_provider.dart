@@ -55,7 +55,9 @@ class PersonalityTestProvider with ChangeNotifier {
     if (currentQuestion == null) return;
 
     debugPrint('\n' + '=' * 80);
-    debugPrint('📋 PERSONALITY TEST - Question ${_currentQuestionIndex + 1}/${_questions.length}');
+    debugPrint(
+      '📋 PERSONALITY TEST - Question ${_currentQuestionIndex + 1}/${_questions.length}',
+    );
     debugPrint('=' * 80);
     debugPrint('❓ Question: ${currentQuestion!.text.substring(0, 50)}...');
 
@@ -95,16 +97,15 @@ class PersonalityTestProvider with ChangeNotifier {
       // Get local test result (for display purposes)
       _testResult = _testService.calculateResult(userId);
 
-      // Submit raw scores to database - Python backend will:
-      // 1. Read raw scores from personality_test_results
-      // 2. Calculate max scores from quiz_answers
-      // 3. Normalize scores to percentages (raw/max * 100)
-      // 4. Load all characters from Supabase
-      // 5. Calculate Euclidean Distance with all characters
-      // 6. Assign character with minimum distance
-      // 7. Update assigned_character_id in personality_test_results
+      // Submit raw scores to database and call process_personality_test():
+      // 1. Save raw scores to personality_test_results
+      // 2. Call process_personality_test() function which will:
+      //    - Calculate max scores from quiz_answers table
+      //    - Normalize scores (raw/max * 100)
+      //    - Calculate Euclidean Distance with all characters
+      //    - Assign character with minimum distance
+      //    - Update users.character_id and users.quiz_completed = true
       debugPrint('📤 Submitting raw scores to database...');
-      debugPrint('⚙️  Python backend (personality_quiz.py + euclidean.py) will handle character matching');
 
       final result = await QuizService.submitTestResults(
         userId: userId,

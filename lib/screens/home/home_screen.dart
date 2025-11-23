@@ -9,6 +9,7 @@ import '../../theme/app_text_styles.dart';
 import '../../services/karya_service.dart';
 import '../../services/visit_service.dart';
 import '../../config/supabase_config.dart';
+import '../../widgets/custom_app_bar.dart';
 import 'category_list_screen.dart';
 import '../qr/qr_scanner_screen.dart';
 
@@ -114,50 +115,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.orange50,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: CustomGradientAppBar(
+          title: 'Halo, Penjelajah!',
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Consumer<HomeProvider>(
+                builder: (context, homeProvider, _) {
+                  return _buildLevelProgress(
+                    homeProvider.userLevel,
+                    homeProvider.progressToNextLevel,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with gradient background
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: AppColors.orangePinkGradient,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Halo, Penjelajah!',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Consumer<HomeProvider>(
-                      builder: (context, homeProvider, _) {
-                        return _buildLevelProgress(
-                          homeProvider.userLevel,
-                          homeProvider.progressToNextLevel,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
@@ -165,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     // Advertisement Carousel
                     SizedBox(
-                      height: 160,
+                      height: 200,
                       child: PageView(
                         controller: _pageController,
                         children: [
@@ -499,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                // Image with gradient
+                                                // Image with actual photo or gradient fallback
                                                 Container(
                                                   height: 120,
                                                   decoration: BoxDecoration(
@@ -509,30 +490,65 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             16,
                                                           ),
                                                         ),
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                      colors: [
-                                                        (item['color'] as Color)
-                                                            .withOpacity(0.8),
-                                                        (item['color'] as Color)
-                                                            .withOpacity(0.4),
-                                                      ],
-                                                    ),
+                                                    color: AppColors.grey200,
                                                   ),
                                                   child: Stack(
                                                     children: [
-                                                      // Decorative icon
-                                                      Center(
-                                                        child: Icon(
-                                                          item['icon']
-                                                              as IconData,
-                                                          size: 50,
-                                                          color: Colors.white
-                                                              .withOpacity(0.4),
+                                                      // Actual image or gradient placeholder
+                                                      if (item['imageUrl'] != null && (item['imageUrl'] as String).isNotEmpty)
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              const BorderRadius.vertical(
+                                                                top: Radius.circular(16),
+                                                              ),
+                                                          child: Image.network(
+                                                            item['imageUrl'] as String,
+                                                            width: double.infinity,
+                                                            height: 120,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return Container(
+                                                                decoration: BoxDecoration(
+                                                                  gradient: LinearGradient(
+                                                                    begin: Alignment.topLeft,
+                                                                    end: Alignment.bottomRight,
+                                                                    colors: [
+                                                                      (item['color'] as Color).withOpacity(0.8),
+                                                                      (item['color'] as Color).withOpacity(0.4),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Icon(
+                                                                    item['icon'] as IconData,
+                                                                    size: 50,
+                                                                    color: Colors.white.withOpacity(0.4),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        )
+                                                      else
+                                                        Container(
+                                                          decoration: BoxDecoration(
+                                                            gradient: LinearGradient(
+                                                              begin: Alignment.topLeft,
+                                                              end: Alignment.bottomRight,
+                                                              colors: [
+                                                                (item['color'] as Color).withOpacity(0.8),
+                                                                (item['color'] as Color).withOpacity(0.4),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                            child: Icon(
+                                                              item['icon'] as IconData,
+                                                              size: 50,
+                                                              color: Colors.white.withOpacity(0.4),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
                                                       // Tag at bottom
                                                       Positioned(
                                                         bottom: 8,
@@ -690,15 +706,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLevelProgress(int level, double progress) {
     return SizedBox(
-      width: 60,
-      height: 60,
+      width: 45,
+      height: 45,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // Background circle
           Container(
-            width: 60,
-            height: 60,
+            width: 45,
+            height: 45,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withOpacity(0.3),
@@ -706,11 +722,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // Progress indicator
           SizedBox(
-            width: 60,
-            height: 60,
+            width: 45,
+            height: 45,
             child: CircularProgressIndicator(
               value: progress,
-              strokeWidth: 4,
+              strokeWidth: 3,
               backgroundColor: Colors.white.withOpacity(0.2),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
             ),
@@ -719,7 +735,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             '$level',
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

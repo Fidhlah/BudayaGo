@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/message_model.dart';
 import '../../services/chat_service.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../../providers/profile_provider.dart';
+import '../../theme/app_colors.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -106,11 +110,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = Provider.of<ProfileProvider>(context).profile;
+    final mascotName = profile?.mascot ?? 'Maskot';
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gemini RAG Chatbot'),
-        backgroundColor: Colors.blue,
-      ),
+      backgroundColor: AppColors.orange50,
+      appBar: CustomGradientAppBar(title: 'Chat dengan $mascotName'),
       body: Column(
         children: <Widget>[
           // Message List (Reversed to show newest at the bottom)

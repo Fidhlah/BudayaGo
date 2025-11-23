@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/chatbot_provider.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../../theme/app_colors.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final String mascot;
@@ -62,19 +64,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.orange.shade600,
-        foregroundColor: Colors.white,
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.smart_toy, color: Colors.orange.shade600),
-            ),
-            const SizedBox(width: 12),
-            Text('Chat dengan \${widget.mascot}'),
-          ],
-        ),
+      backgroundColor: AppColors.orange50,
+      appBar: CustomGradientAppBar(
+        title: 'Chat dengan \${widget.mascot}',
         actions: [
           Consumer<ChatbotProvider>(
             builder: (context, chatbotProvider, _) {

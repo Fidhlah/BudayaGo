@@ -293,33 +293,28 @@ class ProfileProvider extends ChangeNotifier {
     try {
       final userId = _profile!.id;
 
-      // Fetch from Supabase
+      // Fetch ALL collectibles (both locked and unlocked) from Supabase
       final collectiblesData = await CollectiblesService.loadUserCollectibles(
         userId,
       );
 
-      // Convert to Collectible model
+      // Convert to Collectible model - include ALL items
       _collectibles =
-          collectiblesData
-              .where(
-                (item) => item['isUnlocked'] == true,
-              ) // Only include unlocked items
-              .map((item) {
-                return Collectible(
-                  id: item['id'],
-                  name: item['name'],
-                  category: 'Artifact', // Default category
-                  imageUrl: item['imageUrl'],
-                  collectedAt:
-                      item['unlockedAt'] != null
-                          ? DateTime.parse(item['unlockedAt'])
-                          : DateTime.now(),
-                  xpEarned: item['xpEarned'],
-                );
-              })
-              .toList();
+          collectiblesData.map((item) {
+            return Collectible(
+              id: item['id'],
+              name: item['name'],
+              category: 'Artifact', // Default category
+              imageUrl: item['imageUrl'],
+              collectedAt:
+                  item['unlockedAt'] != null
+                      ? DateTime.parse(item['unlockedAt'])
+                      : DateTime.now(),
+              xpEarned: item['xpEarned'],
+            );
+          }).toList();
 
-      debugPrint('✅ Loaded ${_collectibles.length} collectibles');
+      debugPrint('✅ Loaded ${_collectibles.length} collectibles (all items)');
     } catch (e) {
       _error = 'Failed to load collectibles: $e';
       debugPrint('❌ ProfileProvider.loadCollectibles error: $e');
@@ -327,6 +322,11 @@ class ProfileProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Get collectibles data as Map for backward compatibility
+  List<Map<String, dynamic>> get collectiblesAsMap {
+    return _collectibles.map((c) => c.toJson()).toList();
   }
 
   /// Add a new collectible
@@ -357,8 +357,13 @@ class ProfileProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Update in Supabase
-      await Future.delayed(const Duration(milliseconds: 300));
+      // Update in Supabase database
+      await SupabaseConfig.client
+          .from('users')
+          .update({'is_pelaku_budaya': true, 'updated_at': DateTime.now().toIso8601String()})
+          .eq('id', _profile!.id);
+
+      debugPrint('✅ Database updated: is_pelaku_budaya = true for user ${_profile!.id}');
 
       _profile = _profile!.copyWith(
         isPelakuBudaya: true,
@@ -379,7 +384,7 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   /// Add uploaded karya ID
-  void addUploadedKarya(String karyaId) {
+  Future<void> addUploadedKarya(String karyaId) async {
     if (_profile == null) return;
 
     final updatedIds = List<String>.from(_profile!.uploadedKaryaIds)
@@ -387,8 +392,20 @@ class ProfileProvider extends ChangeNotifier {
     _profile = _profile!.copyWith(uploadedKaryaIds: updatedIds);
     notifyListeners();
 
-    // TODO: Sync to Supabase
-    debugPrint('✅ Added karya: $karyaId');
+    // Sync to Supabase (now properly implemented)
+    try {
+      await SupabaseConfig.client
+          .from('users')
+          .update({
+            'uploaded_karya_ids': updatedIds,
+          })
+          .eq('id', _profile!.id);
+      
+      debugPrint('✅ Synced karya to database: $karyaId');
+    } catch (e) {
+      debugPrint('❌ Error syncing uploaded_karya_ids: $e');
+      // Note: Keep local state even if sync fails
+    }
   }
 
   /// Clear all data (for logout)

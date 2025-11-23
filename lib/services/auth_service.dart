@@ -41,9 +41,9 @@ class AuthService {
     return await _supabase.auth.signUp(
       email: email,
       password: password,
-      data: {
-        'full_name': fullName,
-      },
+      data: {'full_name': fullName},
+      emailRedirectTo:
+          'budayago://auth-callback', // 🔥 FIX: Deep link untuk email verification
     );
   }
 
@@ -60,15 +60,15 @@ class AuthService {
   }
 
   /// ✅ Resend verification email
-  Future<void> resendVerificationEmail({
-    required String email,
-  }) async {
+  Future<void> resendVerificationEmail({required String email}) async {
     print('📧 AuthService: resendVerificationEmail');
     print('   Email: $email');
 
     await _supabase.auth.resend(
       type: OtpType.signup,
       email: email,
+      emailRedirectTo:
+          'budayago://auth-callback', // 🔥 FIX: Deep link untuk email verification
     );
   }
 }
