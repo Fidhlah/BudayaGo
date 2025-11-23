@@ -7,6 +7,7 @@ import '../../config/supabase_config.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../../widgets/edit_display_name_dialog.dart';
 import '../../widgets/upgrade_pelaku_budaya_dialog.dart';
 import '../karya/upload_karya_screen.dart';
@@ -200,18 +201,18 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         final isPelakuBudaya = profile?.isPelakuBudaya ?? false;
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Profil Saya'),
+          appBar: CustomGradientAppBar(
+            title: 'Profil Saya',
             actions: [
               IconButton(
-                icon: const Icon(Icons.badge),
+                icon: const Icon(Icons.badge, color: Colors.white),
                 tooltip: 'Lihat Kartu',
                 onPressed: () {
                   _showCharacterCard(context);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.settings),
+                icon: const Icon(Icons.settings, color: Colors.white),
                 tooltip: 'Pengaturan',
                 onPressed: () {
                   _showSettingsDialog(context, isPelakuBudaya);
@@ -454,7 +455,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                               height: 60,
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                color: Colors.amber.shade400.withOpacity(0.3),
+                                                color: Colors.amber.shade400
+                                                    .withOpacity(0.3),
                                               ),
                                             ),
                                             // Progress indicator
@@ -464,8 +466,14 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                               child: CircularProgressIndicator(
                                                 value: 0,
                                                 strokeWidth: 4,
-                                                backgroundColor: Colors.amber.shade400.withOpacity(0.2),
-                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.amber.shade400),
+                                                backgroundColor: Colors
+                                                    .amber
+                                                    .shade400
+                                                    .withOpacity(0.2),
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(Colors.amber.shade400),
                                               ),
                                             ),
                                             // Artifact image in center
@@ -1201,7 +1209,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                             value: 1.0,
                             strokeWidth: 6,
                             backgroundColor: Colors.white.withOpacity(0.2),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                         // Artifact image in center
