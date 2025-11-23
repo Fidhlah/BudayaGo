@@ -80,7 +80,7 @@ class PersonalityMatcherService {
 
       for (var test in newTests) {
         try {
-          await _processPersonalityTest(test);
+          await processPersonalityTest(test);
           _processedTestIds.add(test['id'] as String);
         } catch (e, stack) {
           debugPrint('❌ Error processing test ${test['id']}: $e');
@@ -201,8 +201,8 @@ class PersonalityMatcherService {
     return {'character': bestMatch, 'distance': minDistance};
   }
 
-  /// Process a single personality test
-  static Future<void> _processPersonalityTest(
+  /// Process a single personality test (PUBLIC - called by QuizService)
+  static Future<void> processPersonalityTest(
     Map<String, dynamic> testResult,
   ) async {
     final userId = testResult['user_id'] as String;
@@ -270,7 +270,10 @@ class PersonalityMatcherService {
     // Update users table
     await SupabaseConfig.client
         .from('users')
-        .update({'character_id': bestCharacter['id']})
+        .update({
+          'character_id': bestCharacter['id'],
+          'quiz_completed': true,
+        })
         .eq('id', userId);
 
     debugPrint('✅ Character assigned: ${bestCharacter['name']}');
