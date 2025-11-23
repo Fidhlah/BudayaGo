@@ -13,15 +13,13 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(Icons.home, 0, 'Home'),
           _buildNavItem(Icons.explore, 1, 'Eksplorasi'),
           const SizedBox(width: 40), // Space for FAB
-          _buildNavItem(Icons.shopping_bag, 2, 'Karya'),
+          _buildNavItem(Icons.photo_library, 2, 'Galeri'),
           _buildNavItem(Icons.person, 3, 'Profile'),
         ],
       ),

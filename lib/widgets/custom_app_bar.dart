@@ -44,7 +44,8 @@ class CustomGradientAppBar extends StatelessWidget
               )
               : leadingIcon,
       centerTitle: false,
-      titleSpacing: 8,
+      // Jika tidak ada back button atau leading icon, beri spacing seolah-olah ada
+      titleSpacing: (showBackButton || leadingIcon != null) ? 8 : 40,
       title: Text(
         title,
         style: AppTextStyles.h5.copyWith(

@@ -47,13 +47,20 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   void _initializeTabController() {
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(
+      context,
+      listen: false,
+    );
     final isPelakuBudaya = profileProvider.profile?.isPelakuBudaya ?? false;
-    
+
     // Initialize TabController for Pelaku Budaya and auto-open Karya tab
     if (isPelakuBudaya) {
       if (_tabController == null || _tabController!.length != 2) {
-        _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Start at Karya tab
+        _tabController = TabController(
+          length: 2,
+          vsync: this,
+          initialIndex: 1,
+        ); // Start at Karya tab
       }
     }
   }
@@ -173,13 +180,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             title: 'Profil Saya',
             actions: [
               IconButton(
-                icon: const Icon(Icons.badge, color: Colors.white),
-                tooltip: 'Lihat Kartu',
-                onPressed: () {
-                  _showCharacterCard(context);
-                },
-              ),
-              IconButton(
                 icon: const Icon(Icons.settings, color: Colors.white),
                 tooltip: 'Pengaturan',
                 onPressed: () {
@@ -227,30 +227,143 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       ),
       child: Column(
         children: [
-          // Avatar
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.background,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
+          // Character Card (kiri) + 5 Artifacts (kanan)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Spacer(flex: 1),
+              // Character Card (Timun Mas)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                child: Image.asset(
+                  'images/artifacts/kartu2.jpeg',
+                  width: 250,
+                  height: 370,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('❌ Error loading kartu: $error');
+                    return Container(
+                      width: 250,
+                      height: 370,
+                      color: Colors.red.shade100,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            size: 50,
+                            color: Colors.red,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Kartu tidak ditemukan',
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
-            child: Icon(
-              _getMascotIcon(),
-              size: AppDimensions.iconXL,
-              color: AppColors.batik700,
-            ),
+              ),
+              SizedBox(width: AppDimensions.spaceM),
+
+              // 5 Artifacts tersusun vertikal
+              Expanded(
+                child:
+                    _isLoadingCollectibles
+                        ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                        : Builder(
+                          builder: (context) {
+                            final displayCount = 5;
+                            // Set 4 artifact pertama sebagai unlocked
+                            final unlockedCount = 4;
+
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(displayCount, (index) {
+                                final isUnlocked = index < unlockedCount;
+                                final artifactNumber = index + 1;
+
+                                return GestureDetector(
+                                  onTap:
+                                      isUnlocked
+                                          ? () {
+                                            // TODO: Show artifact detail
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Artifact $artifactNumber',
+                                                ),
+                                                duration: const Duration(
+                                                  seconds: 1,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          : null,
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isUnlocked
+                                              ? Colors.transparent
+                                              : AppColors.background
+                                                  .withOpacity(0.3),
+                                      shape: BoxShape.circle,
+                                      border:
+                                          isUnlocked
+                                              ? null
+                                              : Border.all(
+                                                color: AppColors.background
+                                                    .withOpacity(0.5),
+                                                width: 2,
+                                              ),
+                                    ),
+                                    child:
+                                        isUnlocked
+                                            ? ClipOval(
+                                              child: Image.asset(
+                                                'images/artifacts/artifact$artifactNumber.png',
+                                                width: 80,
+                                                height: 80,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return Icon(
+                                                    Icons.broken_image,
+                                                    size: 30,
+                                                    color: AppColors.error,
+                                                  );
+                                                },
+                                              ),
+                                            )
+                                            : Icon(
+                                              Icons.lock,
+                                              size: 30,
+                                              color: AppColors.background
+                                                  .withOpacity(0.7),
+                                            ),
+                                  ),
+                                );
+                              }),
+                            );
+                          },
+                        ),
+              ),
+              const Spacer(flex: 1),
+            ],
           ),
-          SizedBox(height: AppDimensions.spaceM),
 
           // Display Name with Edit Button
+          SizedBox(height: AppDimensions.spaceS),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -285,201 +398,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               ),
             ],
           ),
-          SizedBox(height: AppDimensions.spaceXS),
-
-          // Badge
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppDimensions.paddingS,
-              vertical: AppDimensions.paddingXS,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.background.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-            ),
-            child: Text(
-              isPelakuBudaya ? '✨ Pelaku Budaya' : widget.mascot,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.background,
-              ),
-            ),
-          ),
-
-          // Koleksi Artifacts
-          SizedBox(height: AppDimensions.spaceL),
-          _isLoadingCollectibles
-              ? const SizedBox(
-                height: 60,
-                child: Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                ),
-              )
-              : Builder(
-                builder: (context) {
-                  final collectibleCount = _collectibles?.length ?? 0;
-                  final displayCount =
-                      collectibleCount > 0 ? collectibleCount : 5;
-
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingM,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(displayCount, (index) {
-                        final hasCollectible =
-                            collectibleCount > 0 && index < collectibleCount;
-
-                        if (!hasCollectible) {
-                          return Flexible(
-                            child: AspectRatio(
-                              aspectRatio: 1.0,
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.background.withOpacity(0.3),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.background.withOpacity(
-                                      0.5,
-                                    ),
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.lock,
-                                      size: 30,
-                                      color: AppColors.background.withOpacity(
-                                        0.7,
-                                      ),
-                                    ),
-                                    SizedBox(height: AppDimensions.spaceXS),
-                                    Text(
-                                      '${index + 1}',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: AppColors.background.withOpacity(
-                                          0.7,
-                                        ),
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-
-                        final collectible = _collectibles![index];
-                        final isUnlocked = collectible['unlocked'] == true;
-
-                        return Flexible(
-                          child: AspectRatio(
-                            aspectRatio: 1.0,
-                            child: GestureDetector(
-                              onTap:
-                                  isUnlocked
-                                      ? () {
-                                        _showCollectibleDetail(
-                                          context,
-                                          collectible,
-                                        );
-                                      }
-                                      : null,
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 4),
-                                decoration: BoxDecoration(
-                                  color:
-                                      isUnlocked
-                                          ? Colors.transparent
-                                          : AppColors.background.withOpacity(
-                                            0.3,
-                                          ),
-                                  shape: BoxShape.circle,
-                                  border:
-                                      isUnlocked
-                                          ? null
-                                          : Border.all(
-                                            color: AppColors.background
-                                                .withOpacity(0.5),
-                                          ),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (isUnlocked)
-                                      SizedBox(
-                                        width: 60,
-                                        height: 60,
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Background circle
-                                            Container(
-                                              width: 60,
-                                              height: 60,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.amber.shade400
-                                                    .withOpacity(0.3),
-                                              ),
-                                            ),
-                                            // Progress indicator
-                                            SizedBox(
-                                              width: 60,
-                                              height: 60,
-                                              child: CircularProgressIndicator(
-                                                value: 0,
-                                                strokeWidth: 4,
-                                                backgroundColor: Colors
-                                                    .amber
-                                                    .shade400
-                                                    .withOpacity(0.2),
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                      Color
-                                                    >(Colors.amber.shade400),
-                                              ),
-                                            ),
-                                            // Artifact image in center
-                                            Image.asset(
-                                              'assets/images/artifacts/timun.png',
-                                              width: 40,
-                                              height: 40,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    else
-                                      SizedBox(
-                                        width: 50,
-                                        height: 50,
-                                        child: Icon(
-                                          Icons.lock,
-                                          size: 40,
-                                          color: AppColors.background
-                                              .withOpacity(0.7),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  );
-                },
-              ),
 
           // Progress Bar (if not hidden and not pelaku budaya with hide option)
           if (!hideProgress) ...[
-            SizedBox(height: AppDimensions.spaceL),
             Consumer<HomeProvider>(
               builder: (context, homeProvider, _) {
                 return Column(
@@ -845,8 +766,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 SizedBox(height: AppDimensions.spaceL),
                 Text(
                   'Gagal memuat karya',
-                  style:
-                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.h5.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 SizedBox(height: AppDimensions.spaceS),
                 Text(
@@ -877,8 +799,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 SizedBox(height: AppDimensions.spaceL),
                 Text(
                   'Belum ada karya',
-                  style:
-                      AppTextStyles.h5.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.h5.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 SizedBox(height: AppDimensions.spaceS),
                 Text(
@@ -917,28 +840,29 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KaryaDetailScreen(
-                          karya: {
-                            'id': karya['id'],
-                            'name': karya['name'],
-                            'description': karya['description'],
-                            'imageUrl': imageUrl,
-                            'tag': karya['tag'],
-                            'umkm': karya['umkm_category'],
-                            'creatorName': profile.displayName ?? 'Anonim',
-                            'location': profile.displayName ?? 'Indonesia',
-                            'color': Color(
-                              karya['color'] ?? AppColors.batik700.value,
+                        builder:
+                            (context) => KaryaDetailScreen(
+                              karya: {
+                                'id': karya['id'],
+                                'name': karya['name'],
+                                'description': karya['description'],
+                                'imageUrl': imageUrl,
+                                'tag': karya['tag'],
+                                'umkm': karya['umkm_category'],
+                                'creatorName': profile.displayName ?? 'Anonim',
+                                'location': profile.displayName ?? 'Indonesia',
+                                'color': Color(
+                                  karya['color'] ?? AppColors.batik700.value,
+                                ),
+                                'icon': IconData(
+                                  karya['icon_code_point'] ??
+                                      Icons.auto_awesome.codePoint,
+                                  fontFamily: 'MaterialIcons',
+                                ),
+                                'likes': karya['likes'] ?? 0,
+                                'views': karya['views'] ?? 0,
+                              },
                             ),
-                            'icon': IconData(
-                              karya['icon_code_point'] ??
-                                  Icons.auto_awesome.codePoint,
-                              fontFamily: 'MaterialIcons',
-                            ),
-                            'likes': karya['likes'] ?? 0,
-                            'views': karya['views'] ?? 0,
-                          },
-                        ),
                       ),
                     );
                   },
@@ -1053,7 +977,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               ),
                             ),
                             if (karya['description'] != null &&
-                                (karya['description'] as String).isNotEmpty) ...[
+                                (karya['description'] as String)
+                                    .isNotEmpty) ...[
                               SizedBox(height: AppDimensions.spaceXS),
                               Text(
                                 karya['description'] as String,
@@ -1077,8 +1002,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         color: AppColors.batik700,
                                       ),
                                     ),
-                                    backgroundColor:
-                                        AppColors.batik700.withOpacity(0.1),
+                                    backgroundColor: AppColors.batik700
+                                        .withOpacity(0.1),
                                     side: BorderSide.none,
                                     padding: EdgeInsets.zero,
                                     materialTapTargetSize:
@@ -1092,8 +1017,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
-                                    backgroundColor:
-                                        AppColors.grey100.withOpacity(0.5),
+                                    backgroundColor: AppColors.grey100
+                                        .withOpacity(0.5),
                                     side: BorderSide.none,
                                     padding: EdgeInsets.zero,
                                     materialTapTargetSize:
@@ -1114,8 +1039,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       },
     );
   }
-
-
 
   void _showCollectibleDetail(
     BuildContext context,
@@ -1514,7 +1437,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   Widget _buildPelakuBudayaBody(UserProfile profile) {
     // Ensure TabController is initialized (already done in initState with Karya tab as default)
     if (_tabController == null || _tabController!.length != 2) {
-      _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Default to Karya tab
+      _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: 1,
+      ); // Default to Karya tab
     }
 
     return Column(
