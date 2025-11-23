@@ -217,7 +217,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     BuildContext context,
     UserProfile? profile,
     bool isPelakuBudaya,
-    bool hideProgress,
   ) {
     return Container(
       width: double.infinity,
@@ -238,7 +237,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                   child: Image.asset(
-                    'images/artifacts/kartu2.jpeg',
+                    'assets/images/artifacts/kartu2.jpeg',
                     width: 200,
                     height: 300,
                     fit: BoxFit.contain,
@@ -332,7 +331,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                         isUnlocked
                                             ? ClipOval(
                                               child: Image.asset(
-                                                'images/artifacts/artifact$artifactNumber.png',
+                                                'assets/images/artifacts/artifact$artifactNumber.png',
                                                 width: 60,
                                                 height: 60,
                                                 fit: BoxFit.cover,
@@ -402,9 +401,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             ],
           ),
 
-          // Progress Bar (if not hidden and not pelaku budaya with hide option)
-          if (!hideProgress) ...[
-            Consumer<HomeProvider>(
+          // Progress Bar
+          Consumer<HomeProvider>(
               builder: (context, homeProvider, _) {
                 return Column(
                   children: [
@@ -443,41 +441,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                 );
               },
             ),
-          ],
-
-          // Hide Progress Toggle (for Pelaku Budaya)
-          if (isPelakuBudaya) ...[
-            SizedBox(height: AppDimensions.spaceM),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sembunyikan Progress',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.background,
-                  ),
-                ),
-                SizedBox(width: AppDimensions.spaceS),
-                Theme(
-                  data: ThemeData(useMaterial3: false),
-                  child: Switch(
-                    value: hideProgress,
-                    onChanged: (value) {
-                      final provider = Provider.of<ProfileProvider>(
-                        context,
-                        listen: false,
-                      );
-                      provider.updateProfile(hideProgress: value);
-                    },
-                    activeColor: AppColors.batik700,
-                    inactiveThumbColor: AppColors.grey400,
-                    activeTrackColor: AppColors.batik200,
-                    inactiveTrackColor: AppColors.grey200,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -1429,7 +1392,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             context,
             Provider.of<ProfileProvider>(context).profile,
             false,
-            false,
           ),
           _buildProgressTab(),
         ],
@@ -1455,7 +1417,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               context,
               profile,
               true,
-              profile.hideProgress,
             ),
           ),
           SliverToBoxAdapter(
