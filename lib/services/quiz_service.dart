@@ -124,43 +124,32 @@ class QuizService {
               .single();
 
       debugPrint('✅ Test results saved with ID: ${resultData['id']}');
-      debugPrint('⏳ Background service will process character matching...');
+      debugPrint('⚙️  Calling process_personality_test() function...');
 
-      // Wait for background service to assign character (polling with timeout)
-      final maxAttempts = 30; // 30 seconds max
-      int attempts = 0;
-      String? characterId;
+      // Call process_personality_test() function to:
+      // 1. Normalize scores (raw/max * 100)
+      // 2. Calculate Euclidean distance with all characters
+      // 3. Assign character with minimum distance
+      // 4. Update users.character_id and users.quiz_completed = true
+      await SupabaseConfig.client.rpc('process_personality_test', params: {
+        'p_user_id': userId,
+      });
 
-      while (attempts < maxAttempts) {
-        await Future.delayed(const Duration(seconds: 1));
-        attempts++;
+      debugPrint('✅ process_personality_test() completed');
 
-        // Check if character has been assigned by background service
-        final testResult =
-            await SupabaseConfig.client
-                .from('personality_test_results')
-                .select('assigned_character_id')
-                .eq('user_id', userId)
-                .single();
+      // Get assigned character ID from personality_test_results
+      final testResult =
+          await SupabaseConfig.client
+              .from('personality_test_results')
+              .select('assigned_character_id')
+              .eq('user_id', userId)
+              .single();
 
-        characterId = testResult['assigned_character_id'];
-
-        if (characterId != null) {
-          debugPrint(
-            '✅ Character assigned by background service after ${attempts}s',
-          );
-          break;
-        }
-
-        if (attempts % 5 == 0) {
-          debugPrint('⏳ Still waiting... (${attempts}/${maxAttempts}s)');
-        }
-      }
+      final characterId = testResult['assigned_character_id'];
 
       if (characterId == null) {
         throw Exception(
-          'Character matching timeout. Background service did not assign character within 30 seconds. '
-          'Please check if PersonalityMatcherService is running.',
+          'Character matching failed. process_personality_test() did not assign a character.',
         );
       }
 
