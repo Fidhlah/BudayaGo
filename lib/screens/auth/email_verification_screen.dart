@@ -165,131 +165,153 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Email Verification'),
-        centerTitle: true,
-        automaticallyImplyLeading: false, // Remove back button
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(AppDimensions.paddingL),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Icon
-                Icon(
-                  Icons.mark_email_read,
-                  size: AppDimensions.iconXL,
-                  color: AppColors.primary,
-                ),
-                SizedBox(height: AppDimensions.spaceXL),
-
-                // Title
-                Text(
-                  'Verify Your Email',
-                  style: AppTextStyles.h2,
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: AppDimensions.spaceM),
-
-                // Description
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, _) {
-                    return Text(
-                      'We sent a verification link to:\n${authProvider.user?.email ?? "your email"}',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
-                SizedBox(height: AppDimensions.spaceXS),
-                Text(
-                  'Please click the link in the email to verify your account.',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: AppColors.orangePinkGradient,
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(AppDimensions.paddingL),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Icon
+                  Icon(
+                    Icons.mark_email_read,
+                    size: AppDimensions.iconXL * 1.5,
+                    color: Colors.white,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: AppDimensions.spaceXL),
+                  SizedBox(height: AppDimensions.spaceXL),
 
-                // Check verification button
-                ElevatedButton.icon(
-                  onPressed: _isChecking ? null : _checkVerification,
-                  icon:
-                      _isChecking
-                          ? SizedBox(
-                            width: AppDimensions.iconS,
-                            height: AppDimensions.iconS,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
+                  // Title
+                  Text(
+                    'Verifikasi Email Anda',
+                    style: AppTextStyles.h2.copyWith(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: AppDimensions.spaceM),
+
+                  // Description
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, _) {
+                      return Text(
+                        'Kami telah mengirim link verifikasi ke:\n${authProvider.user?.email ?? "email Anda"}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                        textAlign: TextAlign.center,
+                      );
+                    },
+                  ),
+                  SizedBox(height: AppDimensions.spaceXS),
+                  Text(
+                    'Silakan klik link di email untuk memverifikasi akun Anda.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: AppDimensions.spaceXL),
+
+                  // Check verification button
+                  ElevatedButton.icon(
+                    onPressed: _isChecking ? null : _checkVerification,
+                    icon:
+                        _isChecking
+                            ? SizedBox(
+                              width: AppDimensions.iconS,
+                              height: AppDimensions.iconS,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.orange700,
+                                ),
                               ),
-                            ),
-                          )
-                          : const Icon(Icons.refresh),
-                  label: Text(_isChecking ? 'Checking...' : 'I\'ve Verified'),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingXL,
-                      vertical: AppDimensions.paddingM,
+                            )
+                            : const Icon(Icons.refresh),
+                    label: Text(
+                      _isChecking ? 'Memeriksa...' : 'Sudah Verifikasi',
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.orange700,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingXL,
+                        vertical: AppDimensions.paddingM,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: AppDimensions.spaceS),
+                  SizedBox(height: AppDimensions.spaceS),
 
-                // Resend email button
-                OutlinedButton.icon(
-                  onPressed: _resendVerification,
-                  icon: const Icon(Icons.email),
-                  label: const Text('Resend Email'),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppDimensions.paddingXL,
-                      vertical: AppDimensions.paddingM,
+                  // Resend email button
+                  OutlinedButton.icon(
+                    onPressed: _resendVerification,
+                    icon: const Icon(Icons.email),
+                    label: const Text('Kirim Ulang Email'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white, width: 2),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingXL,
+                        vertical: AppDimensions.paddingM,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: AppDimensions.spaceM),
+                  SizedBox(height: AppDimensions.spaceM),
 
-                // Instructions
-                const Divider(),
-                SizedBox(height: AppDimensions.spaceM),
-                Text(
-                  'Instructions:',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.bold,
+                  // Instructions
+                  Divider(color: Colors.white.withOpacity(0.3)),
+                  SizedBox(height: AppDimensions.spaceM),
+                  Text(
+                    'Instruksi:',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(height: AppDimensions.spaceXS),
-                Text(
-                  '1. Check your email inbox (including spam folder)\n'
-                  '2. Open the verification email from BudayaGo\n'
-                  '3. Click the verification link\n'
-                  '4. App will automatically redirect',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                  SizedBox(height: AppDimensions.spaceXS),
+                  Text(
+                    '1. Cek inbox email Anda (termasuk folder spam)\n'
+                    '2. Buka email verifikasi dari BudayaGo\n'
+                    '3. Klik link verifikasi\n'
+                    '4. Aplikasi akan otomatis redirect',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: AppDimensions.spaceL),
+                  SizedBox(height: AppDimensions.spaceL),
 
-                // Sign out option
-                TextButton(
-                  onPressed: () async {
-                    final authProvider = Provider.of<AuthProvider>(
-                      context,
-                      listen: false,
-                    );
-                    await authProvider.signOut();
-                    // AuthGate will automatically redirect to login
-                  },
-                  child: const Text('Sign Out'),
-                ),
-              ],
+                  // Sign out option
+                  TextButton(
+                    onPressed: () async {
+                      final authProvider = Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      );
+                      await authProvider.signOut();
+                      // AuthGate will automatically redirect to login
+                    },
+                    style: TextButton.styleFrom(foregroundColor: Colors.white),
+                    child: const Text('Keluar'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

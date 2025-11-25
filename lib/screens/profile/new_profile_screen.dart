@@ -82,14 +82,14 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     );
     final isPelakuBudaya = profileProvider.profile?.isPelakuBudaya ?? false;
 
-    // Initialize TabController for Pelaku Budaya and auto-open Karya tab
+    // Initialize TabController for Pelaku Budaya and auto-open Progress tab
     if (isPelakuBudaya) {
       if (_tabController == null || _tabController!.length != 2) {
         _tabController = TabController(
           length: 2,
           vsync: this,
-          initialIndex: 1,
-        ); // Start at Karya tab
+          initialIndex: 0,
+        ); // Start at Progress tab
       }
     }
   }
@@ -1295,39 +1295,51 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildPelakuBudayaBody(UserProfile profile) {
-    // Ensure TabController is initialized (already done in initState with Karya tab as default)
+    // Ensure TabController is initialized (already done in initState with Progress tab as default)
     if (_tabController == null || _tabController!.length != 2) {
       _tabController = TabController(
         length: 2,
         vsync: this,
-        initialIndex: 1,
-      ); // Default to Karya tab
+        initialIndex: 0,
+      ); // Default to Progress tab
     }
 
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return [
-          SliverToBoxAdapter(
-            child: _buildProfileHeader(context, profile, true),
+    return Column(
+      children: [
+        Container(
+          color: AppColors.background,
+          child: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.batik700,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorColor: AppColors.batik700,
+            dividerColor: AppColors.batik700,
+            tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.background,
-              child: TabBar(
-                controller: _tabController,
-                labelColor: AppColors.batik700,
-                unselectedLabelColor: AppColors.textSecondary,
-                indicatorColor: AppColors.batik700,
-                dividerColor: AppColors.batik700,
-                tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
-              ),
-            ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildProgressTabWithHeader(context, profile),
+              _buildShowcaseTab(profile),
+            ],
           ),
-        ];
-      },
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildProgressTab(), _buildShowcaseTab(profile)],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressTabWithHeader(
+    BuildContext context,
+    UserProfile profile,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildProfileHeader(context, profile, true),
+          _buildProgressTab(),
+        ],
       ),
     );
   }
@@ -1368,9 +1380,129 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   ),
                   SizedBox(height: AppDimensions.spaceL),
 
-                  // Upgrade Button (if not pelaku budaya)
+                  // Retake Personality Test Button
+                  OutlinedButton(
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      final shouldRetake = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Konfirmasi Ambil Ulang Tes'),
+                              content: const Text(
+                                'Apakah Anda yakin akan mengambil ulang tes kepribadian? Progress level dan XP Anda akan direset.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  child: const Text('Batal'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.batik700,
+                                  ),
+                                  child: const Text('Lanjutkan'),
+                                ),
+                              ],
+                            ),
+                      );
+
+                      if (shouldRetake == true && context.mounted) {
+                        // Get providers
+                        final homeProvider = Provider.of<HomeProvider>(
+                          context,
+                          listen: false,
+                        );
+                        final profileProvider = Provider.of<ProfileProvider>(
+                          context,
+                          listen: false,
+                        );
+
+                        // Reset progress
+                        homeProvider.resetProgress();
+
+                        // Reset mascot in profile
+                        await profileProvider.updateProfile(mascot: null);
+
+                        // Close settings dialog
+                        Navigator.pop(context);
+
+                        // Navigate to personality test
+                        if (context.mounted) {
+                          Navigator.pushNamed(context, '/personality-test');
+                        }
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.batik700,
+                      side: BorderSide(color: AppColors.batik700, width: 2),
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.paddingM,
+                        horizontal: AppDimensions.paddingM,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.psychology, size: 20),
+                        SizedBox(width: AppDimensions.spaceS),
+                        Text(
+                          'Ambil Ulang Tes Kepribadian',
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.batik700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceM),
+
+                  // Show/Hide Progress Toggle (for pelaku budaya)
+                  if (isPelakuBudaya) ...[
+                    Consumer<ProfileProvider>(
+                      builder: (context, profileProvider, _) {
+                        final hideProgress =
+                            profileProvider.profile?.hideProgress ?? false;
+                        return SwitchListTile(
+                          title: Text(
+                            'Tampilkan Progress',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Tampilkan level dan XP di profile',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          value: !hideProgress,
+                          onChanged: (value) async {
+                            await profileProvider.updateProfile(
+                              hideProgress: !value,
+                            );
+                          },
+                          activeColor: AppColors.batik700,
+                          contentPadding: EdgeInsets.zero,
+                        );
+                      },
+                    ),
+                    SizedBox(height: AppDimensions.spaceM),
+                  ],
+
+                  // Become Pelaku Budaya Button (for regular users)
                   if (!isPelakuBudaya) ...[
-                    ElevatedButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.pop(context);
                         showDialog(
@@ -1379,9 +1511,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               (context) => const UpgradeToPelakuBudayaDialog(),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.batik700,
-                        foregroundColor: AppColors.background,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.batik700,
+                        side: BorderSide(color: AppColors.batik700, width: 2),
                         padding: EdgeInsets.symmetric(
                           vertical: AppDimensions.paddingM,
                           horizontal: AppDimensions.paddingM,
@@ -1395,12 +1527,12 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.upgrade, size: 20),
+                          Icon(Icons.badge, size: 20),
                           SizedBox(width: AppDimensions.spaceS),
                           Text(
                             'Jadi Pelaku Budaya',
                             style: AppTextStyles.labelLarge.copyWith(
-                              color: AppColors.background,
+                              color: AppColors.batik700,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

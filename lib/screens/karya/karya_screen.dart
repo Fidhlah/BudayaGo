@@ -74,12 +74,19 @@ class _KaryaScreenState extends State<KaryaScreen> {
                 final creator = item['users'] as Map<String, dynamic>?;
                 final creatorName =
                     '${creator?['display_name'] ?? creator?['username'] ?? 'Unknown'}';
+                final creatorId = item['creator_id'] as String?;
+
+                debugPrint(
+                  '📦 Mapping karya: ${item['name']}, creator_id: $creatorId',
+                );
+
                 return {
                   'id': item['id'],
                   'name': item['name'],
                   'description': item['description'],
                   'creator': creatorName,
                   'creatorName': creatorName,
+                  'creator_id': creatorId,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
                   'location': 'Indonesia', // Default location
@@ -126,12 +133,19 @@ class _KaryaScreenState extends State<KaryaScreen> {
                 final creator = item['users'] as Map<String, dynamic>?;
                 final creatorName =
                     '${creator?['display_name'] ?? creator?['username'] ?? 'Unknown'}';
+                final creatorId = item['creator_id'] as String?;
+
+                debugPrint(
+                  '🔍 Search result: ${item['name']}, creator_id: $creatorId',
+                );
+
                 return {
                   'id': item['id'],
                   'name': item['name'],
                   'description': item['description'],
                   'creator': creatorName,
                   'creatorName': creatorName,
+                  'creator_id': creatorId,
                   'tag': item['tag'],
                   'umkm': item['umkm_category'],
                   'location': 'Indonesia', // Default location
@@ -412,12 +426,28 @@ class _KaryaScreenState extends State<KaryaScreen> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
+                      debugPrint(
+                        '🔍 Karya item creator_id: ${item['creator_id']}',
+                      );
+                      debugPrint('🔍 Karya item keys: ${item.keys.toList()}');
+
+                      final creatorId = item['creator_id'] as String? ?? '';
+                      if (creatorId.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Creator ID tidak tersedia'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
+
                       _navigateToUserProfile(
                         context,
+                        creatorId,
                         item['creatorName'] as String,
-                        item['color'] as Color,
-                        item['location'] as String?,
-                        item['isPelakuBudaya'] as bool,
+                        null, // mascot
+                        item['isPelakuBudaya'] as bool? ?? false,
                       );
                     },
                     child: Row(
@@ -700,9 +730,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
   // Navigate to user profile
   void _navigateToUserProfile(
     BuildContext context,
+    String userId,
     String userName,
-    Color userColor,
-    String? location,
+    String? mascot,
     bool isPelakuBudaya,
   ) {
     Navigator.push(
@@ -710,10 +740,9 @@ class _KaryaScreenState extends State<KaryaScreen> {
       MaterialPageRoute(
         builder:
             (context) => OtherUserProfileScreen(
+              userId: userId,
               userName: userName,
-              userColor: userColor,
-              location: location,
-              mascot: null, // Mascot field no longer exists in database
+              mascot: mascot,
               isPelakuBudaya: isPelakuBudaya,
             ),
       ),

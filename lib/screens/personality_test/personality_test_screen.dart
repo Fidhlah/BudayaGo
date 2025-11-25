@@ -40,10 +40,13 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
 
     // Check if test is complete
     if (testProvider.isTestComplete) {
-      final character = testProvider.assignedCharacter;
-      if (character != null) {
-        if (!mounted) return;
+      // Wait a bit for character assignment to complete
+      await Future.delayed(const Duration(milliseconds: 500));
 
+      final character = testProvider.assignedCharacter;
+      if (!mounted) return;
+
+      if (character != null) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -58,14 +61,8 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                 ),
           ),
         );
-      } else {
-        // Fallback if no character assigned
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal mendapatkan hasil karakter')),
-        );
       }
+      // Remove else block - let the loading screen handle it
     }
   }
 
@@ -76,9 +73,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
         if (testProvider.isLoading) {
           return Scaffold(
             backgroundColor: AppColors.orange50,
-            appBar: const CustomGradientAppBar(
-              title: 'Tes Kepribadian',
-            ),
+            appBar: const CustomGradientAppBar(title: 'Tes Kepribadian'),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -86,9 +81,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
         if (testProvider.error != null) {
           return Scaffold(
             backgroundColor: AppColors.orange50,
-            appBar: const CustomGradientAppBar(
-              title: 'Tes Kepribadian',
-            ),
+            appBar: const CustomGradientAppBar(title: 'Tes Kepribadian'),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -136,9 +129,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
 
         return Scaffold(
           backgroundColor: AppColors.orange50,
-          appBar: const CustomGradientAppBar(
-            title: 'Tes Kepribadian',
-          ),
+          appBar: const CustomGradientAppBar(title: 'Tes Kepribadian'),
           body: SafeArea(
             child: Padding(
               padding: EdgeInsets.all(AppDimensions.paddingL),
@@ -217,10 +208,11 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                                           child: Center(
                                             child: Text(
                                               optionKey,
-                                              style: AppTextStyles.labelLarge.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.batik700,
-                                              ),
+                                              style: AppTextStyles.labelLarge
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: AppColors.batik700,
+                                                  ),
                                             ),
                                           ),
                                         ),
@@ -228,9 +220,10 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                                         Expanded(
                                           child: Text(
                                             option.text,
-                                            style: AppTextStyles.bodyMedium.copyWith(
-                                              color: AppColors.textPrimary,
-                                            ),
+                                            style: AppTextStyles.bodyMedium
+                                                .copyWith(
+                                                  color: AppColors.textPrimary,
+                                                ),
                                           ),
                                         ),
                                       ],

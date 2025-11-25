@@ -60,6 +60,7 @@ class MyApp extends StatelessWidget {
           '/register': (context) => const RegisterScreen(),
           '/verify-email': (context) => const EmailVerificationScreen(),
           '/home': (context) => const MainScreen(),
+          '/personality-test': (context) => const PersonalityTestScreen(),
         },
       ),
     );

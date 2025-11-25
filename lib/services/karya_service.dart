@@ -3,6 +3,37 @@ import '../config/supabase_config.dart';
 
 /// Service untuk handle karya (UMKM products) integration dengan Supabase
 class KaryaService {
+  /// Get karya by user ID
+  static Future<List<Map<String, dynamic>>> getKaryasByUserId(
+    String userId,
+  ) async {
+    try {
+      debugPrint('🎨 Loading karya for user: $userId');
+
+      final karyaData = await SupabaseConfig.client
+          .from('karya')
+          .select('''
+          id,
+          name,
+          description,
+          tag,
+          image_url,
+          icon_code_point,
+          likes,
+          views,
+          created_at
+          ''')
+          .eq('creator_id', userId)
+          .order('created_at', ascending: false);
+
+      debugPrint('✅ Loaded ${karyaData.length} karya for user');
+      return List<Map<String, dynamic>>.from(karyaData);
+    } catch (e) {
+      debugPrint('❌ Error loading karya for user: $e');
+      return [];
+    }
+  }
+
   /// Load semua karya dari database
   static Future<List<Map<String, dynamic>>> loadAllKarya() async {
     try {
@@ -22,6 +53,7 @@ class KaryaService {
           likes,
           views,
           created_at,
+          creator_id,
           users!karya_creator_id_fkey (
             id,
             display_name,
@@ -65,6 +97,7 @@ class KaryaService {
           likes,
           views,
           created_at,
+          creator_id,
           users!karya_creator_id_fkey (
             id,
             display_name,
@@ -145,6 +178,7 @@ class KaryaService {
           likes,
           views,
           created_at,
+          creator_id,
           users!karya_creator_id_fkey (
             id,
             display_name,
