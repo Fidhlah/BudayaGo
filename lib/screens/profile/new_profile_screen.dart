@@ -121,6 +121,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         userId,
       );
 
+      debugPrint('🎁 Loaded ${collectiblesData.length} collectibles from service');
+      for (var i = 0; i < collectiblesData.length; i++) {
+        debugPrint('  [$i] ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['orderNumber']}, unlocked: ${collectiblesData[i]['isUnlocked']}');
+      }
+
       if (mounted) {
         setState(() {
           // TODO: Load visited locations from user_visits table
@@ -260,45 +265,219 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Character Card (Timun Mas)
+              // Character Card - Load from database
               Flexible(
                 flex: 3,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  child: Image.asset(
-                    'assets/images/artifacts/kartu2.jpeg',
-                    width: 200,
-                    height: 300,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      print('❌ Error loading kartu: $error');
+                child: Consumer<ProfileProvider>(
+                  builder: (context, profileProvider, _) {
+                    final character = profileProvider.character;
+
+                    if (character == null) {
+                      // Placeholder if no character assigned yet
                       return Container(
                         width: 200,
                         height: 300,
-                        color: Colors.red.shade100,
-                        child: const Column(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.image_not_supported,
-                              size: 50,
-                              color: Colors.red,
+                              Icons.person_outline,
+                              size: 64,
+                              color: Colors.white,
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Kartu tidak ditemukan',
-                              style: TextStyle(color: Colors.red, fontSize: 12),
+                              'Belum ada karakter',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
                       );
-                    },
-                  ),
+                    }
+
+                    // Display character card from database
+                    if (character.imageUrl != null &&
+                        character.imageUrl!.isNotEmpty) {
+                      debugPrint('🎴 Character Card Debug:');
+                      debugPrint('   Character Name: ${character.name}');
+                      debugPrint('   Image URL: ${character.imageUrl}');
+                    }
+
+                    return Container(
+                      width: 200,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                        color: Colors.white.withOpacity(0.2),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child:
+                          character.imageUrl != null &&
+                                  character.imageUrl!.isNotEmpty
+                              ? FittedBox(
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                                child: Image.network(
+                                  character.imageUrl!,
+                                  repeat: ImageRepeat.noRepeat,
+                                  frameBuilder: (
+                                    context,
+                                    child,
+                                    frame,
+                                    wasSynchronouslyLoaded,
+                                  ) {
+                                    if (wasSynchronouslyLoaded) {
+                                      debugPrint(
+                                        '✅ Character image loaded synchronously',
+                                      );
+                                      return child;
+                                    }
+                                    if (frame == null) {
+                                      debugPrint(
+                                        '⏳ Character image loading...',
+                                      );
+                                      return Container(
+                                        width: 200,
+                                        height: 300,
+                                        color: Colors.white.withOpacity(0.2),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    debugPrint(
+                                      '✅ Character image loaded (frame: $frame)',
+                                    );
+                                    return child;
+                                  },
+                                  loadingBuilder: (
+                                    context,
+                                    child,
+                                    loadingProgress,
+                                  ) {
+                                    if (loadingProgress == null) {
+                                      debugPrint(
+                                        '✅ Character image fully loaded',
+                                      );
+                                      return child;
+                                    }
+                                    final progress =
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null;
+                                    debugPrint(
+                                      '📥 Loading progress: ${(progress ?? 0) * 100}%',
+                                    );
+                                    return Container(
+                                      width: 200,
+                                      height: 300,
+                                      color: Colors.white.withOpacity(0.2),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          value: progress,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    debugPrint(
+                                      '❌ Error loading character image: $error',
+                                    );
+                                    debugPrint('   URL: ${character.imageUrl}');
+                                    debugPrint('   Stack: $stackTrace');
+                                    return Container(
+                                      width: 200,
+                                      height: 300,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimensions.radiusM,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.image_not_supported,
+                                            size: 50,
+                                            color: Colors.white70,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            character.name,
+                                            style: AppTextStyles.h6.copyWith(
+                                              color: Colors.white,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            'Image load failed',
+                                            style: AppTextStyles.bodySmall
+                                                .copyWith(
+                                                  color: Colors.white60,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                              : Container(
+                                width: 200,
+                                height: 300,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusM,
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      size: 64,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      character.name,
+                                      style: AppTextStyles.h6.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                    );
+                  },
                 ),
               ),
               SizedBox(width: AppDimensions.spaceS),
 
-              // 5 Artifacts tersusun vertikal
+              // 5 Artifacts tersusun vertikal - Load from database
               Flexible(
                 flex: 2,
                 child:
@@ -308,83 +487,152 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         )
                         : Builder(
                           builder: (context) {
+                            // Get collectibles from database (already sorted by order_number)
+                            final collectibles = _collectibles ?? [];
                             final displayCount = 5;
-                            // Set 4 artifact pertama sebagai unlocked
-                            final unlockedCount = 4;
+
+                            debugPrint('📍 Displaying ${collectibles.length} collectibles');
+                            for (var i = 0; i < collectibles.length && i < 5; i++) {
+                              debugPrint('  [UI pos $i (TOP=$i==0)] ${collectibles[i]['name']} - unlocked: ${collectibles[i]['unlocked']}');
+                            }
 
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: List.generate(displayCount, (index) {
-                                final isUnlocked = index < unlockedCount;
-                                final artifactNumber = index + 1;
+                                // Check if collectible exists at this index
+                                if (index < collectibles.length) {
+                                  final collectible = collectibles[index];
+                                  final isUnlocked =
+                                      collectible['unlocked'] == true;
+                                  final imageUrl =
+                                      collectible['imageUrl'] as String?;
 
-                                return GestureDetector(
-                                  onTap:
-                                      isUnlocked
-                                          ? () {
-                                            // TODO: Show artifact detail
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Artifact $artifactNumber',
+                                  return GestureDetector(
+                                    onTap:
+                                        isUnlocked
+                                            ? () {
+                                              // Show artifact detail
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '${collectible['name']} - ${collectible['rarity']}',
+                                                  ),
+                                                  duration: const Duration(
+                                                    seconds: 2,
+                                                  ),
                                                 ),
-                                                duration: const Duration(
-                                                  seconds: 1,
+                                              );
+                                            }
+                                            : null,
+                                    child: Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            isUnlocked
+                                                ? Colors.transparent
+                                                : AppColors.background
+                                                    .withOpacity(0.3),
+                                        shape: BoxShape.circle,
+                                        border:
+                                            isUnlocked
+                                                ? null
+                                                : Border.all(
+                                                  color: AppColors.background
+                                                      .withOpacity(0.5),
+                                                  width: 2,
                                                 ),
+                                      ),
+                                      child:
+                                          isUnlocked &&
+                                                  imageUrl != null &&
+                                                  imageUrl.isNotEmpty
+                                              ? ClipOval(
+                                                child: Image.network(
+                                                  imageUrl,
+                                                  width: 60,
+                                                  height: 60,
+                                                  fit: BoxFit.cover,
+                                                  loadingBuilder: (
+                                                    context,
+                                                    child,
+                                                    loadingProgress,
+                                                  ) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return Center(
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Colors.white,
+                                                        value:
+                                                            loadingProgress
+                                                                        .expectedTotalBytes !=
+                                                                    null
+                                                                ? loadingProgress
+                                                                        .cumulativeBytesLoaded /
+                                                                    loadingProgress
+                                                                        .expectedTotalBytes!
+                                                                : null,
+                                                      ),
+                                                    );
+                                                  },
+                                                  errorBuilder: (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) {
+                                                    debugPrint(
+                                                      '❌ Error loading collectible image: $error',
+                                                    );
+                                                    return Icon(
+                                                      Icons.broken_image,
+                                                      size: 24,
+                                                      color: Colors.white70,
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                              : Icon(
+                                                isUnlocked
+                                                    ? Icons.broken_image
+                                                    : Icons.lock,
+                                                size: 24,
+                                                color:
+                                                    isUnlocked
+                                                        ? Colors.white70
+                                                        : AppColors.background
+                                                            .withOpacity(0.7),
                                               ),
-                                            );
-                                          }
-                                          : null,
-                                  child: Container(
+                                    ),
+                                  );
+                                } else {
+                                  // Empty slot if less than 5 collectibles
+                                  return Container(
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration(
-                                      color:
-                                          isUnlocked
-                                              ? Colors.transparent
-                                              : AppColors.background
-                                                  .withOpacity(0.3),
+                                      color: AppColors.background.withOpacity(
+                                        0.2,
+                                      ),
                                       shape: BoxShape.circle,
-                                      border:
-                                          isUnlocked
-                                              ? null
-                                              : Border.all(
-                                                color: AppColors.background
-                                                    .withOpacity(0.5),
-                                                width: 2,
-                                              ),
+                                      border: Border.all(
+                                        color: AppColors.background.withOpacity(
+                                          0.3,
+                                        ),
+                                        width: 2,
+                                      ),
                                     ),
-                                    child:
-                                        isUnlocked
-                                            ? ClipOval(
-                                              child: Image.asset(
-                                                'assets/images/artifacts/artifact$artifactNumber.png',
-                                                width: 60,
-                                                height: 60,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (
-                                                  context,
-                                                  error,
-                                                  stackTrace,
-                                                ) {
-                                                  return Icon(
-                                                    Icons.broken_image,
-                                                    size: 24,
-                                                    color: AppColors.error,
-                                                  );
-                                                },
-                                              ),
-                                            )
-                                            : Icon(
-                                              Icons.lock,
-                                              size: 24,
-                                              color: AppColors.background
-                                                  .withOpacity(0.7),
-                                            ),
-                                  ),
-                                );
+                                    child: Icon(
+                                      Icons.lock_outline,
+                                      size: 20,
+                                      color: AppColors.background.withOpacity(
+                                        0.5,
+                                      ),
+                                    ),
+                                  );
+                                }
                               }),
                             );
                           },
@@ -432,44 +680,42 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
           // Progress Bar
           Consumer<HomeProvider>(
-              builder: (context, homeProvider, _) {
-                return Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Level ${homeProvider.userLevel}',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.background,
-                          ),
-                        ),
-                        Text(
-                          '${homeProvider.userXP}/${homeProvider.xpForNextLevel} XP',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.background.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: AppDimensions.spaceXS),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      child: LinearProgressIndicator(
-                        value: homeProvider.progressToNextLevel,
-                        minHeight: 10,
-                        backgroundColor: AppColors.background.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.background,
+            builder: (context, homeProvider, _) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Level ${homeProvider.userLevel}',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.background,
                         ),
                       ),
+                      Text(
+                        '${homeProvider.userXP}/${homeProvider.xpForNextLevel} XP',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.background.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: AppDimensions.spaceXS),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    child: LinearProgressIndicator(
+                      value: homeProvider.progressToNextLevel,
+                      minHeight: 10,
+                      backgroundColor: AppColors.background.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.background,
+                      ),
                     ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -849,7 +1095,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                 'color': Color(
                                   karya['color'] ?? AppColors.batik700.value,
                                 ),
-                                'icon': _getIconFromCodePoint(karya['icon_code_point']),
+                                'icon': _getIconFromCodePoint(
+                                  karya['icon_code_point'],
+                                ),
                                 'likes': karya['likes'] ?? 0,
                                 'views': karya['views'] ?? 0,
                               },
@@ -1060,11 +1308,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
           SliverToBoxAdapter(
-            child: _buildProfileHeader(
-              context,
-              profile,
-              true,
-            ),
+            child: _buildProfileHeader(context, profile, true),
           ),
           SliverToBoxAdapter(
             child: Container(

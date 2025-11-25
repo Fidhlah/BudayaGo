@@ -148,6 +148,7 @@ class _CategoryDetailScreenState extends State<CategoryDetailScreen> {
                             MaterialPageRoute(
                               builder:
                                   (context) => CulturalObjectDetailScreen(
+                                    contentId: item['id'] ?? '',
                                     objectName: item['title'],
                                     region: item['province_name'] ?? '',
                                     description: item['description'],

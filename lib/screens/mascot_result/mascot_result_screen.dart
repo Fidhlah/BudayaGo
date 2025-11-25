@@ -74,7 +74,9 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                         height: 420,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusXL,
+                          ),
                         ),
                         child: Icon(
                           Icons.person,
@@ -132,7 +134,9 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.orange700,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
                       ),
                       elevation: 0,
                     ),

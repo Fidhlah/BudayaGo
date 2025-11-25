@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../theme/app_colors.dart';
+import '../../config/supabase_config.dart';
+import '../../services/eksplorasi_service.dart';
+import '../../providers/home_provider.dart';
 
 class CulturalObjectDetailScreen extends StatefulWidget {
+  final String contentId;
   final String objectName;
   final String region;
   final String description;
@@ -15,6 +20,7 @@ class CulturalObjectDetailScreen extends StatefulWidget {
 
   const CulturalObjectDetailScreen({
     Key? key,
+    required this.contentId,
     required this.objectName,
     required this.region,
     required this.description,
@@ -63,20 +69,52 @@ class _CulturalObjectDetailScreenState
     }
   }
 
-  void _claimXP() {
+  Future<void> _claimXP() async {
     if (_hasClaimedXP) return;
+
+    final userId = SupabaseConfig.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Anda harus login terlebih dahulu')),
+      );
+      return;
+    }
 
     setState(() {
       _hasClaimedXP = true;
     });
 
-    // TODO: Simpan ke database bahwa user telah claim XP untuk konten ini
-    // TODO: Update total XP user
-
+    // Show loading
+    if (!mounted) return;
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
+    );
+
+    try {
+      // Record content read and give XP
+      final result = await EksplorasiService.recordContentRead(
+        userId: userId,
+        contentId: widget.contentId,
+        xpReward: widget.xp,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context); // Close loading
+
+      if (result['success'] == true) {
+        // Refresh home provider to update XP display
+        final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+        await homeProvider.syncUserProgress();
+
+        // Show success dialog
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -132,7 +170,34 @@ class _CulturalObjectDetailScreenState
               ],
             ),
           ),
-    );
+        );
+      } else {
+        // Show error
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['error']?.toString() ?? 'Gagal mengklaim XP'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // Close loading
+      
+      debugPrint('❌ Error claiming XP: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      
+      // Reset state
+      setState(() {
+        _hasClaimedXP = false;
+      });
+    }
   }
 
   @override

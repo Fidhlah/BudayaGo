@@ -185,6 +185,7 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
           MaterialPageRoute(
             builder:
                 (context) => CulturalObjectDetailScreen(
+                  contentId: object['id'] ?? '',
                   objectName: object['title'] ?? 'Objek Budaya',
                   region: provinceName,
                   description:

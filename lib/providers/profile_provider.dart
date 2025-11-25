@@ -137,18 +137,57 @@ class Collectible {
   }
 }
 
+class Character {
+  final String id;
+  final String name;
+  final String? description;
+  final String? lore;
+  final String? imageUrl;
+  final List<String> personalityTraits;
+  final String? archetype;
+
+  Character({
+    required this.id,
+    required this.name,
+    this.description,
+    this.lore,
+    this.imageUrl,
+    this.personalityTraits = const [],
+    this.archetype,
+  });
+
+  factory Character.fromJson(Map<String, dynamic> json) {
+    return Character(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      lore: json['lore'] as String?,
+      imageUrl: json['image_url'] as String?,
+      personalityTraits:
+          (json['personality_traits'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      archetype: json['archetype'] as String?,
+    );
+  }
+}
+
 class ProfileProvider extends ChangeNotifier {
   UserProfile? _profile;
+  Character? _character;
   List<Collectible> _collectibles = [];
   bool _isLoading = false;
   String? _error;
 
   // Getters
   UserProfile? get profile => _profile;
+  Character? get character => _character;
   List<Collectible> get collectibles => List.unmodifiable(_collectibles);
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasProfile => _profile != null;
+  bool get hasCharacter => _character != null;
 
   // Stats
   int get totalCollectibles => _collectibles.length;
@@ -177,7 +216,8 @@ class ProfileProvider extends ChangeNotifier {
           updated_at,
           is_pelaku_budaya,
           hide_progress,
-          uploaded_karya_ids
+          uploaded_karya_ids,
+          character_id
         ''')
               .eq('id', userId)
               .single();
@@ -203,6 +243,15 @@ class ProfileProvider extends ChangeNotifier {
             [],
       );
 
+      // Load character data if character_id exists
+      final characterId = userData['character_id'];
+      if (characterId != null) {
+        await _loadCharacter(characterId);
+      } else {
+        _character = null;
+        debugPrint('⚠️ User has no character assigned yet');
+      }
+
       debugPrint('✅ Profile loaded: ${_profile?.email}');
     } catch (e) {
       _error = 'Failed to load profile: $e';
@@ -210,6 +259,27 @@ class ProfileProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Load character data from database
+  Future<void> _loadCharacter(String characterId) async {
+    try {
+      debugPrint('🎭 Loading character data: $characterId');
+
+      final characterData =
+          await SupabaseConfig.client
+              .from('characters')
+              .select('*')
+              .eq('id', characterId)
+              .single();
+
+      _character = Character.fromJson(characterData);
+
+      debugPrint('✅ Character loaded: ${_character?.name}');
+    } catch (e) {
+      debugPrint('❌ Error loading character: $e');
+      _character = null;
     }
   }
 
@@ -414,6 +484,7 @@ class ProfileProvider extends ChangeNotifier {
   /// Clear all data (for logout)
   void clear() {
     _profile = null;
+    _character = null;
     _collectibles = [];
     _error = null;
     notifyListeners();

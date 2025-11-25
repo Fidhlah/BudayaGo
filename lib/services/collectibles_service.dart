@@ -47,9 +47,13 @@ class CollectiblesService {
         ''')
           .eq('character_id', characterId)
           .eq('user_collectibles.user_id', userId)
-          .order('order_number');
+          .order('order_number', ascending: true); // EXPLICIT ASC
 
       debugPrint('✅ Loaded ${collectiblesData.length} collectibles');
+      // Debug: check order from database
+      for (var i = 0; i < collectiblesData.length && i < 5; i++) {
+        debugPrint('  DB[$i]: ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['order_number']}');
+      }
 
       // Parse and format data
       List<Map<String, dynamic>> collectibles = [];
@@ -75,6 +79,14 @@ class CollectiblesService {
           'orderNumber': item['order_number'],
         });
       }
+
+      // FAILSAFE: Sort by order_number manually to ensure correct order
+      // (in case Supabase query sorting doesn't work as expected)
+      collectibles.sort((a, b) => 
+        (a['orderNumber'] as int).compareTo(b['orderNumber'] as int)
+      );
+      
+      debugPrint('📦 After sorting: ${collectibles.map((c) => '${c['name']}(${c['orderNumber']})').join(', ')}');
 
       return collectibles;
     } catch (e) {
