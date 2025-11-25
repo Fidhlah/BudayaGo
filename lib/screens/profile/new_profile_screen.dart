@@ -82,14 +82,14 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     );
     final isPelakuBudaya = profileProvider.profile?.isPelakuBudaya ?? false;
 
-    // Initialize TabController for Pelaku Budaya and auto-open Karya tab
+    // Initialize TabController for Pelaku Budaya and auto-open Progress tab
     if (isPelakuBudaya) {
       if (_tabController == null || _tabController!.length != 2) {
         _tabController = TabController(
           length: 2,
           vsync: this,
-          initialIndex: 1,
-        ); // Start at Karya tab
+          initialIndex: 0,
+        ); // Start at Progress tab
       }
     }
   }
@@ -1047,39 +1047,51 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildPelakuBudayaBody(UserProfile profile) {
-    // Ensure TabController is initialized (already done in initState with Karya tab as default)
+    // Ensure TabController is initialized (already done in initState with Progress tab as default)
     if (_tabController == null || _tabController!.length != 2) {
       _tabController = TabController(
         length: 2,
         vsync: this,
-        initialIndex: 1,
-      ); // Default to Karya tab
+        initialIndex: 0,
+      ); // Default to Progress tab
     }
 
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return [
-          SliverToBoxAdapter(
-            child: _buildProfileHeader(context, profile, true),
+    return Column(
+      children: [
+        Container(
+          color: AppColors.background,
+          child: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.batik700,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorColor: AppColors.batik700,
+            dividerColor: AppColors.batik700,
+            tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              color: AppColors.background,
-              child: TabBar(
-                controller: _tabController,
-                labelColor: AppColors.batik700,
-                unselectedLabelColor: AppColors.textSecondary,
-                indicatorColor: AppColors.batik700,
-                dividerColor: AppColors.batik700,
-                tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
-              ),
-            ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildProgressTabWithHeader(context, profile),
+              _buildShowcaseTab(profile),
+            ],
           ),
-        ];
-      },
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildProgressTab(), _buildShowcaseTab(profile)],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressTabWithHeader(
+    BuildContext context,
+    UserProfile profile,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildProfileHeader(context, profile, true),
+          _buildProgressTab(),
+        ],
       ),
     );
   }
@@ -1204,6 +1216,41 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                     ),
                   ),
                   SizedBox(height: AppDimensions.spaceM),
+
+                  // Show/Hide Progress Toggle (for pelaku budaya)
+                  if (isPelakuBudaya) ...[
+                    Consumer<ProfileProvider>(
+                      builder: (context, profileProvider, _) {
+                        final hideProgress =
+                            profileProvider.profile?.hideProgress ?? false;
+                        return SwitchListTile(
+                          title: Text(
+                            'Tampilkan Progress',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Tampilkan level dan XP di profile',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          value: !hideProgress,
+                          onChanged: (value) async {
+                            await profileProvider.updateProfile(
+                              hideProgress: !value,
+                            );
+                          },
+                          activeColor: AppColors.batik700,
+                          contentPadding: EdgeInsets.zero,
+                        );
+                      },
+                    ),
+                    SizedBox(height: AppDimensions.spaceM),
+                  ],
 
                   // Become Pelaku Budaya Button (for regular users)
                   if (!isPelakuBudaya) ...[

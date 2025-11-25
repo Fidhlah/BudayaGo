@@ -1,439 +1,104 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../services/karya_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../karya/karya_detail_screen.dart';
 
-class OtherUserProfileScreen extends StatelessWidget {
+class OtherUserProfileScreen extends StatefulWidget {
+  final String userId;
   final String userName;
-  final Color userColor;
-  final String? location;
   final String? mascot;
   final bool isPelakuBudaya;
+  final int? level;
+  final int? xp;
+  final bool hideProgress;
 
   const OtherUserProfileScreen({
     super.key,
+    required this.userId,
     required this.userName,
-    required this.userColor,
-    this.location,
     this.mascot,
     this.isPelakuBudaya = false,
+    this.level,
+    this.xp,
+    this.hideProgress = false,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // App Bar with gradient
-          SliverAppBar(
-            expandedHeight: 200,
-            pinned: true,
-            backgroundColor: userColor,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      userColor.withOpacity(0.8),
-                      userColor.withOpacity(0.4),
-                    ],
-                  ),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: AppDimensions.spaceXL),
-                      // Avatar
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.background,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Icon(Icons.person, size: 50, color: userColor),
-                      ),
-                      SizedBox(height: AppDimensions.spaceM),
-                      // Name
-                      Text(
-                        userName,
-                        style: AppTextStyles.h4.copyWith(
-                          color: AppColors.background,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (location != null) ...[
-                        SizedBox(height: AppDimensions.spaceXS),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: AppColors.background.withOpacity(0.8),
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              location!,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.background.withOpacity(0.9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+  State<OtherUserProfileScreen> createState() => _OtherUserProfileScreenState();
+}
 
-          // Profile content
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(AppDimensions.paddingL),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: userColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: userColor.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isPelakuBudaya ? Icons.verified : _getMascotIcon(),
-                          size: 18,
-                          color: userColor,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          isPelakuBudaya
-                              ? '✨ Pelaku Budaya'
-                              : _getMascotBadgeText(),
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: userColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXL),
+class _OtherUserProfileScreenState extends State<OtherUserProfileScreen>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+  List<Map<String, dynamic>>? _karyas;
+  bool _isLoadingKaryas = true;
 
-                  // Stats
-                  Center(
-                    child: _buildStatColumn('12', 'Karya', Icons.art_track),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXL),
+  @override
+  void initState() {
+    super.initState();
+    _karyas = <Map<String, dynamic>>[];
 
-                  // Bio
-                  Text(
-                    'Tentang',
-                    style: AppTextStyles.h6.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceS),
-                  Text(
-                    'Pelaku budaya yang mencintai seni dan tradisi Nusantara. Berbagi karya untuk melestarikan budaya Indonesia.',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceXL),
+    // Initialize TabController immediately for pelaku budaya
+    if (widget.isPelakuBudaya) {
+      _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: 1, // Default to Karya tab for pelaku budaya
+      );
+    }
 
-                  // Karya Section
-                  Text(
-                    'Karya Terbaru',
-                    style: AppTextStyles.h6.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceM),
-
-                  // List of karya cards with photo variations
-                  ...List.generate(4, (index) {
-                    // Variasi jumlah foto: 1, 2, 3, atau 4
-                    final photoCount = (index % 4) + 1;
-
-                    return Card(
-                      margin: EdgeInsets.only(bottom: AppDimensions.spaceL),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusL,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Header: Creator info
-                          Padding(
-                            padding: EdgeInsets.all(AppDimensions.paddingM),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: userColor,
-                                  ),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: AppColors.background,
-                                    size: 20,
-                                  ),
-                                ),
-                                SizedBox(width: AppDimensions.spaceS),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        userName,
-                                        style: AppTextStyles.labelLarge
-                                            .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      Text(
-                                        location ?? 'Indonesia',
-                                        style: AppTextStyles.bodySmall.copyWith(
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Photo Grid (1-4 photos)
-                          _buildKaryaPhotoGrid(photoCount, userColor),
-
-                          // Content: Title + Description
-                          Padding(
-                            padding: EdgeInsets.all(AppDimensions.paddingM),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                RichText(
-                                  text: TextSpan(
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: AppColors.textPrimary,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: '$userName ',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      TextSpan(text: 'Karya ${index + 1}'),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: AppDimensions.spaceXS),
-                                Text(
-                                  'Karya seni budaya yang menggambarkan keindahan tradisi Nusantara.',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Tag at bottom
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(
-                              AppDimensions.paddingM,
-                              0,
-                              AppDimensions.paddingM,
-                              AppDimensions.paddingM,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.local_offer,
-                                  size: 16,
-                                  color: userColor,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  index % 2 == 0 ? 'Seni Rupa' : 'Kerajinan',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: userColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadKaryas();
+    });
   }
 
-  Widget _buildStatColumn(String value, String label, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: userColor, size: 28),
-        SizedBox(height: 8),
-        Text(
-          value,
-          style: AppTextStyles.h5.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        Text(
-          label,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
+  Future<void> _loadKaryas() async {
+    try {
+      debugPrint('🔍 Loading karyas for userId: ${widget.userId}');
+
+      if (widget.userId.isEmpty) {
+        debugPrint('⚠️ userId is empty, skipping karya load');
+        if (mounted) {
+          setState(() {
+            _karyas = [];
+            _isLoadingKaryas = false;
+          });
+        }
+        return;
+      }
+
+      final loadedKaryas = await KaryaService.getKaryasByUserId(widget.userId);
+      debugPrint('✅ Loaded ${loadedKaryas.length} karyas');
+
+      if (mounted) {
+        setState(() {
+          _karyas = loadedKaryas;
+          _isLoadingKaryas = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading karyas: $e');
+      if (mounted) {
+        setState(() {
+          _karyas = [];
+          _isLoadingKaryas = false;
+        });
+      }
+    }
   }
 
-  // Helper methods untuk photo grid
-  Widget _buildKaryaPhotoGrid(int photoCount, Color userColor) {
-    return AspectRatio(
-      aspectRatio: 1.0,
-      child: ClipRRect(
-        borderRadius: BorderRadius.zero,
-        child: Builder(
-          builder: (context) {
-            switch (photoCount) {
-              case 1:
-                return _buildSingleKaryaPhoto(0, userColor);
-              case 2:
-                return _buildTwoKaryaPhotos(0, userColor);
-              case 3:
-                return _buildThreeKaryaPhotos(0, userColor);
-              case 4:
-                return _buildFourKaryaPhotos(0, userColor);
-              default:
-                return _buildSingleKaryaPhoto(0, userColor);
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSingleKaryaPhoto(int index, Color userColor) {
-    return _buildKaryaPhotoPlaceholder(userColor);
-  }
-
-  Widget _buildTwoKaryaPhotos(int index, Color userColor) {
-    return Row(
-      children: [
-        Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-        SizedBox(width: 2),
-        Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-      ],
-    );
-  }
-
-  Widget _buildThreeKaryaPhotos(int index, Color userColor) {
-    return Row(
-      children: [
-        Expanded(flex: 2, child: _buildKaryaPhotoPlaceholder(userColor)),
-        SizedBox(width: 2),
-        Expanded(
-          flex: 1,
-          child: Column(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-              SizedBox(height: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFourKaryaPhotos(int index, Color userColor) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-              SizedBox(width: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-            ],
-          ),
-        ),
-        SizedBox(height: 2),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-              SizedBox(width: 2),
-              Expanded(child: _buildKaryaPhotoPlaceholder(userColor)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildKaryaPhotoPlaceholder(Color userColor) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [userColor.withOpacity(0.6), userColor.withOpacity(0.3)],
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.image,
-          color: AppColors.background.withOpacity(0.7),
-          size: 40,
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
   }
 
   IconData _getMascotIcon() {
-    switch (mascot) {
+    switch (widget.mascot) {
       case 'Komodo':
         return Icons.pets;
       case 'Harimau':
@@ -453,7 +118,638 @@ class OtherUserProfileScreen extends StatelessWidget {
     }
   }
 
-  String _getMascotBadgeText() {
-    return mascot ?? 'User';
+  String _getMascotName() {
+    return widget.mascot ?? 'User';
+  }
+
+  IconData _getIconFromCodePoint(int? codePoint) {
+    switch (codePoint) {
+      case 0xe838:
+        return Icons.star;
+      case 0xe7f2:
+        return Icons.favorite;
+      case 0xe55c:
+        return Icons.home;
+      case 0xe3af:
+        return Icons.location_on;
+      case 0xe3c7:
+        return Icons.person;
+      case 0xe3e4:
+        return Icons.settings;
+      case 0xe3f4:
+        return Icons.shopping_cart;
+      case 0xe1d8:
+        return Icons.camera_alt;
+      case 0xe3f7:
+        return Icons.share;
+      case 0xe3e6:
+        return Icons.search;
+      default:
+        return Icons.auto_awesome;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: CustomGradientAppBar(title: widget.userName),
+      body:
+          widget.isPelakuBudaya
+              ? _buildPelakuBudayaBody()
+              : _buildRegularUserBody(),
+    );
+  }
+
+  Widget _buildRegularUserBody() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [_buildProfileHeader(context, false), _buildProgressTab()],
+      ),
+    );
+  }
+
+  Widget _buildPelakuBudayaBody() {
+    return Column(
+      children: [
+        Container(
+          color: AppColors.background,
+          child: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.batik700,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorColor: AppColors.batik700,
+            dividerColor: AppColors.batik700,
+            tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildProgressTabWithHeader(context),
+              _buildShowcaseTab(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressTabWithHeader(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [_buildProfileHeader(context, true), _buildProgressTab()],
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader(BuildContext context, bool isPelakuBudaya) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppColors.orangePinkGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      padding: EdgeInsets.all(AppDimensions.paddingL),
+      child: Column(
+        children: [
+          // Name and mascot badge
+          Column(
+            children: [
+              Text(
+                widget.userName,
+                style: AppTextStyles.h4.copyWith(
+                  color: AppColors.background,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: AppDimensions.spaceS),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingM,
+                  vertical: AppDimensions.paddingS,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.background.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      widget.isPelakuBudaya ? Icons.verified : _getMascotIcon(),
+                      color: AppColors.batik700,
+                      size: 20,
+                    ),
+                    SizedBox(width: AppDimensions.spaceS),
+                    Text(
+                      widget.isPelakuBudaya
+                          ? 'Pelaku Budaya'
+                          : _getMascotName(),
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.batik700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimensions.spaceL),
+
+          // Character card and artifacts
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Character card
+              Flexible(
+                flex: 3,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                  child: Image.asset(
+                    'assets/images/artifacts/kartu2.jpeg',
+                    width: 200,
+                    height: 300,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 200,
+                        height: 300,
+                        color: AppColors.grey100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _getMascotIcon(),
+                              size: 50,
+                              color: AppColors.grey400,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              widget.mascot ?? 'User',
+                              style: TextStyle(
+                                color: AppColors.grey400,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(width: AppDimensions.spaceS),
+
+              // 5 Artifacts
+              Flexible(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(5, (index) {
+                    final isUnlocked = index < 4; // Hardcoded for now
+                    final artifactNumber = index + 1;
+
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color:
+                            isUnlocked
+                                ? Colors.transparent
+                                : AppColors.background.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                        border:
+                            isUnlocked
+                                ? null
+                                : Border.all(
+                                  color: AppColors.background.withOpacity(0.5),
+                                  width: 2,
+                                ),
+                      ),
+                      child:
+                          isUnlocked
+                              ? ClipOval(
+                                child: Image.asset(
+                                  'assets/images/artifacts/artifact$artifactNumber.png',
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.broken_image,
+                                      size: 24,
+                                      color: AppColors.error,
+                                    );
+                                  },
+                                ),
+                              )
+                              : Icon(
+                                Icons.lock,
+                                size: 24,
+                                color: AppColors.background.withOpacity(0.7),
+                              ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+
+          // Display Name
+          SizedBox(height: AppDimensions.spaceS),
+          Text(
+            widget.userName,
+            style: AppTextStyles.h4.copyWith(color: AppColors.background),
+          ),
+
+          // Progress Bar (only if not hidden and has level data)
+          if (!widget.hideProgress && widget.level != null) ...[
+            SizedBox(height: AppDimensions.spaceS),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Level ${widget.level}',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.background,
+                  ),
+                ),
+                Text(
+                  '${widget.xp ?? 0}/${(widget.level ?? 1) * 100} XP',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.background.withOpacity(0.8),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: AppDimensions.spaceXS),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+              child: LinearProgressIndicator(
+                value: (widget.xp ?? 0) / ((widget.level ?? 1) * 100),
+                minHeight: 10,
+                backgroundColor: AppColors.background.withOpacity(0.3),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.background),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressTab() {
+    return Padding(
+      padding: EdgeInsets.all(AppDimensions.paddingM),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Pencapaian',
+            style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+          ),
+          SizedBox(height: AppDimensions.spaceM),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(AppDimensions.paddingL),
+            decoration: BoxDecoration(
+              color: AppColors.grey50,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+              border: Border.all(color: AppColors.grey200),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.emoji_events, size: 48, color: AppColors.grey300),
+                SizedBox(height: AppDimensions.spaceS),
+                Text(
+                  'Data pencapaian tidak ditampilkan',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShowcaseTab() {
+    if (_isLoadingKaryas) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_karyas == null || _karyas!.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(AppDimensions.paddingL),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.art_track, size: 64, color: AppColors.grey300),
+              SizedBox(height: AppDimensions.spaceM),
+              Text(
+                'Belum ada karya',
+                style: AppTextStyles.h6.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              SizedBox(height: AppDimensions.spaceS),
+              Text(
+                '${widget.userName} belum mengunggah karya',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(AppDimensions.paddingM),
+      itemCount: _karyas!.length,
+      itemBuilder: (context, index) {
+        final karya = _karyas![index];
+        final imageUrl = karya['image_url'] as String?;
+        final photos = imageUrl != null ? [imageUrl] : [];
+
+        return Card(
+          margin: EdgeInsets.only(bottom: AppDimensions.spaceL),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+          ),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => KaryaDetailScreen(
+                        karya: {
+                          'id': karya['id'],
+                          'name': karya['name'],
+                          'description': karya['description'],
+                          'tag': karya['tag'],
+                          'imageUrl': karya['image_url'],
+                          'creatorName': widget.userName,
+                          'location': 'Indonesia',
+                          'color': AppColors.batik700,
+                          'likes': karya['likes'] ?? 0,
+                          'views': karya['views'] ?? 0,
+                        },
+                      ),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Creator info
+                Padding(
+                  padding: EdgeInsets.all(AppDimensions.paddingM),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: AppColors.orangePinkGradient,
+                          ),
+                        ),
+                        child: Icon(
+                          _getMascotIcon(),
+                          color: AppColors.background,
+                          size: 20,
+                        ),
+                      ),
+                      SizedBox(width: AppDimensions.spaceS),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.userName,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Indonesia',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Photos
+                if (photos.isNotEmpty) _buildPhotoGrid(photos),
+
+                // Content
+                Padding(
+                  padding: EdgeInsets.all(AppDimensions.paddingM),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        karya['name'] ?? 'Untitled',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: AppDimensions.spaceXS),
+                      Text(
+                        karya['description'] ?? '',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Category tag
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppDimensions.paddingM,
+                    0,
+                    AppDimensions.paddingM,
+                    AppDimensions.paddingM,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getIconFromCodePoint(karya['icon_code_point']),
+                        size: 16,
+                        color: AppColors.batik700,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        karya['tag'] ?? 'Umum',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.batik700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPhotoGrid(List<dynamic> photos) {
+    final photoCount = photos.length;
+
+    if (photoCount == 0) return const SizedBox.shrink();
+
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.zero,
+        child: Builder(
+          builder: (context) {
+            if (photoCount == 1) {
+              return _buildSinglePhoto(photos[0]);
+            } else if (photoCount == 2) {
+              return _buildTwoPhotos(photos);
+            } else if (photoCount == 3) {
+              return _buildThreePhotos(photos);
+            } else {
+              return _buildFourPhotos(photos);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSinglePhoto(String photoUrl) {
+    return Image.network(
+      photoUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPhotoPlaceholder();
+      },
+    );
+  }
+
+  Widget _buildTwoPhotos(List<dynamic> photos) {
+    return Row(
+      children: [
+        Expanded(child: _buildPhoto(photos[0])),
+        SizedBox(width: 2),
+        Expanded(child: _buildPhoto(photos[1])),
+      ],
+    );
+  }
+
+  Widget _buildThreePhotos(List<dynamic> photos) {
+    return Row(
+      children: [
+        Expanded(flex: 2, child: _buildPhoto(photos[0])),
+        SizedBox(width: 2),
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              Expanded(child: _buildPhoto(photos[1])),
+              SizedBox(height: 2),
+              Expanded(child: _buildPhoto(photos[2])),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFourPhotos(List<dynamic> photos) {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(child: _buildPhoto(photos[0])),
+              SizedBox(width: 2),
+              Expanded(child: _buildPhoto(photos[1])),
+            ],
+          ),
+        ),
+        SizedBox(height: 2),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(child: _buildPhoto(photos[2])),
+              SizedBox(width: 2),
+              Expanded(
+                child:
+                    photos.length > 3
+                        ? _buildPhoto(photos[3])
+                        : _buildPhotoPlaceholder(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoto(String photoUrl) {
+    return Image.network(
+      photoUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPhotoPlaceholder();
+      },
+    );
+  }
+
+  Widget _buildPhotoPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.batik200.withOpacity(0.6),
+            AppColors.batik100.withOpacity(0.3),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.image,
+          color: AppColors.background.withOpacity(0.7),
+          size: 40,
+        ),
+      ),
+    );
   }
 }
