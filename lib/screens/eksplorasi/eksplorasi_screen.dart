@@ -6,7 +6,18 @@ import 'cultural_objects_screen.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class EksplorasiScreen extends StatefulWidget {
-  const EksplorasiScreen({Key? key}) : super(key: key);
+  final int initialTabIndex;
+  final String? initialSearchQuery;
+  final String? categoryId; // For direct category navigation
+  final String? provinceId; // For direct province navigation
+
+  const EksplorasiScreen({
+    Key? key,
+    this.initialTabIndex = 0,
+    this.initialSearchQuery,
+    this.categoryId,
+    this.provinceId,
+  }) : super(key: key);
 
   @override
   State<EksplorasiScreen> createState() => _EksplorasiScreenState();
@@ -54,7 +65,18 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+    
+    // Set initial search query if provided
+    if (widget.initialSearchQuery != null) {
+      _searchController.text = widget.initialSearchQuery!;
+      _searchQuery = widget.initialSearchQuery!;
+    }
+    
     _loadData();
   }
 
@@ -89,12 +111,70 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
 
           _isLoading = false;
         });
+        
+        // Auto-navigate to specific category or province if provided
+        _handleDirectNavigation();
       }
     } catch (e) {
       debugPrint('❌ Error loading eksplorasi data: $e');
       if (mounted) {
         setState(() {
           _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _handleDirectNavigation() {
+    // Navigate to specific category
+    if (widget.categoryId != null) {
+      final category = _kulturalCategories.firstWhere(
+        (cat) => cat['id'] == widget.categoryId,
+        orElse: () => {},
+      );
+      
+      if (category.isNotEmpty && mounted) {
+        // Small delay to ensure UI is ready
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CulturalObjectsScreen(
+                  categoryName: category['name'] as String,
+                  categoryId: category['id'] as String,
+                  categoryColor: category['color'] as Color,
+                  categoryIcon: category['icon'] as IconData,
+                ),
+              ),
+            );
+          }
+        });
+      }
+    }
+    
+    // Navigate to specific province
+    if (widget.provinceId != null) {
+      final province = _provinces.firstWhere(
+        (prov) => prov['id'] == widget.provinceId,
+        orElse: () => {},
+      );
+      
+      if (province.isNotEmpty && mounted) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CulturalObjectsScreen(
+                  categoryName: province['name'] as String,
+                  categoryId: province['id'] as String,
+                  categoryColor: AppColors.batik600,
+                  categoryIcon: Icons.location_on,
+                ),
+              ),
+            );
+          }
         });
       }
     }
