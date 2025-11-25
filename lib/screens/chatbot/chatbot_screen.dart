@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../providers/chatbot_provider.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_dimensions.dart';
+import '../../theme/app_text_styles.dart';
 
 class ChatbotScreen extends StatefulWidget {
   final String mascot;
@@ -92,6 +94,9 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                                   chatbotProvider.clearChat();
                                   Navigator.pop(context);
                                 },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.error,
+                                ),
                                 child: const Text('Hapus'),
                               ),
                             ],
@@ -138,22 +143,35 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                           maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
                         decoration: BoxDecoration(
-                          color:
+                          gradient:
                               isBot
-                                  ? Colors.orange.shade50
-                                  : Colors.orange.shade600,
+                                  ? null
+                                  : LinearGradient(
+                                    colors: AppColors.orangePinkGradient,
+                                  ),
+                          color: isBot ? Colors.white : null,
                           borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(16),
-                            topRight: const Radius.circular(16),
-                            bottomLeft: Radius.circular(isBot ? 0 : 16),
-                            bottomRight: Radius.circular(isBot ? 16 : 0),
+                            topLeft: Radius.circular(AppDimensions.radiusM),
+                            topRight: Radius.circular(AppDimensions.radiusM),
+                            bottomLeft: Radius.circular(
+                              isBot ? 0 : AppDimensions.radiusM,
+                            ),
+                            bottomRight: Radius.circular(
+                              isBot ? AppDimensions.radiusM : 0,
+                            ),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Text(
                           message.content,
-                          style: TextStyle(
-                            color: isBot ? Colors.black87 : Colors.white,
-                            fontSize: 15,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: isBot ? AppColors.textPrimary : Colors.white,
                           ),
                         ),
                       ),
@@ -182,33 +200,51 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: 'Ketik pesanmu...',
+                      hintStyle: TextStyle(color: AppColors.textHint),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.orange.shade200),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
+                        borderSide: BorderSide(color: AppColors.orange300),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.orange.shade200),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
+                        borderSide: BorderSide(color: AppColors.orange300),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.orange.shade600),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusL,
+                        ),
+                        borderSide: BorderSide(
+                          color: AppColors.orange700,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.paddingM,
+                        vertical: AppDimensions.paddingS,
                       ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
                 const SizedBox(width: 12),
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.orange.shade600,
-                  child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: _sendMessage,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: AppColors.orangePinkGradient,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.transparent,
+                    child: IconButton(
+                      icon: const Icon(Icons.send, color: Colors.white),
+                      onPressed: _sendMessage,
+                    ),
                   ),
                 ),
               ],

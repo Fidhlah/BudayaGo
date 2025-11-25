@@ -432,44 +432,42 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
           // Progress Bar
           Consumer<HomeProvider>(
-              builder: (context, homeProvider, _) {
-                return Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Level ${homeProvider.userLevel}',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.background,
-                          ),
-                        ),
-                        Text(
-                          '${homeProvider.userXP}/${homeProvider.xpForNextLevel} XP',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.background.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: AppDimensions.spaceXS),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                      child: LinearProgressIndicator(
-                        value: homeProvider.progressToNextLevel,
-                        minHeight: 10,
-                        backgroundColor: AppColors.background.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.background,
+            builder: (context, homeProvider, _) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Level ${homeProvider.userLevel}',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.background,
                         ),
                       ),
+                      Text(
+                        '${homeProvider.userXP}/${homeProvider.xpForNextLevel} XP',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.background.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: AppDimensions.spaceXS),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    child: LinearProgressIndicator(
+                      value: homeProvider.progressToNextLevel,
+                      minHeight: 10,
+                      backgroundColor: AppColors.background.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.background,
+                      ),
                     ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -849,7 +847,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                 'color': Color(
                                   karya['color'] ?? AppColors.batik700.value,
                                 ),
-                                'icon': _getIconFromCodePoint(karya['icon_code_point']),
+                                'icon': _getIconFromCodePoint(
+                                  karya['icon_code_point'],
+                                ),
                                 'likes': karya['likes'] ?? 0,
                                 'views': karya['views'] ?? 0,
                               },
@@ -1060,11 +1060,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
           SliverToBoxAdapter(
-            child: _buildProfileHeader(
-              context,
-              profile,
-              true,
-            ),
+            child: _buildProfileHeader(context, profile, true),
           ),
           SliverToBoxAdapter(
             child: Container(
@@ -1124,9 +1120,94 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   ),
                   SizedBox(height: AppDimensions.spaceL),
 
-                  // Upgrade Button (if not pelaku budaya)
+                  // Retake Personality Test Button
+                  OutlinedButton(
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      final shouldRetake = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Konfirmasi Ambil Ulang Tes'),
+                              content: const Text(
+                                'Apakah Anda yakin akan mengambil ulang tes kepribadian? Progress level dan XP Anda akan direset.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  child: const Text('Batal'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.batik700,
+                                  ),
+                                  child: const Text('Lanjutkan'),
+                                ),
+                              ],
+                            ),
+                      );
+
+                      if (shouldRetake == true && context.mounted) {
+                        // Get providers
+                        final homeProvider = Provider.of<HomeProvider>(
+                          context,
+                          listen: false,
+                        );
+                        final profileProvider = Provider.of<ProfileProvider>(
+                          context,
+                          listen: false,
+                        );
+
+                        // Reset progress
+                        homeProvider.resetProgress();
+
+                        // Reset mascot in profile
+                        await profileProvider.updateProfile(mascot: null);
+
+                        // Close settings dialog
+                        Navigator.pop(context);
+
+                        // Navigate to personality test
+                        if (context.mounted) {
+                          Navigator.pushNamed(context, '/personality-test');
+                        }
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.batik700,
+                      side: BorderSide(color: AppColors.batik700, width: 2),
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.paddingM,
+                        horizontal: AppDimensions.paddingM,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.psychology, size: 20),
+                        SizedBox(width: AppDimensions.spaceS),
+                        Text(
+                          'Ambil Ulang Tes Kepribadian',
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.batik700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceM),
+
+                  // Become Pelaku Budaya Button (for regular users)
                   if (!isPelakuBudaya) ...[
-                    ElevatedButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.pop(context);
                         showDialog(
@@ -1135,9 +1216,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               (context) => const UpgradeToPelakuBudayaDialog(),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.batik700,
-                        foregroundColor: AppColors.background,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.batik700,
+                        side: BorderSide(color: AppColors.batik700, width: 2),
                         padding: EdgeInsets.symmetric(
                           vertical: AppDimensions.paddingM,
                           horizontal: AppDimensions.paddingM,
@@ -1151,12 +1232,12 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.upgrade, size: 20),
+                          Icon(Icons.badge, size: 20),
                           SizedBox(width: AppDimensions.spaceS),
                           Text(
                             'Jadi Pelaku Budaya',
                             style: AppTextStyles.labelLarge.copyWith(
-                              color: AppColors.background,
+                              color: AppColors.batik700,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
