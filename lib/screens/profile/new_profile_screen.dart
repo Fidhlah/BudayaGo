@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../config/supabase_config.dart';
 import '../../services/collectibles_service.dart';
 import '../../services/karya_service.dart';
+import '../../services/achievement_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
@@ -30,6 +31,8 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   List<Map<String, dynamic>>? _collectibles;
   bool _isLoadingCollectibles = true;
   List<Map<String, dynamic>>? _visitedLocations;
+  List<Map<String, dynamic>>? _achievements;
+  bool _isLoadingAchievements = true;
 
   // Helper method to get constant icons for tree shaking
   IconData _getIconFromCodePoint(int? codePoint) {
@@ -67,6 +70,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     // Explicitly initialize lists for Flutter Web compatibility
     _collectibles = <Map<String, dynamic>>[];
     _visitedLocations = <Map<String, dynamic>>[];
+    _achievements = <Map<String, dynamic>>[];
 
     // Load data after build is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -121,10 +125,17 @@ class _NewProfileScreenState extends State<NewProfileScreen>
         userId,
       );
 
-      debugPrint('🎁 Loaded ${collectiblesData.length} collectibles from service');
+      debugPrint(
+        '🎁 Loaded ${collectiblesData.length} collectibles from service',
+      );
       for (var i = 0; i < collectiblesData.length; i++) {
-        debugPrint('  [$i] ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['orderNumber']}, unlocked: ${collectiblesData[i]['isUnlocked']}');
+        debugPrint(
+          '  [$i] ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['orderNumber']}, unlocked: ${collectiblesData[i]['isUnlocked']}',
+        );
       }
+
+      // Load achievements from database
+      await _loadAchievements(userId);
 
       if (mounted) {
         setState(() {
@@ -155,6 +166,94 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       if (mounted) {
         setState(() {
           _isLoadingCollectibles = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadAchievements(String userId) async {
+    try {
+      debugPrint('🏆 Loading achievements for user...');
+
+      // Get all achievements from database
+      final allAchievements = await AchievementService.loadAchievements();
+
+      // Get user's unlocked achievements
+      final userAchievements = await AchievementService.loadUserAchievements(
+        userId,
+      );
+
+      // Create a Set of unlocked achievement IDs for quick lookup
+      final unlockedIds =
+          userAchievements
+              .where((ua) => ua['is_completed'] == true)
+              .map((ua) => ua['achievement_id'] as String)
+              .toSet();
+
+      // Get current user stats for dynamic checking
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
+      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+
+      final currentLevel = homeProvider.userLevel;
+      final unlockedCollectibles =
+          _collectibles?.where((c) => c['unlocked'] == true).length ?? 0;
+
+      // Map achievements with unlock status and dynamic checking
+      final achievementsWithStatus =
+          allAchievements.map((achievement) {
+            final isUnlocked = unlockedIds.contains(achievement['id']);
+
+            // Dynamic unlock check based on criteria
+            bool shouldBeUnlocked = isUnlocked;
+            if (!isUnlocked) {
+              final criteria = achievement['criteria'] as Map<String, dynamic>?;
+              if (criteria != null) {
+                // Check level requirement
+                if (criteria.containsKey('level_reached')) {
+                  final requiredLevel = criteria['level_reached'] as int;
+                  shouldBeUnlocked = currentLevel >= requiredLevel;
+                }
+                // Check collectibles requirement
+                else if (criteria.containsKey('collectibles_unlocked')) {
+                  final requiredCount =
+                      criteria['collectibles_unlocked'] as int;
+                  shouldBeUnlocked = unlockedCollectibles >= requiredCount;
+                }
+                // Other criteria can be checked here (museums_visited, etc.)
+              }
+            }
+
+            return {
+              'id': achievement['id'],
+              'name': achievement['name'],
+              'description': achievement['description'],
+              'type': achievement['type'],
+              'exp_reward': achievement['exp_reward'],
+              'icon_url': achievement['icon_url'],
+              'criteria': achievement['criteria'],
+              'unlocked': shouldBeUnlocked,
+            };
+          }).toList();
+
+      if (mounted) {
+        setState(() {
+          _achievements = achievementsWithStatus;
+          _isLoadingAchievements = false;
+        });
+      }
+
+      debugPrint(
+        '✅ Loaded ${_achievements?.length ?? 0} achievements (${unlockedIds.length} unlocked)',
+      );
+    } catch (e) {
+      debugPrint('❌ Error loading achievements: $e');
+      if (mounted) {
+        setState(() {
+          _achievements = [];
+          _isLoadingAchievements = false;
         });
       }
     }
@@ -491,9 +590,17 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                             final collectibles = _collectibles ?? [];
                             final displayCount = 5;
 
-                            debugPrint('📍 Displaying ${collectibles.length} collectibles');
-                            for (var i = 0; i < collectibles.length && i < 5; i++) {
-                              debugPrint('  [UI pos $i (TOP=$i==0)] ${collectibles[i]['name']} - unlocked: ${collectibles[i]['unlocked']}');
+                            debugPrint(
+                              '📍 Displaying ${collectibles.length} collectibles',
+                            );
+                            for (
+                              var i = 0;
+                              i < collectibles.length && i < 5;
+                              i++
+                            ) {
+                              debugPrint(
+                                '  [UI pos $i (TOP=$i==0)] ${collectibles[i]['name']} - unlocked: ${collectibles[i]['unlocked']}',
+                              );
                             }
 
                             return Column(
@@ -722,34 +829,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildProgressTab() {
-    // Achievements hardcoded (bisa diintegrasikan dengan database nanti)
-    final achievements = [
-      {
-        'name': 'Penjelajah Pemula',
-        'desc': 'Selesaikan 5 eksplorasi',
-        'icon': Icons.explore,
-        'unlocked': true,
-      },
-      {
-        'name': 'Kolektor Budaya',
-        'desc': 'Kumpulkan 3 artifact',
-        'icon': Icons.collections,
-        'unlocked': false, // Will check dynamically later
-      },
-      {
-        'name': 'Master Budaya',
-        'desc': 'Capai level 10',
-        'icon': Icons.workspace_premium,
-        'unlocked': false,
-      },
-      {
-        'name': 'Pecinta Seni',
-        'desc': 'Scan 10 QR lokasi',
-        'icon': Icons.qr_code_scanner,
-        'unlocked': false,
-      },
-    ];
-
     return SingleChildScrollView(
       padding: EdgeInsets.all(AppDimensions.paddingM),
       child: Column(
@@ -883,105 +962,177 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
           ),
           SizedBox(height: AppDimensions.spaceM),
-          // Build achievement widgets as grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.85,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: achievements.length,
-            itemBuilder: (context, index) {
-              final achievement = achievements[index];
-              // Dynamic check for Kolektor Budaya achievement
-              bool unlocked = achievement['unlocked'] as bool;
-              if (achievement['name'] == 'Kolektor Budaya' && mounted) {
-                try {
-                  unlocked = (_collectibles?.length ?? 0) >= 3;
-                } catch (e) {
-                  unlocked = false;
-                }
-              }
 
-              return Container(
-                padding: EdgeInsets.all(AppDimensions.paddingS),
-                decoration: BoxDecoration(
-                  color: unlocked ? AppColors.batik50 : AppColors.grey50,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  border: Border.all(
-                    color: unlocked ? AppColors.batik300 : AppColors.grey200,
+          // Loading state for achievements
+          if (_isLoadingAchievements)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+
+          // Empty state for achievements
+          if (!_isLoadingAchievements && (_achievements?.isEmpty ?? true))
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(AppDimensions.paddingL),
+              decoration: BoxDecoration(
+                color: AppColors.grey50,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                border: Border.all(color: AppColors.grey200),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.emoji_events, size: 48, color: AppColors.grey300),
+                  SizedBox(height: AppDimensions.spaceS),
+                  Text(
+                    'Belum ada pencapaian tersedia',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color:
-                            unlocked ? AppColors.batik700 : AppColors.grey300,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        achievement['icon'] as IconData,
-                        color: AppColors.background,
-                        size: 26,
-                      ),
+                ],
+              ),
+            ),
+
+          // Build achievement widgets as grid from database
+          if (!_isLoadingAchievements && (_achievements?.isNotEmpty ?? false))
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.85,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: _achievements!.length,
+              itemBuilder: (context, index) {
+                final achievement = _achievements![index];
+                final unlocked = achievement['unlocked'] as bool? ?? false;
+                final name = achievement['name'] as String? ?? 'Achievement';
+                final description = achievement['description'] as String? ?? '';
+                final expReward = achievement['exp_reward'] as int? ?? 0;
+
+                // Map achievement icons based on name or type
+                IconData achievementIcon = _getAchievementIcon(name);
+
+                return Container(
+                  padding: EdgeInsets.all(AppDimensions.paddingS),
+                  decoration: BoxDecoration(
+                    color: unlocked ? AppColors.batik50 : AppColors.grey50,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                    border: Border.all(
+                      color: unlocked ? AppColors.batik300 : AppColors.grey200,
                     ),
-                    SizedBox(height: 6),
-                    Flexible(
-                      child: Text(
-                        achievement['name'] as String,
-                        style: AppTextStyles.bodySmall.copyWith(
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
                           color:
-                              unlocked
-                                  ? AppColors.textPrimary
-                                  : AppColors.textTertiary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
+                              unlocked ? AppColors.batik700 : AppColors.grey300,
+                          shape: BoxShape.circle,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Flexible(
-                      child: Text(
-                        achievement['desc'] as String,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color:
-                              unlocked
-                                  ? AppColors.textSecondary
-                                  : AppColors.textTertiary,
-                          fontSize: 9,
+                        child: Icon(
+                          achievementIcon,
+                          color: AppColors.background,
+                          size: 26,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    if (unlocked) ...[
-                      SizedBox(height: 2),
-                      Icon(
-                        Icons.check_circle,
-                        color: AppColors.success,
-                        size: 14,
+                      SizedBox(height: 6),
+                      Flexible(
+                        child: Text(
+                          name,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color:
+                                unlocked
+                                    ? AppColors.textPrimary
+                                    : AppColors.textTertiary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
+                      SizedBox(height: 4),
+                      Flexible(
+                        child: Text(
+                          description,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color:
+                                unlocked
+                                    ? AppColors.textSecondary
+                                    : AppColors.textTertiary,
+                            fontSize: 9,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (unlocked) ...[
+                        SizedBox(height: 2),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: AppColors.success,
+                              size: 12,
+                            ),
+                            SizedBox(width: 2),
+                            Text(
+                              '+$expReward XP',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.success,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-              );
-            },
-          ),
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
+  }
+
+  // Helper method to get icon based on achievement name
+  IconData _getAchievementIcon(String achievementName) {
+    final nameLower = achievementName.toLowerCase();
+
+    if (nameLower.contains('penjelajah') || nameLower.contains('explorer')) {
+      return Icons.explore;
+    } else if (nameLower.contains('kolektor') ||
+        nameLower.contains('collector')) {
+      return Icons.collections;
+    } else if (nameLower.contains('master') || nameLower.contains('level')) {
+      return Icons.workspace_premium;
+    } else if (nameLower.contains('wisata') || nameLower.contains('museum')) {
+      return Icons.museum;
+    } else if (nameLower.contains('quiz') || nameLower.contains('test')) {
+      return Icons.psychology;
+    } else if (nameLower.contains('seni') || nameLower.contains('art')) {
+      return Icons.palette;
+    } else if (nameLower.contains('scan') || nameLower.contains('qr')) {
+      return Icons.qr_code_scanner;
+    } else {
+      return Icons.emoji_events; // Default trophy icon
+    }
   }
 
   Widget _buildShowcaseTab(UserProfile profile) {

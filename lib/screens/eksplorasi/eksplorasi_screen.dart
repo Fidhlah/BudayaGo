@@ -173,6 +173,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                       categoryId: province['id'] as String,
                       categoryColor: AppColors.batik600,
                       categoryIcon: Icons.location_on,
+                      isProvince: true, // Set flag for province filtering
                     ),
               ),
             );
@@ -445,6 +446,7 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                     categoryId: province['id'] as String,
                     categoryColor: AppColors.batik600,
                     categoryIcon: Icons.location_on,
+                    isProvince: true, // Set flag to indicate province filtering
                   ),
             ),
           );

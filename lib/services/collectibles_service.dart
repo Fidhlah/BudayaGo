@@ -52,7 +52,9 @@ class CollectiblesService {
       debugPrint('✅ Loaded ${collectiblesData.length} collectibles');
       // Debug: check order from database
       for (var i = 0; i < collectiblesData.length && i < 5; i++) {
-        debugPrint('  DB[$i]: ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['order_number']}');
+        debugPrint(
+          '  DB[$i]: ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['order_number']}',
+        );
       }
 
       // Parse and format data
@@ -82,11 +84,13 @@ class CollectiblesService {
 
       // FAILSAFE: Sort by order_number manually to ensure correct order
       // (in case Supabase query sorting doesn't work as expected)
-      collectibles.sort((a, b) => 
-        (a['orderNumber'] as int).compareTo(b['orderNumber'] as int)
+      collectibles.sort(
+        (a, b) => (a['orderNumber'] as int).compareTo(b['orderNumber'] as int),
       );
-      
-      debugPrint('📦 After sorting: ${collectibles.map((c) => '${c['name']}(${c['orderNumber']})').join(', ')}');
+
+      debugPrint(
+        '📦 After sorting: ${collectibles.map((c) => '${c['name']}(${c['orderNumber']})').join(', ')}',
+      );
 
       return collectibles;
     } catch (e) {

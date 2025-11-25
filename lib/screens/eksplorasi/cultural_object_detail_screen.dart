@@ -89,9 +89,10 @@ class _CulturalObjectDetailScreenState
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      builder:
+          (context) => const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
     );
 
     try {
@@ -114,62 +115,73 @@ class _CulturalObjectDetailScreenState
         if (!mounted) return;
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Colors.orange.shade400, Colors.orange.shade700],
-                    ),
-                  ),
-                  child: const Icon(Icons.star, color: Colors.white, size: 40),
+          builder:
+              (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Selamat!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Kamu mendapatkan ${widget.xp} XP',
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close dialog
-                    Navigator.pop(context); // Back to list
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.orange.shade400,
+                            Colors.orange.shade700,
+                          ],
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.star,
+                        color: Colors.white,
+                        size: 40,
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Selamat!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Kamu mendapatkan ${widget.xp} XP',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context); // Back to list
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
         );
       } else {
         // Show error
@@ -184,15 +196,12 @@ class _CulturalObjectDetailScreenState
     } catch (e) {
       if (!mounted) return;
       Navigator.pop(context); // Close loading
-      
+
       debugPrint('❌ Error claiming XP: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
-      
+
       // Reset state
       setState(() {
         _hasClaimedXP = false;

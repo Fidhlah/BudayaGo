@@ -9,6 +9,7 @@ class CulturalObjectsScreen extends StatefulWidget {
   final String categoryId;
   final Color categoryColor;
   final IconData categoryIcon;
+  final bool isProvince; // Flag to indicate if filtering by province
 
   const CulturalObjectsScreen({
     Key? key,
@@ -16,6 +17,7 @@ class CulturalObjectsScreen extends StatefulWidget {
     required this.categoryId,
     required this.categoryColor,
     required this.categoryIcon,
+    this.isProvince = false, // Default to category filtering
   }) : super(key: key);
 
   @override
@@ -34,9 +36,11 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
 
   Future<void> _loadContent() async {
     try {
-      final contents = await EksplorasiService.loadContentByCategory(
-        widget.categoryId,
-      );
+      // Load content based on filter type (province or category)
+      final contents = widget.isProvince
+          ? await EksplorasiService.loadContentByProvince(widget.categoryId)
+          : await EksplorasiService.loadContentByCategory(widget.categoryId);
+          
       if (mounted) {
         setState(() {
           _contents = contents;
@@ -78,34 +82,97 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
         title: widget.categoryName,
         showBackButton: true,
       ),
-      body:
-          _contents.isEmpty
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      widget.categoryIcon,
-                      size: 80,
-                      color: Colors.grey.shade300,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Belum ada konten',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          // Header info badge
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            color: Colors.white,
+            child: Row(
+              children: [
+                Icon(
+                  widget.categoryIcon,
+                  color: widget.categoryColor,
+                  size: 20,
                 ),
-              )
-              : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: _buildMasonryLayout(context, _contents),
+                const SizedBox(width: 8),
+                Text(
+                  widget.isProvince
+                      ? 'Budaya dari ${widget.categoryName}'
+                      : 'Kategori: ${widget.categoryName}',
+                  style: TextStyle(
+                    color: widget.categoryColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: widget.categoryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${_contents.length} Konten',
+                    style: TextStyle(
+                      color: widget.categoryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Content area
+          Expanded(
+            child: _contents.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          widget.categoryIcon,
+                          size: 80,
+                          color: Colors.grey.shade300,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Belum ada konten',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.isProvince
+                              ? 'Konten dari ${widget.categoryName} akan segera ditambahkan'
+                              : 'Konten untuk kategori ini akan segera ditambahkan',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: _buildMasonryLayout(context, _contents),
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -279,9 +346,29 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    object['provinces']?['name'] ?? 'Indonesia',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  // Show different info based on filter type
+                  Row(
+                    children: [
+                      Icon(
+                        widget.isProvince ? Icons.category : Icons.location_on,
+                        size: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.isProvince
+                              ? (object['cultural_categories']?['name'] ?? 'Budaya')
+                              : (object['provinces']?['name'] ?? 'Indonesia'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Row(
