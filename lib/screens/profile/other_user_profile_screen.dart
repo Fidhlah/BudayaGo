@@ -44,10 +44,15 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen>
 
     // Initialize TabController immediately for pelaku budaya
     if (widget.isPelakuBudaya) {
+      // If hideProgress is true, only show Karya tab (length: 1)
+      // Otherwise show both Progress and Karya tabs (length: 2)
+      final tabLength = widget.hideProgress ? 1 : 2;
+      final initialTab = widget.hideProgress ? 0 : 1; // Karya tab index
+
       _tabController = TabController(
-        length: 2,
+        length: tabLength,
         vsync: this,
-        initialIndex: 1, // Default to Karya tab for pelaku budaya
+        initialIndex: initialTab, // Default to Karya tab for pelaku budaya
       );
     }
 
@@ -170,6 +175,32 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen>
   }
 
   Widget _buildPelakuBudayaBody() {
+    // If hideProgress is true, only show Karya tab
+    if (widget.hideProgress) {
+      return Column(
+        children: [
+          Container(
+            color: AppColors.background,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: AppColors.batik700,
+              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: AppColors.batik700,
+              dividerColor: AppColors.batik700,
+              tabs: const [Tab(text: 'Karya')],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [_buildShowcaseTab()],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Show both Progress and Karya tabs
     return Column(
       children: [
         Container(

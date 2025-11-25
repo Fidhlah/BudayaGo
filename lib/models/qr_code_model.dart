@@ -1,9 +1,9 @@
 import 'dart:convert';
 import '../config/qr_config.dart'; // ✅ IMPORT CONFIG
 
-/// Model untuk QR Code format BudayaGo/Langkara
+/// Model untuk QR Code format Sembara
 /// Format: PREFIX:BASE64_ENCODED_JSON
-/// 
+///
 /// JSON Structure:
 /// {
 ///   "UUID": "location-uuid-from-supabase",
@@ -13,34 +13,25 @@ class QRCodeModel {
   final String uuid;
   final int version;
 
-  QRCodeModel({
-    required this.uuid,
-    required this.version,
-  });
+  QRCodeModel({required this.uuid, required this.version});
 
   /// Create from JSON
   factory QRCodeModel.fromJson(Map<String, dynamic> json) {
-    return QRCodeModel(
-      uuid: json['UUID'] as String,
-      version: json['v'] as int,
-    );
+    return QRCodeModel(uuid: json['UUID'] as String, version: json['v'] as int);
   }
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'UUID': uuid,
-      'v': version,
-    };
+    return {'UUID': uuid, 'v': version};
   }
 
   /// Encode QR data ke Base64 dengan prefix
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final qr = QRCodeModel(uuid: '123456789', version: 1);
   /// final encoded = qr.encode();
-  /// // Result: "LANGKARA-o2o:eyJVVUlEIjoiMTIzNDU2Nzg5IiwidiI6MX0="
+  /// // Result: "SEMBARA-o2o:eyJVVUlEIjoiMTIzNDU2Nzg5IiwidiI6MX0="
   /// ```
   String encode({String? prefix}) {
     // ✅ USE CONFIG: Default ke QRConfig.qrPrefix jika tidak di-specify
@@ -51,14 +42,14 @@ class QRCodeModel {
   }
 
   /// Decode QR string dengan format PREFIX:BASE64
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final decoded = QRCodeModel.decode(
-  ///   qrString: 'LANGKARA-o2o:eyJVVUlEIjoiMTIzNDU2Nzg5IiwidiI6MX0='
+  ///   qrString: 'SEMBARA-o2o:eyJVVUlEIjoiMTIzNDU2Nzg5IiwidiI6MX0='
   /// );
   /// ```
-  /// 
+  ///
   /// Throws:
   /// - [QRCodeFormatException] jika format tidak valid
   /// - [QRCodePrefixException] jika prefix tidak sesuai
@@ -69,10 +60,10 @@ class QRCodeModel {
     try {
       // ✅ USE CONFIG: Default ke QRConfig.qrPrefix jika tidak di-specify
       final actualExpectedPrefix = expectedPrefix ?? QRConfig.qrPrefix;
-      
+
       // 1. Split by ':'
       final parts = qrString.split(':');
-      
+
       if (parts.length != 2) {
         throw QRCodeFormatException(
           'Invalid QR format. Expected: PREFIX:BASE64',
@@ -82,8 +73,8 @@ class QRCodeModel {
       final prefix = parts[0].trim();
       final base64Data = parts[1].trim();
 
-      // 2. Validate prefix
-      if (prefix != actualExpectedPrefix) {
+      // 2. Validate prefix (support legacy prefixes)
+      if (prefix != actualExpectedPrefix && !QRConfig.isValidPrefix(prefix)) {
         throw QRCodePrefixException(
           'Invalid prefix. Expected: "$actualExpectedPrefix", Got: "$prefix"',
         );
@@ -98,9 +89,7 @@ class QRCodeModel {
 
       // 5. Validate required fields
       if (!jsonData.containsKey('UUID') || !jsonData.containsKey('v')) {
-        throw QRCodeFormatException(
-          'Missing required fields: UUID or v',
-        );
+        throw QRCodeFormatException('Missing required fields: UUID or v');
       }
 
       return QRCodeModel.fromJson(jsonData);

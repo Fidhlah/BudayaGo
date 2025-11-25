@@ -12,7 +12,7 @@ class QrService {
     }
 
     final barcode = capture.barcodes.first;
-    
+
     if (barcode.rawValue == null || barcode.rawValue!.isEmpty) {
       print('⚠️ Barcode has no data');
       return null;
@@ -20,18 +20,15 @@ class QrService {
 
     try {
       print('📄 Parsing QR data: ${barcode.rawValue}');
-      
+
       // ✅ DECODE: QR string format "PREFIX:BASE64"
-      final qrCode = QRCodeModel.decode(
-        qrString: barcode.rawValue!,
-      );
-      
+      final qrCode = QRCodeModel.decode(qrString: barcode.rawValue!);
+
       print('✅ QR decoded successfully!');
       print('   UUID: ${qrCode.uuid}');
       print('   Version: ${qrCode.version}');
-      
+
       return qrCode;
-      
     } catch (e) {
       print('❌ QR Parse Error: $e');
       return null;
@@ -45,28 +42,21 @@ class QrService {
     print('   Version: ${qrCode.version}');
 
     // ✅ Basic validation: UUID tidak boleh kosong
-    final isValid = qrCode.uuid.isNotEmpty && 
-                    qrCode.version > 0;
+    final isValid = qrCode.uuid.isNotEmpty && qrCode.version > 0;
 
     print(isValid ? '✅ QR code valid' : '❌ QR code invalid');
     return isValid;
   }
 
   /// Generate QR code data (for testing)
-  /// 
+  ///
   /// Returns encoded QR string: "PREFIX:BASE64"
-  String generateQrCodeData({
-    required String uuid,
-    int version = 1,
-  }) {
-    final qrCode = QRCodeModel(
-      uuid: uuid,
-      version: version,
-    );
-    
-    // ✅ ENCODE: Returns "LANGKARA-o2o:BASE64..."
+  String generateQrCodeData({required String uuid, int version = 1}) {
+    final qrCode = QRCodeModel(uuid: uuid, version: version);
+
+    // ✅ ENCODE: Returns "SEMBARA-o2o:BASE64..."
     final encodedData = qrCode.encode();
-    
+
     print('🔨 Generated QR data: $encodedData');
     return encodedData;
   }

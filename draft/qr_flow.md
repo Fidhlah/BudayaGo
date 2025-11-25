@@ -10,11 +10,11 @@ BudayaGo menggunakan QR code untuk check-in di lokasi wisata budaya.
 
 ### Format QR Code:
 ```
-LANGKARA-o2o:eyJVVUlEIjoibG9jYXRpb24taWQiLCJ2IjoxfQ==
+SEMBARA-o2o:eyJVVUlEIjoibG9jYXRpb24taWQiLCJ2IjoxfQ==
 ```
 
 **Components**:
-- `LANGKARA-o2o` - Prefix
+- `SEMBARA-o2o` - Prefix
 - `:` - Separator
 - `eyJVVU...` - Base64 encoded JSON
 
@@ -58,7 +58,7 @@ Generate QR Image
     ↓
 eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9
     ↓
-LANGKARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9
+SEMBARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9
     ↓
 [QR Code Image]
 ```
@@ -91,9 +91,9 @@ Validate Data
 ```
 [QR Code Scan]
     ↓
-"LANGKARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9"
+"SEMBARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9"
     ↓
-["LANGKARA-o2o", "eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9"]
+["SEMBARA-o2o", "eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9"]
     ↓
 ✅ Prefix valid
     ↓
@@ -124,7 +124,7 @@ final qrData = qrService.generateQrCodeData(
 );
 
 print(qrData);
-// Output: LANGKARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9
+// Output: SEMBARA-o2o:eyJVVUlEIjoiY2FuZGktYm9yb2J1ZHVyLTAwMSIsInYiOjF9
 ```
 
 ---
@@ -154,7 +154,7 @@ controller.barcodes.listen((capture) {
 final qrCode = QRCodeModel(uuid: 'test-123', version: 1);
 final encoded = qrCode.encode();
 print(encoded);
-// LANGKARA-o2o:eyJVVUlEIjoidGVzdC0xMjMiLCJ2IjoxfQ==
+// SEMBARA-o2o:eyJVVUlEIjoidGVzdC0xMjMiLCJ2IjoxfQ==
 
 // DECODING
 final decoded = QRCodeModel.decode(qrString: encoded);

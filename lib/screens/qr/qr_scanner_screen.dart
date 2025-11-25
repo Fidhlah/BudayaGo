@@ -563,291 +563,357 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.error.withOpacity(0.8),
-                AppColors.error,
-              ],
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             ),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(AppDimensions.paddingL),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.error_outline_rounded,
-                        size: 50,
-                        color: AppColors.background,
-                      ),
-                    ),
-                    SizedBox(height: AppDimensions.spaceM),
-                    Text(
-                      title,
-                      style: AppTextStyles.h4.copyWith(
-                        color: AppColors.background,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.error.withOpacity(0.8), AppColors.error],
                 ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-                padding: EdgeInsets.all(AppDimensions.paddingM),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-                      textAlign: TextAlign.center,
-                    ),
-                    if (details != null) ...[
-                      SizedBox(height: AppDimensions.spaceM),
-                      Container(
-                        padding: EdgeInsets.all(AppDimensions.paddingS),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusS),
-                          border: Border.all(color: AppColors.error.withOpacity(0.3)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(AppDimensions.paddingL),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.error_outline_rounded,
+                            size: 50,
+                            color: AppColors.background,
+                          ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.info_outline, size: 16, color: AppColors.error),
-                            SizedBox(width: AppDimensions.spaceXS),
-                            Expanded(
-                              child: Text(
-                                details,
-                                style: AppTextStyles.caption.copyWith(color: AppColors.error),
+                        SizedBox(height: AppDimensions.spaceM),
+                        Text(
+                          title,
+                          style: AppTextStyles.h4.copyWith(
+                            color: AppColors.background,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    padding: EdgeInsets.all(AppDimensions.paddingM),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (details != null) ...[
+                          SizedBox(height: AppDimensions.spaceM),
+                          Container(
+                            padding: EdgeInsets.all(AppDimensions.paddingS),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusS,
+                              ),
+                              border: Border.all(
+                                color: AppColors.error.withOpacity(0.3),
                               ),
                             ),
-                          ],
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 16,
+                                  color: AppColors.error,
+                                ),
+                                SizedBox(width: AppDimensions.spaceXS),
+                                Expanded(
+                                  child: Text(
+                                    details,
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceL),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.close_rounded, color: AppColors.error),
+                        label: Text(
+                          'Tutup',
+                          style: TextStyle(color: AppColors.error),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(height: AppDimensions.spaceL),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.close_rounded, color: AppColors.error),
-                    label: Text('Tutup', style: TextStyle(color: AppColors.error)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.background,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.background,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.paddingM,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  SizedBox(height: AppDimensions.paddingL),
+                ],
               ),
-              SizedBox(height: AppDimensions.paddingL),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
   void _showSuccessDialog(Map<String, dynamic> result) {
     if (!mounted) return;
 
+    // Note: XP reward akan diberikan oleh caller (home_screen)
+    // setelah dialog ditutup untuk menghindari duplikasi
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: AppColors.orangePinkGradient,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
             ),
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(AppDimensions.paddingL),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        size: 50,
-                        color: AppColors.background,
-                      ),
-                    ),
-                    SizedBox(height: AppDimensions.spaceM),
-                    Text(
-                      '🎉 Selamat!',
-                      style: AppTextStyles.h3.copyWith(
-                        color: AppColors.background,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: AppDimensions.spaceXS),
-                    Text(
-                      'Kamu telah berhasil mengunjungi',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.background.withOpacity(0.9),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AppColors.orangePinkGradient,
                 ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-                padding: EdgeInsets.all(AppDimensions.paddingM),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(AppDimensions.paddingL),
+                    child: Column(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(AppDimensions.paddingXS),
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: AppColors.orangePinkGradient),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusS),
+                            color: Colors.white.withOpacity(0.3),
+                            shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.location_on, size: 20, color: AppColors.background),
+                          child: Icon(
+                            Icons.check_circle_rounded,
+                            size: 50,
+                            color: AppColors.background,
+                          ),
                         ),
-                        SizedBox(width: AppDimensions.spaceS),
-                        Expanded(
-                          child: Text(
-                            result['locationName'],
-                            style: AppTextStyles.h5.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
+                        SizedBox(height: AppDimensions.spaceM),
+                        Text(
+                          '🎉 Selamat!',
+                          style: AppTextStyles.h3.copyWith(
+                            color: AppColors.background,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: AppDimensions.spaceXS),
+                        Text(
+                          'Kamu telah berhasil mengunjungi',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.background.withOpacity(0.9),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
+                    ),
+                    padding: EdgeInsets.all(AppDimensions.paddingM),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(AppDimensions.paddingXS),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: AppColors.orangePinkGradient,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusS,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.location_on,
+                                size: 20,
+                                color: AppColors.background,
+                              ),
                             ),
+                            SizedBox(width: AppDimensions.spaceS),
+                            Expanded(
+                              child: Text(
+                                result['locationName'],
+                                style: AppTextStyles.h5.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (result['description'] != null &&
+                            result['description'].toString().isNotEmpty) ...[
+                          SizedBox(height: AppDimensions.spaceS),
+                          Text(
+                            result['description'],
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                        SizedBox(height: AppDimensions.spaceM),
+                        Container(
+                          padding: EdgeInsets.all(AppDimensions.paddingM),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: AppColors.orangePinkGradient,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.stars_rounded,
+                                color: AppColors.background,
+                                size: 24,
+                              ),
+                              SizedBox(width: AppDimensions.spaceS),
+                              Text(
+                                '+50 XP',
+                                style: AppTextStyles.h5.copyWith(
+                                  color: AppColors.background,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    if (result['description'] != null && result['description'].toString().isNotEmpty) ...[
-                      SizedBox(height: AppDimensions.spaceS),
-                      Text(
-                        result['description'],
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(height: AppDimensions.spaceL),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppDimensions.paddingL),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _resetScanState();
-                        },
-                        icon: Icon(Icons.qr_code_scanner, color: AppColors.background),
-                        label: Text('Scan Lagi', style: TextStyle(color: AppColors.background)),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.background.withOpacity(0.5), width: 2),
-                          padding: EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                          ),
-                        ),
-                      ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceL),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDimensions.paddingL,
                     ),
-                    SizedBox(width: AppDimensions.spaceS),
-                    Expanded(
+                    child: SizedBox(
+                      width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.pop(context);
                           Navigator.pop(context, result);
                         },
-                        icon: Icon(Icons.home_rounded, color: AppColors.batik700),
-                        label: Text('Kembali', style: TextStyle(color: AppColors.batik700)),
+                        icon: Icon(
+                          Icons.home_rounded,
+                          color: AppColors.batik700,
+                        ),
+                        label: Text(
+                          'Kembali ke Home',
+                          style: TextStyle(
+                            color: AppColors.batik700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.background,
                           elevation: 0,
-                          padding: EdgeInsets.symmetric(vertical: AppDimensions.paddingM),
+                          padding: EdgeInsets.symmetric(
+                            vertical: AppDimensions.paddingM,
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusM),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusM,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: AppDimensions.paddingL),
+                ],
               ),
-              SizedBox(height: AppDimensions.paddingL),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
