@@ -29,6 +29,10 @@ class AppColors {
   static const Color blueLight = Color(0xFF64B5F6);
   static const Color blueDark = Color(0xFF1976D2);
 
+  // ========== SKY COLORS ==========
+  static const Color skyLight = Color(0xFFC0FFFE);
+  static const Color skyDark = Color(0xFF7DA0F9);
+
   // ========== GREEN COLORS ==========
   static const Color green = Color(0xFF4CAF50);
   static const Color greenLight = Color(0xFF81C784);
@@ -111,7 +115,7 @@ class AppColors {
   static const Color orange100 = batik100;
   static const Color orange200 = batik200;
   static const Color orange300 = batik300;
-  static const Color orange400 = batik400;
+  static const Color orange400 = Color(0xFFEAA76D);
   static const Color orange500 = batik500;
   static const Color orange600 = batik600;
   static const Color orange700 = batik700;
@@ -131,7 +135,7 @@ class AppColors {
 
   // Pink shades
   static const Color pink200 = Color(0xFFF48FB1);
-  static const Color pink300 = Color(0xFFF06292);
+  static const Color pink300 = Color(0xFFAA4046);
   static const Color pink400 = Color(0xFFEC407A);
 
   // ========== GRADIENT COLORS ==========
@@ -142,6 +146,8 @@ class AppColors {
   static const List<Color> culturalGradient = [batikBrown, batikGold];
 
   static const List<Color> orangePinkGradient = [orange400, pink300];
+
+  static const List<Color> skyGradient = [skyLight, skyDark];
 
   static const List<Color> purpleBlueGradient = [purpleLight, blueLight];
 }

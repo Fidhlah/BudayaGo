@@ -241,59 +241,13 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: AppColors.orangePinkGradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       padding: EdgeInsets.all(AppDimensions.paddingL),
       child: Column(
         children: [
-          // Name and mascot badge
-          Column(
-            children: [
-              Text(
-                widget.userName,
-                style: AppTextStyles.h4.copyWith(
-                  color: AppColors.background,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: AppDimensions.spaceS),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppDimensions.paddingM,
-                  vertical: AppDimensions.paddingS,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.background.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      widget.isPelakuBudaya ? Icons.verified : _getMascotIcon(),
-                      color: AppColors.batik700,
-                      size: 20,
-                    ),
-                    SizedBox(width: AppDimensions.spaceS),
-                    Text(
-                      widget.isPelakuBudaya
-                          ? 'Pelaku Budaya'
-                          : _getMascotName(),
-                      style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.batik700,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppDimensions.spaceL),
-
           // Character card and artifacts
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -394,11 +348,50 @@ class _OtherUserProfileScreenState extends State<OtherUserProfileScreen>
             ],
           ),
 
-          // Display Name
+          // Display Name with Badge
           SizedBox(height: AppDimensions.spaceS),
-          Text(
-            widget.userName,
-            style: AppTextStyles.h4.copyWith(color: AppColors.background),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.userName,
+                style: AppTextStyles.h4.copyWith(
+                  color: AppColors.background,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(width: AppDimensions.spaceS),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingM,
+                  vertical: AppDimensions.paddingS,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.background.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      widget.isPelakuBudaya ? Icons.verified : _getMascotIcon(),
+                      color: AppColors.batik700,
+                      size: 18,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      widget.isPelakuBudaya
+                          ? 'Pelaku Budaya'
+                          : _getMascotName(),
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: AppColors.batik700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
 
           // Progress Bar (only if not hidden and has level data)
