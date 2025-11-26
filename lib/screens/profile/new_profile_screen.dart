@@ -327,18 +327,25 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   : _buildRegularUserBody(),
           floatingActionButton:
               isPelakuBudaya
-                  ? FloatingActionButton.extended(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const UploadKaryaScreen(),
-                        ),
-                      );
-                    },
-                    backgroundColor: AppColors.batik700,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Upload Karya'),
+                  ? Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: AppColors.skyGradient),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: FloatingActionButton.extended(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UploadKaryaScreen(),
+                          ),
+                        );
+                      },
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      icon: const Icon(Icons.add),
+                      label: const Text('Upload Karya'),
+                    ),
                   )
                   : null,
         );
@@ -355,7 +362,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       width: double.infinity,
       padding: EdgeInsets.all(AppDimensions.paddingL),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: AppColors.orangePinkGradient),
+        gradient: LinearGradient(
+          colors: AppColors.orangePinkGradient,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
       ),
       child: Column(
         children: [
