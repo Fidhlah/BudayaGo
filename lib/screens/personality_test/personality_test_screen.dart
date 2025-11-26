@@ -129,7 +129,24 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
 
         return Scaffold(
           backgroundColor: AppColors.orange50,
-          appBar: const CustomGradientAppBar(title: 'Tes Kepribadian'),
+          appBar: CustomGradientAppBar(
+            title: 'Tes Kepribadian',
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Skip test and go back to home
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Lewati',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
           body: SafeArea(
             child: Padding(
               padding: EdgeInsets.all(AppDimensions.paddingL),
@@ -138,9 +155,9 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                 children: [
                   LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: AppColors.batik100,
+                    backgroundColor: AppColors.orange400.withOpacity(0.3),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.batik700,
+                      AppColors.pink300,
                     ),
                     minHeight: 8,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusS),
@@ -189,7 +206,9 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                                     ),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                        color: AppColors.batik200,
+                                        color: AppColors.pink300.withOpacity(
+                                          0.3,
+                                        ),
                                         width: 2,
                                       ),
                                       borderRadius: BorderRadius.circular(
@@ -202,7 +221,12 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                                           width: 40,
                                           height: 40,
                                           decoration: BoxDecoration(
-                                            color: AppColors.batik50,
+                                            gradient: LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors:
+                                                  AppColors.orangePinkGradient,
+                                            ),
                                             shape: BoxShape.circle,
                                           ),
                                           child: Center(
@@ -211,7 +235,7 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen> {
                                               style: AppTextStyles.labelLarge
                                                   .copyWith(
                                                     fontWeight: FontWeight.bold,
-                                                    color: AppColors.batik700,
+                                                    color: Colors.white,
                                                   ),
                                             ),
                                           ),

@@ -129,10 +129,9 @@ class _CulturalObjectDetailScreenState
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [
-                            Colors.orange.shade400,
-                            Colors.orange.shade700,
-                          ],
+                          colors: AppColors.orangePinkGradient,
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
                       child: const Icon(
@@ -163,7 +162,7 @@ class _CulturalObjectDetailScreenState
                         ).pop(); // Close dialog only
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade700,
+                        backgroundColor: AppColors.buttonColour,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -490,7 +489,7 @@ class _CulturalObjectDetailScreenState
                         _hasClaimedXP
                             ? Colors.grey.shade400
                             : (_hasReadToBottom
-                                ? Colors.orange.shade700
+                                ? AppColors.buttonColour
                                 : Colors.grey.shade300),
                     disabledBackgroundColor: Colors.grey.shade300,
                     shape: RoundedRectangleBorder(

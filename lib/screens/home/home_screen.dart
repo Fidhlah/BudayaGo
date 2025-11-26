@@ -193,12 +193,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider = Provider.of<ProfileProvider>(context);
+    final username = profileProvider.profile?.displayName ?? 'Penjelajah';
+
     return Scaffold(
       backgroundColor: AppColors.orange50,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: CustomGradientAppBar(
-          title: 'Halo, Penjelajah!',
+          title: 'Halo, $username!',
+          centerTitle: false,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16),
@@ -273,8 +277,28 @@ class _HomeScreenState extends State<HomeScreen> {
                               mounted) {
                             final userId = SupabaseConfig.currentUser?.id;
 
+                            debugPrint(
+                              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                            );
+                            debugPrint('🎯 QR SCAN SUCCESS - PROCESSING VISIT');
+                            debugPrint(
+                              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                            );
+                            debugPrint('   User ID: $userId');
+                            debugPrint('   Partner UUID: ${result['uuid']}');
+                            debugPrint(
+                              '   Location: ${result['locationName']}',
+                            );
+                            debugPrint(
+                              '   Distance: ${result['distance']?.toStringAsFixed(1)} m',
+                            );
+
                             if (userId != null) {
                               try {
+                                debugPrint(
+                                  '📤 Calling recordVisitAndGiveExp()...',
+                                );
+
                                 // Record visit and give XP through database
                                 final visitResult =
                                     await VisitService.recordVisitAndGiveExp(
@@ -283,14 +307,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                       expGained: 50, // 50 XP for QR scan
                                     );
 
+                                // Check if it's a duplicate visit
+                                if (visitResult['isDuplicate'] == true) {
+                                  if (mounted) {
+                                    debugPrint(
+                                      '⚠️ Duplicate visit detected, showing warning...',
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '⚠️ ${visitResult['message']}\n'
+                                          'Coba kunjungi lokasi budaya lainnya! 🗺️',
+                                        ),
+                                        backgroundColor: AppColors.warning,
+                                        duration: const Duration(seconds: 4),
+                                      ),
+                                    );
+                                  }
+                                  return; // Stop processing
+                                }
+
                                 if (mounted && visitResult['success'] == true) {
+                                  debugPrint(
+                                    '✅ Visit recorded! Syncing providers...',
+                                  );
+
                                   // Sync HomeProvider with new XP/Level
                                   final homeProvider =
                                       Provider.of<HomeProvider>(
                                         context,
                                         listen: false,
                                       );
+                                  debugPrint('🔄 Syncing HomeProvider...');
                                   await homeProvider.syncUserProgress();
+                                  debugPrint('✅ HomeProvider synced');
 
                                   // Sync ProfileProvider for collectibles
                                   final profileProvider =
@@ -299,10 +349,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                         listen: false,
                                       );
                                   if (profileProvider.hasProfile) {
+                                    debugPrint('🔄 Loading collectibles...');
                                     await profileProvider.loadCollectibles();
+                                    debugPrint('✅ Collectibles loaded');
+
+                                    // 🆕 Reload visited locations after successful scan
+                                    debugPrint(
+                                      '🔄 Loading visited locations...',
+                                    );
+                                    await profileProvider.loadVisitedLocations(
+                                      userId,
+                                    );
+                                    debugPrint(
+                                      '✅ Visited locations loaded: ${profileProvider.visitedLocations.length} items',
+                                    );
+                                  } else {
+                                    debugPrint(
+                                      '⚠️ ProfileProvider has no profile loaded!',
+                                    );
                                   }
 
                                   // Show success message with details
+                                  debugPrint(
+                                    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                                  );
+                                  debugPrint('✅ QR SCAN FLOW COMPLETE');
+                                  debugPrint(
+                                    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n',
+                                  );
+
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
@@ -313,6 +388,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       backgroundColor: AppColors.success,
                                       duration: const Duration(seconds: 4),
                                     ),
+                                  );
+                                } else {
+                                  debugPrint(
+                                    '⚠️ Visit result success = ${visitResult['success']}',
                                   );
                                 }
                               } catch (e) {

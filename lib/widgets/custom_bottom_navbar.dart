@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -16,11 +17,11 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(Icons.home, 0, 'Home'),
+          _buildNavItem(Icons.home, 0, 'Beranda'),
           _buildNavItem(Icons.explore, 1, 'Eksplorasi'),
           const SizedBox(width: 40), // Space for FAB
           _buildNavItem(Icons.photo_library, 2, 'Galeri'),
-          _buildNavItem(Icons.person, 3, 'Profile'),
+          _buildNavItem(Icons.person, 3, 'Profil'),
         ],
       ),
     );
@@ -41,7 +42,7 @@ class CustomBottomNavBar extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isActive ? Colors.orange.shade700 : Colors.grey,
+                color: isActive ? AppColors.buttonColour : Colors.grey,
                 size: 20,
               ),
               const SizedBox(height: 2),
@@ -49,7 +50,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 9,
-                  color: isActive ? Colors.orange.shade700 : Colors.grey,
+                  color: isActive ? AppColors.buttonColour : Colors.grey,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),

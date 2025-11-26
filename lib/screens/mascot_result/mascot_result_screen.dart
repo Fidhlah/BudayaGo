@@ -80,29 +80,76 @@ class _MascotResultScreenState extends State<MascotResultScreen> {
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusXL,
                             ),
-                            child: Image.asset(
-                              'assets/images/artifacts/kartu2.jpeg',
-                              width: imageSize,
-                              height: imageSize,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: imageSize,
-                                  height: imageSize,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.radiusXL,
+                            child: widget.characterImageUrl != null &&
+                                    widget.characterImageUrl!.isNotEmpty
+                                ? Image.network(
+                                    widget.characterImageUrl!,
+                                    width: imageSize,
+                                    height: imageSize,
+                                    fit: BoxFit.contain,
+                                    loadingBuilder: (
+                                      context,
+                                      child,
+                                      loadingProgress,
+                                    ) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        width: imageSize,
+                                        height: imageSize,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimensions.radiusXL,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: imageSize,
+                                        height: imageSize,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimensions.radiusXL,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.person,
+                                          size: imageSize * 0.5,
+                                          color: AppColors.orange700,
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    width: imageSize,
+                                    height: imageSize,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(
+                                        AppDimensions.radiusXL,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.person,
+                                      size: imageSize * 0.5,
+                                      color: AppColors.orange700,
                                     ),
                                   ),
-                                  child: Icon(
-                                    Icons.person,
-                                    size: imageSize * 0.5,
-                                    color: AppColors.orange700,
-                                  ),
-                                );
-                              },
-                            ),
                           ),
                           SizedBox(height: dynamicSpacing * 2),
                           Text(
