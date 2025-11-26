@@ -122,7 +122,7 @@ class AuthProvider with ChangeNotifier {
   Future<bool> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String username,
   }) async {
     try {
       _error = null;
@@ -133,7 +133,7 @@ class AuthProvider with ChangeNotifier {
       final response = await _authService.signUpWithEmail(
         email: email,
         password: password,
-        fullName: fullName,
+        username: username,
       );
 
       _user = response.user;

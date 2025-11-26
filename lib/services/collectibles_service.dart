@@ -67,7 +67,8 @@ class CollectiblesService {
             unlockData.isNotEmpty &&
             unlockData[0]['is_unlocked'] == true;
 
-        final levelRequired = item['level_required'] as int? ?? (item['order_number'] as int) * 2;
+        final levelRequired =
+            item['level_required'] as int? ?? (item['order_number'] as int) * 2;
 
         collectibles.add({
           'id': item['id'],

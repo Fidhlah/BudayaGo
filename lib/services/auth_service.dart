@@ -32,16 +32,16 @@ class AuthService {
   Future<AuthResponse> signUpWithEmail({
     required String email,
     required String password,
-    required String fullName,
+    required String username,
   }) async {
     print('📧 AuthService: signUpWithEmail');
     print('   Email: $email');
-    print('   Name: $fullName');
+    print('   Username: $username');
 
     return await _supabase.auth.signUp(
       email: email,
       password: password,
-      data: {'full_name': fullName},
+      data: {'username': username},
       emailRedirectTo:
           'budayago://auth-callback', // 🔥 FIX: Deep link untuk email verification
     );
