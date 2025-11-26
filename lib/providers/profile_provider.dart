@@ -316,13 +316,8 @@ class ProfileProvider extends ChangeNotifier {
             .eq('id', userId);
       }
 
-      _profile = _profile!.copyWith(
-        displayName: displayName ?? _profile!.displayName,
-        mascot: mascot ?? _profile!.mascot,
-        isPelakuBudaya: isPelakuBudaya ?? _profile!.isPelakuBudaya,
-        hideProgress: hideProgress ?? _profile!.hideProgress,
-        lastActive: DateTime.now(),
-      );
+      // Reload profile dari database untuk memastikan data terbaru
+      await loadProfile(userId);
 
       debugPrint('✅ Profile updated');
     } catch (e) {

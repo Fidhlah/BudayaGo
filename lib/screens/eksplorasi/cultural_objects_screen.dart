@@ -37,10 +37,13 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
   Future<void> _loadContent() async {
     try {
       // Load content based on filter type (province or category)
-      final contents = widget.isProvince
-          ? await EksplorasiService.loadContentByProvince(widget.categoryId)
-          : await EksplorasiService.loadContentByCategory(widget.categoryId);
-          
+      final contents =
+          widget.isProvince
+              ? await EksplorasiService.loadContentByProvince(widget.categoryId)
+              : await EksplorasiService.loadContentByCategory(
+                widget.categoryId,
+              );
+
       if (mounted) {
         setState(() {
           _contents = contents;
@@ -81,6 +84,7 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
       appBar: CustomGradientAppBar(
         title: widget.categoryName,
         showBackButton: true,
+        onBackPressed: () => Navigator.of(context, rootNavigator: false).pop(),
       ),
       body: Column(
         children: [
@@ -129,47 +133,48 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
               ],
             ),
           ),
-          
+
           // Content area
           Expanded(
-            child: _contents.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          widget.categoryIcon,
-                          size: 80,
-                          color: Colors.grey.shade300,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Belum ada konten',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
+            child:
+                _contents.isEmpty
+                    ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            widget.categoryIcon,
+                            size: 80,
+                            color: Colors.grey.shade300,
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.isProvince
-                              ? 'Konten dari ${widget.categoryName} akan segera ditambahkan'
-                              : 'Konten untuk kategori ini akan segera ditambahkan',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
+                          const SizedBox(height: 16),
+                          Text(
+                            'Belum ada konten',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.isProvince
+                                ? 'Konten dari ${widget.categoryName} akan segera ditambahkan'
+                                : 'Konten untuk kategori ini akan segera ditambahkan',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    )
+                    : SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: _buildMasonryLayout(context, _contents),
+                      ),
                     ),
-                  )
-                : SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: _buildMasonryLayout(context, _contents),
-                    ),
-                  ),
           ),
         ],
       ),
@@ -238,7 +243,7 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
     int index,
   ) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         // Extract province name from nested object or use fallback
         String provinceName = 'Indonesia';
         if (object['provinces'] != null && object['provinces'] is Map) {
@@ -247,7 +252,7 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
           provinceName = object['province_name'];
         }
 
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder:
@@ -358,7 +363,8 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
                       Expanded(
                         child: Text(
                           widget.isProvince
-                              ? (object['cultural_categories']?['name'] ?? 'Budaya')
+                              ? (object['cultural_categories']?['name'] ??
+                                  'Budaya')
                               : (object['provinces']?['name'] ?? 'Indonesia'),
                           style: TextStyle(
                             fontSize: 12,

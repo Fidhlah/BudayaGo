@@ -100,6 +100,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
                   'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
+                  'hideProgress': creator?['hide_progress'] ?? false,
                 };
               }).toList();
           _isLoading = false;
@@ -156,6 +157,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                   'likes': item['likes'] ?? 0,
                   'views': item['views'] ?? 0,
                   'isPelakuBudaya': creator?['is_pelaku_budaya'] ?? false,
+                  'hideProgress': creator?['hide_progress'] ?? false,
                 };
               }).toList();
           _isLoading = false;
@@ -448,6 +450,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
                         item['creatorName'] as String,
                         null, // mascot
                         item['isPelakuBudaya'] as bool? ?? false,
+                        item['hideProgress'] as bool? ?? false,
                       );
                     },
                     child: Row(
@@ -734,6 +737,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
     String userName,
     String? mascot,
     bool isPelakuBudaya,
+    bool hideProgress,
   ) {
     Navigator.push(
       context,
@@ -744,6 +748,7 @@ class _KaryaScreenState extends State<KaryaScreen> {
               userName: userName,
               mascot: mascot,
               isPelakuBudaya: isPelakuBudaya,
+              hideProgress: hideProgress,
             ),
       ),
     );

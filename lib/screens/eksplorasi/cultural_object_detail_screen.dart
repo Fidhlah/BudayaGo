@@ -157,8 +157,10 @@ class _CulturalObjectDetailScreenState
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close dialog
-                        Navigator.pop(context); // Back to list
+                        Navigator.of(
+                          context,
+                          rootNavigator: false,
+                        ).pop(); // Close dialog only
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange.shade700,

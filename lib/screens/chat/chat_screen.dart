@@ -92,7 +92,11 @@ class _ChatScreenState extends State<ChatScreen> {
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           decoration: BoxDecoration(
-            color: isUser ? Colors.blue.shade600 : Colors.grey.shade300,
+            gradient:
+                isUser
+                    ? LinearGradient(colors: AppColors.orangePinkGradient)
+                    : null,
+            color: isUser ? null : AppColors.grey100,
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.all(12),
@@ -142,12 +146,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Ask about your complex JSON data...',
-                        border: OutlineInputBorder(
+                      decoration: InputDecoration(
+                        hintText:
+                            'Tanya $mascotName tentang budaya Indonesia...',
+                        border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(24)),
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                        ),
                       ),
                       onSubmitted: (text) => _sendMessage(),
                       enabled: !_isLoading, // Disable input while loading
@@ -157,7 +164,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   IconButton(
                     icon: Icon(
                       Icons.send,
-                      color: _isLoading ? Colors.grey : Colors.blue,
+                      color: _isLoading ? Colors.grey : AppColors.orange700,
                     ),
                     onPressed: _isLoading ? null : _sendMessage,
                   ),

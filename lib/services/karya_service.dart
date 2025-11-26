@@ -58,7 +58,8 @@ class KaryaService {
             id,
             display_name,
             username,
-            is_pelaku_budaya
+            is_pelaku_budaya,
+            hide_progress
           )
         ''')
           .order('created_at', ascending: false);
@@ -102,7 +103,8 @@ class KaryaService {
             id,
             display_name,
             username,
-            is_pelaku_budaya
+            is_pelaku_budaya,
+            hide_progress
           )
         ''')
           .eq('tag', tag)
@@ -142,7 +144,8 @@ class KaryaService {
             id,
             display_name,
             username,
-            is_pelaku_budaya
+            is_pelaku_budaya,
+            hide_progress
           )
         ''')
           .eq('umkm_category', category)
@@ -183,7 +186,8 @@ class KaryaService {
             id,
             display_name,
             username,
-            is_pelaku_budaya
+            is_pelaku_budaya,
+            hide_progress
           )
         ''')
           .or('name.ilike.%$query%,description.ilike.%$query%')
