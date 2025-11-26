@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   bool _isLoading = false;
   bool _isLoadingHistory = true;
+
+  // Queue for delayed messages
+  List<String> _messageQueue = [];
+  Timer? _messageTimer;
 
   @override
   void initState() {
@@ -82,16 +87,90 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    _messageTimer?.cancel();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Clear message queue and cancel timer
+  void _clearMessageQueue() {
+    _messageTimer?.cancel();
+    _messageQueue.clear();
+  }
+
+  /// Send messages from queue with delays and typing indicators
+  void _startDelayedMessagesWithTyping(List<String> messageParts) {
+    _clearMessageQueue(); // Clear any existing queue
+    _messageQueue = List.from(messageParts);
+    _sendNextQueuedMessageWithTyping();
+  }
+
+  /// Send next message from queue with typing indicator
+  void _sendNextQueuedMessageWithTyping() async {
+    if (_messageQueue.isEmpty) return;
+
+    final currentUser = SupabaseConfig.currentUser;
+    final nextMessage = _messageQueue.removeAt(0);
+    // Check if this is the last message
+    final isFirstMessage = _messageQueue.isEmpty;
+
+    // Add typing indicator (except for very first message - it already has one)
+    if (!isFirstMessage) {
+      setState(() {
+        _messages.insert(0, Message(text: '...', sender: MessageSender.gemini));
+      });
+      _scrollToBottom();
+
+      // Wait for typing delay
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      // Remove typing indicator if still there (user might have interrupted)
+      if (_messages.isNotEmpty &&
+          _messages.first.text == '...' &&
+          _messages.first.sender == MessageSender.gemini) {
+        setState(() {
+          _messages.removeAt(0);
+        });
+      }
+    }
+
+    // Add actual message to UI
+    setState(() {
+      _messages.insert(
+        0,
+        Message(text: nextMessage, sender: MessageSender.gemini),
+      );
+    });
+    _scrollToBottom();
+
+    // Save message to database
+    if (currentUser?.id != null) {
+      await ChatService.saveMessage(
+        userId: currentUser!.id,
+        message: nextMessage,
+        sender: 'bot',
+      );
+    }
+
+    // Schedule next message if queue not empty
+    if (_messageQueue.isNotEmpty) {
+      _messageTimer = Timer(const Duration(seconds: 10), () {
+        _sendNextQueuedMessageWithTyping();
+      });
+    }
   }
 
   void _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
 
-    // 1. Add user message and typing indicator
+    // Clear any ongoing delayed messages
+    _clearMessageQueue();
+
+    final currentUser = SupabaseConfig.currentUser;
+
+    // 1. Add and save user message
     setState(() {
       _messages.insert(0, Message(text: text, sender: MessageSender.user));
       _messages.insert(
@@ -101,30 +180,56 @@ class _ChatScreenState extends State<ChatScreen> {
       _isLoading = true;
     });
     _controller.clear();
-    // Scroll to the newest message
     _scrollToBottom();
+
+    // Save user message to database
+    if (currentUser?.id != null) {
+      await ChatService.saveMessage(
+        userId: currentUser!.id,
+        message: text,
+        sender: 'user',
+      );
+    }
 
     // 2. Call the custom RAG API
     try {
       final response = await _chatService.sendMessage(text);
 
-      // 3. Replace typing indicator with actual response
+      // 3. Remove typing indicator
       setState(() {
         _messages.removeAt(0); // Remove typing indicator
-        _messages.insert(
-          0,
-          Message(text: response, sender: MessageSender.gemini),
-        );
       });
+
+      // 4. Split response and send with delays and typing indicators
+      final messageParts =
+          response
+              .split('\n\n')
+              .where((part) => part.trim().isNotEmpty)
+              .map((part) => part.trim())
+              .toList();
+
+      if (messageParts.isNotEmpty) {
+        _startDelayedMessagesWithTyping(messageParts);
+      }
     } catch (e) {
-      // Handle errors caught in the service
+      // Handle errors - save error message
+      final errorMsg = 'System Error: $e';
       setState(() {
         _messages.removeAt(0); // Remove typing indicator
         _messages.insert(
           0,
-          Message(text: 'System Error: $e', sender: MessageSender.gemini),
+          Message(text: errorMsg, sender: MessageSender.gemini),
         );
       });
+
+      // Save error message to database
+      if (currentUser?.id != null) {
+        await ChatService.saveMessage(
+          userId: currentUser!.id,
+          message: errorMsg,
+          sender: 'bot',
+        );
+      }
     } finally {
       setState(() {
         _isLoading = false;

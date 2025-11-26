@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; // Import for debugPrint
 import '../config/supabase_config.dart'; // Import for current user access
@@ -44,42 +45,28 @@ class ChatService {
     }
   }
 
-  /// Save individual chat messages to Supabase table
-  static Future<void> _saveChatMessages({
+  /// Save single message to Supabase
+  static Future<void> saveMessage({
     required String userId,
-    required String character,
-    required String userMessage,
-    required String modelResponse,
+    required String message,
+    required String sender, // 'user' or 'bot'
   }) async {
     try {
       final timestamp = DateTime.now().toIso8601String();
 
-      debugPrint('💾 Saving chat messages to Supabase...');
-      debugPrint('   User ID: $userId');
-      debugPrint('   Character: $character');
-
-      // Save user message
       await SupabaseConfig.client.from('chat_messages').insert({
         'user_id': userId,
-        'message': userMessage,
-        'sender': 'user',
-        'session_id': userId, // Use user_id as session_id (UUID)
+        'message': message,
+        'sender': sender,
+        'session_id': userId,
         'timestamp': timestamp,
       });
 
-      // Save model response
-      await SupabaseConfig.client.from('chat_messages').insert({
-        'user_id': userId,
-        'message': modelResponse,
-        'sender': 'bot', // Changed from 'model' to 'bot'
-        'session_id': userId, // Use user_id as session_id (UUID)
-        'timestamp': timestamp,
-      });
-
-      debugPrint('✅ Chat messages saved successfully');
+      debugPrint(
+        '✅ Message saved: $sender -> ${message.substring(0, math.min(50, message.length))}...',
+      );
     } catch (e) {
-      debugPrint('❌ Error saving chat messages: $e');
-      // Don't rethrow to avoid breaking the chat flow
+      debugPrint('❌ Error saving message: $e');
     }
   }
 
@@ -157,50 +144,16 @@ class ChatService {
         }
       }
 
-      // Save chat messages to Supabase (both success and error responses)
-      if (currentUser?.id != null) {
-        await _saveChatMessages(
-          userId: currentUser!.id,
-          character: characterName,
-          userMessage: userMessage,
-          modelResponse: responseMessage,
-        );
-      }
-
+      // Note: Messages will be saved individually when displayed in chat screen
       return responseMessage;
     } on http.ClientException catch (e) {
       // Handle HTTP-specific errors like connection timeout, host lookup failure, or CORS
       debugPrint('Network/Client Error: $e');
-      final errorMessage =
-          'Network Error: Could not connect to the chat service. Please check your network connection.';
-
-      // Save error message to database
-      if (currentUser?.id != null) {
-        await _saveChatMessages(
-          userId: currentUser!.id,
-          character: characterName,
-          userMessage: userMessage,
-          modelResponse: errorMessage,
-        );
-      }
-
-      return errorMessage;
+      return 'Network Error: Could not connect to the chat service. Please check your network connection.';
     } catch (e) {
       // Catch all other exceptions (e.g., Json decoding error if response is invalid)
       debugPrint('General Exception: $e');
-      final errorMessage = 'An unexpected error occurred during processing.';
-
-      // Save error message to database
-      if (currentUser?.id != null) {
-        await _saveChatMessages(
-          userId: currentUser!.id,
-          character: characterName,
-          userMessage: userMessage,
-          modelResponse: errorMessage,
-        );
-      }
-
-      return errorMessage;
+      return 'An unexpected error occurred during processing.';
     }
   }
 
