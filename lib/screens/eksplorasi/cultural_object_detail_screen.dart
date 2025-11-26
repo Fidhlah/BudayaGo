@@ -490,7 +490,7 @@ class _CulturalObjectDetailScreenState
                         _hasClaimedXP
                             ? Colors.grey.shade400
                             : (_hasReadToBottom
-                                ? Colors.orange.shade700
+                                ? AppColors.buttonColour
                                 : Colors.grey.shade300),
                     disabledBackgroundColor: Colors.grey.shade300,
                     shape: RoundedRectangleBorder(

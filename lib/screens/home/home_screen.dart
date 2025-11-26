@@ -193,12 +193,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider = Provider.of<ProfileProvider>(context);
+    final username = profileProvider.profile?.displayName ?? 'Penjelajah';
+
     return Scaffold(
       backgroundColor: AppColors.orange50,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: CustomGradientAppBar(
-          title: 'Halo, Penjelajah!',
+          title: 'Halo, $username!',
+          centerTitle: false,
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16),

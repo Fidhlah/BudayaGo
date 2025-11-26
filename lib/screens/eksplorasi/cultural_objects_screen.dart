@@ -86,98 +86,45 @@ class _CulturalObjectsScreenState extends State<CulturalObjectsScreen> {
         showBackButton: true,
         onBackPressed: () => Navigator.of(context, rootNavigator: false).pop(),
       ),
-      body: Column(
-        children: [
-          // Header info badge
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Icon(
-                  widget.categoryIcon,
-                  color: widget.categoryColor,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.isProvince
-                      ? 'Budaya dari ${widget.categoryName}'
-                      : 'Kategori: ${widget.categoryName}',
-                  style: TextStyle(
-                    color: widget.categoryColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: widget.categoryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${_contents.length} Konten',
-                    style: TextStyle(
-                      color: widget.categoryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+      body:
+          _contents.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      widget.categoryIcon,
+                      size: 80,
+                      color: Colors.grey.shade300,
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Content area
-          Expanded(
-            child:
-                _contents.isEmpty
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            widget.categoryIcon,
-                            size: 80,
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Belum ada konten',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            widget.isProvince
-                                ? 'Konten dari ${widget.categoryName} akan segera ditambahkan'
-                                : 'Konten untuk kategori ini akan segera ditambahkan',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    )
-                    : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: _buildMasonryLayout(context, _contents),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Belum ada konten',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade600,
                       ),
                     ),
-          ),
-        ],
-      ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.isProvince
+                          ? 'Konten dari ${widget.categoryName} akan segera ditambahkan'
+                          : 'Konten untuk kategori ini akan segera ditambahkan',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              )
+              : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: _buildMasonryLayout(context, _contents),
+                ),
+              ),
     );
   }
 

@@ -130,7 +130,7 @@ class AppTheme {
       // ========== BOTTOM NAVIGATION BAR ==========
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.buttonColour,
         unselectedItemColor: AppColors.textSecondary,
         selectedLabelStyle: AppTextStyles.labelSmall,
         unselectedLabelStyle: AppTextStyles.labelSmall,

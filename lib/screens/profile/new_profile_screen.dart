@@ -327,25 +327,18 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   : _buildRegularUserBody(),
           floatingActionButton:
               isPelakuBudaya
-                  ? Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: AppColors.skyGradient),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: FloatingActionButton.extended(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const UploadKaryaScreen(),
-                          ),
-                        );
-                      },
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      icon: const Icon(Icons.add),
-                      label: const Text('Upload Karya'),
-                    ),
+                  ? FloatingActionButton.extended(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UploadKaryaScreen(),
+                        ),
+                      );
+                    },
+                    backgroundColor: AppColors.buttonColour,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Upload Karya'),
                   )
                   : null,
         );
@@ -615,7 +608,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                             }
 
                             return Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: List.generate(displayCount, (index) {
                                 // Check if collectible exists at this index
                                 if (index < collectibles.length) {
@@ -629,124 +622,260 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                     onTap:
                                         isUnlocked
                                             ? () {
-                                              // Show artifact detail
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    '${collectible['name']} - ${collectible['rarity']}',
-                                                  ),
-                                                  duration: const Duration(
-                                                    seconds: 2,
-                                                  ),
-                                                ),
+                                              // Show artifact detail dialog
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (context) => AlertDialog(
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                      ),
+                                                      contentPadding:
+                                                          EdgeInsets.all(24),
+                                                      content: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          // Artifact Icon
+                                                          ClipOval(
+                                                            child:
+                                                                imageUrl !=
+                                                                            null &&
+                                                                        imageUrl
+                                                                            .isNotEmpty
+                                                                    ? Image.network(
+                                                                      imageUrl,
+                                                                      width:
+                                                                          100,
+                                                                      height:
+                                                                          100,
+                                                                      fit:
+                                                                          BoxFit
+                                                                              .cover,
+                                                                      errorBuilder: (
+                                                                        context,
+                                                                        error,
+                                                                        stackTrace,
+                                                                      ) {
+                                                                        return Container(
+                                                                          width:
+                                                                              100,
+                                                                          height:
+                                                                              100,
+                                                                          color:
+                                                                              AppColors.grey200,
+                                                                          child: Icon(
+                                                                            Icons.image_not_supported,
+                                                                            size:
+                                                                                50,
+                                                                            color:
+                                                                                AppColors.grey400,
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    )
+                                                                    : Container(
+                                                                      width:
+                                                                          100,
+                                                                      height:
+                                                                          100,
+                                                                      color:
+                                                                          AppColors
+                                                                              .grey200,
+                                                                      child: Icon(
+                                                                        Icons
+                                                                            .image,
+                                                                        size:
+                                                                            50,
+                                                                        color:
+                                                                            AppColors.grey400,
+                                                                      ),
+                                                                    ),
+                                                          ),
+                                                          SizedBox(height: 16),
+                                                          // Artifact Name
+                                                          Text(
+                                                            collectible['name'] ??
+                                                                'Artefak',
+                                                            style: AppTextStyles
+                                                                .h5
+                                                                .copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                          ),
+                                                          SizedBox(height: 16),
+                                                          // Description
+                                                          Text(
+                                                            collectible['description'] ??
+                                                                'Tidak ada deskripsi tersedia.',
+                                                            style: AppTextStyles
+                                                                .bodyMedium
+                                                                .copyWith(
+                                                                  color:
+                                                                      AppColors
+                                                                          .textSecondary,
+                                                                ),
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                          ),
+                                                          SizedBox(height: 20),
+                                                          // Close Button
+                                                          ElevatedButton(
+                                                            onPressed:
+                                                                () =>
+                                                                    Navigator.pop(
+                                                                      context,
+                                                                    ),
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  AppColors
+                                                                      .buttonColour,
+                                                              foregroundColor:
+                                                                  Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      12,
+                                                                    ),
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        32,
+                                                                    vertical:
+                                                                        12,
+                                                                  ),
+                                                            ),
+                                                            child: Text(
+                                                              'Tutup',
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                               );
                                             }
                                             : null,
-                                    child: Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isUnlocked
-                                                ? Colors.transparent
-                                                : AppColors.background
-                                                    .withOpacity(0.3),
-                                        shape: BoxShape.circle,
-                                        border:
-                                            isUnlocked
-                                                ? null
-                                                : Border.all(
-                                                  color: AppColors.background
-                                                      .withOpacity(0.5),
-                                                  width: 2,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 4,
+                                      ),
+                                      child: Container(
+                                        width: isUnlocked ? 60 : 50,
+                                        height: isUnlocked ? 60 : 50,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isUnlocked
+                                                  ? Colors.transparent
+                                                  : AppColors.background
+                                                      .withOpacity(0.3),
+                                          shape: BoxShape.circle,
+                                          border:
+                                              isUnlocked
+                                                  ? null
+                                                  : Border.all(
+                                                    color: AppColors.background
+                                                        .withOpacity(0.5),
+                                                    width: 2,
+                                                  ),
+                                        ),
+                                        child:
+                                            isUnlocked &&
+                                                    imageUrl != null &&
+                                                    imageUrl.isNotEmpty
+                                                ? ClipOval(
+                                                  child: Image.network(
+                                                    imageUrl,
+                                                    width: 60,
+                                                    height: 60,
+                                                    fit: BoxFit.cover,
+                                                    loadingBuilder: (
+                                                      context,
+                                                      child,
+                                                      loadingProgress,
+                                                    ) {
+                                                      if (loadingProgress ==
+                                                          null)
+                                                        return child;
+                                                      return Center(
+                                                        child: CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Colors.white,
+                                                          value:
+                                                              loadingProgress
+                                                                          .expectedTotalBytes !=
+                                                                      null
+                                                                  ? loadingProgress
+                                                                          .cumulativeBytesLoaded /
+                                                                      loadingProgress
+                                                                          .expectedTotalBytes!
+                                                                  : null,
+                                                        ),
+                                                      );
+                                                    },
+                                                    errorBuilder: (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      debugPrint(
+                                                        '❌ Error loading collectible image: $error',
+                                                      );
+                                                      return Icon(
+                                                        Icons.broken_image,
+                                                        size: 24,
+                                                        color: Colors.white70,
+                                                      );
+                                                    },
+                                                  ),
+                                                )
+                                                : Icon(
+                                                  isUnlocked
+                                                      ? Icons.broken_image
+                                                      : Icons.lock,
+                                                  size: 24,
+                                                  color:
+                                                      isUnlocked
+                                                          ? Colors.white70
+                                                          : AppColors.background
+                                                              .withOpacity(0.7),
                                                 ),
                                       ),
-                                      child:
-                                          isUnlocked &&
-                                                  imageUrl != null &&
-                                                  imageUrl.isNotEmpty
-                                              ? ClipOval(
-                                                child: Image.network(
-                                                  imageUrl,
-                                                  width: 60,
-                                                  height: 60,
-                                                  fit: BoxFit.cover,
-                                                  loadingBuilder: (
-                                                    context,
-                                                    child,
-                                                    loadingProgress,
-                                                  ) {
-                                                    if (loadingProgress == null)
-                                                      return child;
-                                                    return Center(
-                                                      child: CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        color: Colors.white,
-                                                        value:
-                                                            loadingProgress
-                                                                        .expectedTotalBytes !=
-                                                                    null
-                                                                ? loadingProgress
-                                                                        .cumulativeBytesLoaded /
-                                                                    loadingProgress
-                                                                        .expectedTotalBytes!
-                                                                : null,
-                                                      ),
-                                                    );
-                                                  },
-                                                  errorBuilder: (
-                                                    context,
-                                                    error,
-                                                    stackTrace,
-                                                  ) {
-                                                    debugPrint(
-                                                      '❌ Error loading collectible image: $error',
-                                                    );
-                                                    return Icon(
-                                                      Icons.broken_image,
-                                                      size: 24,
-                                                      color: Colors.white70,
-                                                    );
-                                                  },
-                                                ),
-                                              )
-                                              : Icon(
-                                                isUnlocked
-                                                    ? Icons.broken_image
-                                                    : Icons.lock,
-                                                size: 24,
-                                                color:
-                                                    isUnlocked
-                                                        ? Colors.white70
-                                                        : AppColors.background
-                                                            .withOpacity(0.7),
-                                              ),
                                     ),
                                   );
                                 } else {
                                   // Empty slot if less than 5 collectibles
-                                  return Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.background.withOpacity(
-                                        0.2,
-                                      ),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 4),
+                                    child: Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
                                         color: AppColors.background.withOpacity(
-                                          0.3,
+                                          0.2,
                                         ),
-                                        width: 2,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.background
+                                              .withOpacity(0.3),
+                                          width: 2,
+                                        ),
                                       ),
-                                    ),
-                                    child: Icon(
-                                      Icons.lock_outline,
-                                      size: 20,
-                                      color: AppColors.background.withOpacity(
-                                        0.5,
+                                      child: Icon(
+                                        Icons.lock_outline,
+                                        size: 20,
+                                        color: AppColors.background.withOpacity(
+                                          0.5,
+                                        ),
                                       ),
                                     ),
                                   );
