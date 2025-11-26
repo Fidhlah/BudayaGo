@@ -745,20 +745,35 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                                           SizedBox(height: 8),
                                                           // Level Required Badge
                                                           Container(
-                                                            padding: EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                              vertical: 6,
-                                                            ),
+                                                            padding:
+                                                                EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6,
+                                                                ),
                                                             decoration: BoxDecoration(
-                                                              color: AppColors.batik700.withOpacity(0.1),
-                                                              borderRadius: BorderRadius.circular(12),
+                                                              color: AppColors
+                                                                  .batik700
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    12,
+                                                                  ),
                                                             ),
                                                             child: Text(
                                                               'Terbuka di Level ${collectible['levelRequired'] ?? 2}',
-                                                              style: AppTextStyles.bodySmall.copyWith(
-                                                                color: AppColors.batik700,
-                                                                fontWeight: FontWeight.w600,
-                                                              ),
+                                                              style: AppTextStyles
+                                                                  .bodySmall
+                                                                  .copyWith(
+                                                                    color:
+                                                                        AppColors
+                                                                            .batik700,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
                                                             ),
                                                           ),
                                                           SizedBox(height: 16),
@@ -899,27 +914,40 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                                       color:
                                                           isUnlocked
                                                               ? Colors.white70
-                                                              : AppColors.background
-                                                                  .withOpacity(0.7),
+                                                              : AppColors
+                                                                  .background
+                                                                  .withOpacity(
+                                                                    0.7,
+                                                                  ),
                                                     ),
                                                     if (!isUnlocked)
                                                       Positioned(
                                                         bottom: -2,
                                                         child: Container(
-                                                          padding: EdgeInsets.symmetric(
-                                                            horizontal: 4,
-                                                            vertical: 1,
-                                                          ),
+                                                          padding:
+                                                              EdgeInsets.symmetric(
+                                                                horizontal: 4,
+                                                                vertical: 1,
+                                                              ),
                                                           decoration: BoxDecoration(
-                                                            color: AppColors.background,
-                                                            borderRadius: BorderRadius.circular(8),
+                                                            color:
+                                                                AppColors
+                                                                    .background,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
                                                           ),
                                                           child: Text(
                                                             'Lv${collectible['levelRequired'] ?? 2}',
                                                             style: TextStyle(
                                                               fontSize: 8,
-                                                              fontWeight: FontWeight.bold,
-                                                              color: AppColors.batik700,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color:
+                                                                  AppColors
+                                                                      .batik700,
                                                             ),
                                                           ),
                                                         ),

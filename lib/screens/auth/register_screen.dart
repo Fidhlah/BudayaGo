@@ -14,7 +14,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -43,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final success = await authProvider.signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text,
-      fullName: _fullNameController.text.trim(),
+      username: _usernameController.text.trim(),
     );
 
     setState(() => _isLoading = false);
@@ -120,16 +120,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: AppDimensions.spaceXL),
 
-                    // Full Name Field
+                    // Username Field
                     TextFormField(
-                      controller: _fullNameController,
-                      keyboardType: TextInputType.name,
-                      textCapitalization: TextCapitalization.words,
+                      controller: _usernameController,
+                      keyboardType: TextInputType.text,
                       style: TextStyle(color: AppColors.textPrimary),
                       decoration: InputDecoration(
-                        labelText: 'Nama Lengkap',
+                        labelText: 'Username',
                         labelStyle: TextStyle(color: AppColors.textSecondary),
-                        hintText: 'Nama Lengkap Anda',
+                        hintText: 'username_anda',
                         hintStyle: TextStyle(color: AppColors.textHint),
                         prefixIcon: Icon(
                           Icons.person,
@@ -161,10 +160,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Nama tidak boleh kosong';
+                          return 'Username tidak boleh kosong';
                         }
                         if (value.length < 3) {
-                          return 'Nama minimal 3 karakter';
+                          return 'Username minimal 3 karakter';
+                        }
+                        if (value.contains(' ')) {
+                          return 'Username tidak boleh mengandung spasi';
+                        }
+                        if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                          return 'Username hanya boleh huruf, angka, dan underscore';
                         }
                         return null;
                       },
