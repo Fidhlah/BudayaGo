@@ -8,10 +8,85 @@ import '../config/supabase_config.dart'; // Import for current user access
 class ChatService {
   static const String workerUrl = 'https://budayago.kiyahh.workers.dev/';
 
+  /// Get user's character name from Supabase
+  static Future<String> _getUserCharacterName(String userId) async {
+    try {
+      debugPrint('🎭 Getting user character name for: $userId');
+
+      // Get user's character_id
+      final userData =
+          await SupabaseConfig.client
+              .from('users')
+              .select('character_id')
+              .eq('id', userId)
+              .single();
+
+      final characterId = userData['character_id'];
+      if (characterId == null) {
+        debugPrint('⚠️ User has no character assigned, using default');
+        return 'timun mas'; // fallback default
+      }
+
+      // Get character name
+      final characterData =
+          await SupabaseConfig.client
+              .from('characters')
+              .select('name')
+              .eq('id', characterId)
+              .single();
+
+      final characterName = characterData['name'] as String;
+      debugPrint('✅ Found character: $characterName');
+      return characterName;
+    } catch (e) {
+      debugPrint('❌ Error getting character name: $e');
+      return 'timun mas'; // fallback default
+    }
+  }
+
+  /// Save individual chat messages to Supabase table
+  static Future<void> _saveChatMessages({
+    required String userId,
+    required String character,
+    required String userMessage,
+    required String modelResponse,
+  }) async {
+    try {
+      final timestamp = DateTime.now().toIso8601String();
+
+      debugPrint('💾 Saving chat messages to Supabase...');
+      debugPrint('   User ID: $userId');
+      debugPrint('   Character: $character');
+
+      // Save user message
+      await SupabaseConfig.client.from('chat_messages').insert({
+        'user_id': userId,
+        'message': userMessage,
+        'sender': 'user',
+        'session_id': userId, // Use user_id as session_id (UUID)
+        'timestamp': timestamp,
+      });
+
+      // Save model response
+      await SupabaseConfig.client.from('chat_messages').insert({
+        'user_id': userId,
+        'message': modelResponse,
+        'sender': 'bot', // Changed from 'model' to 'bot'
+        'session_id': userId, // Use user_id as session_id (UUID)
+        'timestamp': timestamp,
+      });
+
+      debugPrint('✅ Chat messages saved successfully');
+    } catch (e) {
+      debugPrint('❌ Error saving chat messages: $e');
+      // Don't rethrow to avoid breaking the chat flow
+    }
+  }
+
   // 1. Prepare the URI
   Future<String> sendMessage(
     String userMessage, {
-    String character = 'timun mas', // TODO: ubah jadi dinamis
+    String? character, // Optional, will be auto-detected from user's profile
     String? username, // Made optional, will be auto-detected from auth
   }) async {
     final uri = Uri.parse(workerUrl);
@@ -25,10 +100,19 @@ class ChatService {
     debugPrint('   User ID: ${currentUser?.id}');
     debugPrint('   User Email: ${currentUser?.email}');
 
+    // Get character name dynamically if not provided
+    final characterName =
+        character ??
+        (currentUser?.id != null
+            ? await _getUserCharacterName(currentUser!.id)
+            : 'timun mas');
+
+    debugPrint('🎭 Using character: $characterName');
+
     // 2. Prepare the JSON body structure
     final bodyJson = jsonEncode(<String, String>{
       'message': userMessage,
-      'character': character,
+      'character': characterName,
       'sessionId': sessionId,
     });
 
@@ -43,43 +127,126 @@ class ChatService {
       );
 
       // 4. Check for success status code
+      String responseMessage;
+
       if (response.statusCode == 200) {
         // Successful response from your Worker
-
-        // Decode the JSON response body
         final jsonResponse = jsonDecode(response.body);
-
-        // Ensure the key 'response' matches what the Worker sends back: { "response": "..." }
         final llmResponse = jsonResponse['response'] as String?;
 
         if (llmResponse != null) {
-          return llmResponse;
+          responseMessage = llmResponse;
         } else {
           // Handle case where 'response' field is missing or null
-          return 'Server response was malformed. The chat service did not return the expected field.';
+          responseMessage =
+              'Server response was malformed. The chat service did not return the expected field.';
         }
       } else {
         // Handle non-200 status codes (e.g., 400 Bad Request, 500 Server Error)
-        // Log the error body for debugging
         debugPrint('API Error ${response.statusCode}: ${response.body}');
 
         // Try to return a friendly error message
         try {
           final errorJson = jsonDecode(response.body);
           final errorMessage = errorJson['error'] ?? 'Unknown server error.';
-          return 'Sorry, a server error occurred (Code: ${response.statusCode}). Details: $errorMessage';
+          responseMessage =
+              'Sorry, a server error occurred (Code: ${response.statusCode}). Details: $errorMessage';
         } catch (_) {
-          return 'Sorry, a server error occurred (Code: ${response.statusCode}).';
+          responseMessage =
+              'Sorry, a server error occurred (Code: ${response.statusCode}).';
         }
       }
+
+      // Save chat messages to Supabase (both success and error responses)
+      if (currentUser?.id != null) {
+        await _saveChatMessages(
+          userId: currentUser!.id,
+          character: characterName,
+          userMessage: userMessage,
+          modelResponse: responseMessage,
+        );
+      }
+
+      return responseMessage;
     } on http.ClientException catch (e) {
       // Handle HTTP-specific errors like connection timeout, host lookup failure, or CORS
       debugPrint('Network/Client Error: $e');
-      return 'Network Error: Could not connect to the chat service. Please check your network connection.';
+      final errorMessage =
+          'Network Error: Could not connect to the chat service. Please check your network connection.';
+
+      // Save error message to database
+      if (currentUser?.id != null) {
+        await _saveChatMessages(
+          userId: currentUser!.id,
+          character: characterName,
+          userMessage: userMessage,
+          modelResponse: errorMessage,
+        );
+      }
+
+      return errorMessage;
     } catch (e) {
       // Catch all other exceptions (e.g., Json decoding error if response is invalid)
       debugPrint('General Exception: $e');
-      return 'An unexpected error occurred during processing.';
+      final errorMessage = 'An unexpected error occurred during processing.';
+
+      // Save error message to database
+      if (currentUser?.id != null) {
+        await _saveChatMessages(
+          userId: currentUser!.id,
+          character: characterName,
+          userMessage: userMessage,
+          modelResponse: errorMessage,
+        );
+      }
+
+      return errorMessage;
+    }
+  }
+
+  /// Load chat messages from Supabase table
+  static Future<List<Map<String, dynamic>>> loadChatHistory({
+    required String userId,
+    required String character,
+  }) async {
+    try {
+      debugPrint('📚 Loading chat history from Supabase...');
+      debugPrint('   User ID: $userId');
+      debugPrint('   Character: $character');
+
+      final data = await SupabaseConfig.client
+          .from('chat_messages')
+          .select('message, sender, timestamp, created_at')
+          .eq('user_id', userId)
+          .order('created_at', ascending: true);
+
+      debugPrint('✅ Loaded ${data.length} chat messages');
+      return List<Map<String, dynamic>>.from(data);
+    } catch (e) {
+      debugPrint('❌ Error loading chat history: $e');
+      return [];
+    }
+  }
+
+  /// Clear chat history for a specific user and character
+  static Future<void> clearChatHistory({
+    required String userId,
+    required String character,
+  }) async {
+    try {
+      debugPrint('🗑️ Clearing chat history...');
+      debugPrint('   User ID: $userId');
+      debugPrint('   Character: $character');
+
+      await SupabaseConfig.client
+          .from('chat_messages')
+          .delete()
+          .eq('user_id', userId);
+
+      debugPrint('✅ Chat history cleared successfully');
+    } catch (e) {
+      debugPrint('❌ Error clearing chat history: $e');
+      rethrow;
     }
   }
 }
