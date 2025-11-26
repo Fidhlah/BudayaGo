@@ -65,28 +65,64 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: screens[_currentIndex],
-      floatingActionButton: SizedBox(
-        width: 100,
-        height: 100,
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ChatScreen()),
-            );
-          },
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          shape: const CircleBorder(),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/artifacts/profile timun mas@4x.png',
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
+      floatingActionButton: Consumer<ProfileProvider>(
+        builder: (context, profileProvider, _) {
+          // Get character profile image URL from database
+          final imageUrl = profileProvider.characterProfileImageUrl;
+          final characterName = profileProvider.character?.name ?? 'Mascot';
+
+          return SizedBox(
+            width: 100,
+            height: 100,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                );
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              shape: const CircleBorder(),
+              child: ClipOval(
+                child:
+                    imageUrl != null
+                        ? Image.network(
+                          imageUrl,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback to default Timun Mas if network image fails
+                            debugPrint(
+                              '❌ Failed to load character image: $error',
+                            );
+                            return Image.asset(
+                              'assets/images/artifacts/profile timun mas@4x.png',
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                        )
+                        : Image.asset(
+                          // Fallback to default if no character assigned yet
+                          'assets/images/artifacts/profile timun mas@4x.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+              ),
+              heroTag: 'character_mascot_$characterName',
             ),
-          ),
-        ),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNavBar(

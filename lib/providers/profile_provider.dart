@@ -194,6 +194,34 @@ class ProfileProvider extends ChangeNotifier {
   int get totalXPEarned =>
       _collectibles.fold(0, (sum, item) => sum + item.xpEarned);
 
+  /// Get character profile image URL from Supabase storage
+  /// Returns URL for "profile-{character-name}.png" format
+  String? get characterProfileImageUrl {
+    if (_character == null) return null;
+
+    // Convert character name to lowercase and replace spaces with hyphens
+    // Example: "Timun Mas" -> "timun-mas"
+    final characterSlug = _character!.name.toLowerCase().replaceAll(' ', '-');
+
+    // Construct Supabase storage URL
+    // Format: profile-{character-slug}.png
+    final fileName = 'profile-$characterSlug.png';
+
+    try {
+      final url = SupabaseConfig.client.storage
+          .from(
+            'Characters',
+          ) // Bucket name is just 'Characters', not 'Buckets/Characters'
+          .getPublicUrl(fileName);
+
+      debugPrint('📸 Character profile image URL: $url');
+      return url;
+    } catch (e) {
+      debugPrint('❌ Error getting character profile image: $e');
+      return null;
+    }
+  }
+
   /// Load user profile from Supabase
   Future<void> loadProfile(String userId) async {
     _isLoading = true;

@@ -48,11 +48,14 @@ class LocationService {
 
   static Future<Map<String, dynamic>?> _getDatabaseLocation(String uuid) async {
     try {
-      final data = await SupabaseConfig.client
-          .from('cultural_partners')
-          .select('id, name, latitude, longitude, geofence_radius, description')
-          .eq('id', uuid)
-          .maybeSingle();
+      final data =
+          await SupabaseConfig.client
+              .from('cultural_partners')
+              .select(
+                'id, name, latitude, longitude, geofence_radius, description',
+              )
+              .eq('id', uuid)
+              .maybeSingle();
 
       if (data == null) {
         print('❌ UUID not found in database');
@@ -80,7 +83,9 @@ class LocationService {
     try {
       final data = await SupabaseConfig.client
           .from('cultural_partners')
-          .select('id, name, latitude, longitude, geofence_radius, description, city, province')
+          .select(
+            'id, name, latitude, longitude, geofence_radius, description, city, province',
+          )
           .order('province')
           .order('city')
           .order('name');
@@ -91,16 +96,18 @@ class LocationService {
       }
 
       return List<Map<String, dynamic>>.from(
-        data.map((item) => {
-          'uuid': item['id'],
-          'name': item['name'],
-          'latitude': item['latitude'],
-          'longitude': item['longitude'],
-          'geofence_radius': item['geofence_radius'] ?? 100,
-          'description': item['description'] ?? '',
-          'city': item['city'] ?? '',
-          'province': item['province'] ?? '',
-        }),
+        data.map(
+          (item) => {
+            'uuid': item['id'],
+            'name': item['name'],
+            'latitude': item['latitude'],
+            'longitude': item['longitude'],
+            'geofence_radius': item['geofence_radius'] ?? 100,
+            'description': item['description'] ?? '',
+            'city': item['city'] ?? '',
+            'province': item['province'] ?? '',
+          },
+        ),
       );
     } catch (e) {
       print('❌ Database error: $e');
@@ -115,7 +122,7 @@ class LocationService {
 
   static Future<Map<String, dynamic>?> _getLocalLocation(String uuid) async {
     final localData = TestLocations.getLocationByUUID(uuid);
-    
+
     if (localData == null) {
       print('❌ UUID not found in test_locations.dart');
       print('📋 Available UUIDs:');
@@ -140,7 +147,7 @@ class LocationService {
 
   static Future<List<Map<String, dynamic>>> _getAllLocalLocations() async {
     final List<Map<String, dynamic>> results = [];
-    
+
     for (var entry in TestLocations.locations.entries) {
       results.add({
         'uuid': entry.key,
@@ -151,7 +158,7 @@ class LocationService {
         'description': entry.value['description'],
       });
     }
-    
+
     return results;
   }
 
@@ -177,14 +184,14 @@ class LocationService {
     print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     print('📋 DEBUG: ALL LOCATIONS');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
+
     final locations = await getAllLocations();
-    
+
     if (locations.isEmpty) {
       print('❌ No locations found');
     } else {
       print('✅ Found ${locations.length} locations:\n');
-      
+
       for (var i = 0; i < locations.length; i++) {
         final loc = locations[i];
         print('${i + 1}. ${loc['name']}');
@@ -194,7 +201,7 @@ class LocationService {
         print('   Desc: ${loc['description']}\n');
       }
     }
-    
+
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   }
 }
