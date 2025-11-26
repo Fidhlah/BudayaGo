@@ -330,21 +330,30 @@ class _KaryaScreenState extends State<KaryaScreen> {
                           ),
                           if (_searchQuery.isEmpty) ...[
                             const SizedBox(height: AppDimensions.spaceL),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                // Navigate to home and switch to profile tab
-                                Navigator.of(
-                                  context,
-                                ).popUntil((route) => route.isFirst);
-                              },
-                              icon: const Icon(Icons.upload),
-                              label: const Text('Upgrade & Upload Karya'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.batik700,
-                                foregroundColor: AppColors.background,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppDimensions.paddingL,
-                                  vertical: AppDimensions.paddingM,
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: AppColors.skyGradient,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  // Navigate to home and switch to profile tab
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                },
+                                icon: const Icon(Icons.upload),
+                                label: const Text('Upgrade & Upload Karya'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: AppColors.background,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppDimensions.paddingL,
+                                    vertical: AppDimensions.paddingM,
+                                  ),
                                 ),
                               ),
                             ),

@@ -434,19 +434,28 @@ class _UploadKaryaScreenState extends State<UploadKaryaScreen> {
               SizedBox(height: AppDimensions.spaceXL),
 
               // Submit Button
-              ElevatedButton(
-                onPressed: _submitKarya,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.batik700,
-                  foregroundColor: AppColors.background,
-                  padding: EdgeInsets.symmetric(
-                    vertical: AppDimensions.paddingM,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                  ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: AppColors.skyGradient),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                 ),
-                child: Text('Upload Karya', style: AppTextStyles.button),
+                child: ElevatedButton(
+                  onPressed: _submitKarya,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: AppColors.background,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppDimensions.paddingM,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusM,
+                      ),
+                    ),
+                  ),
+                  child: Text('Upload Karya', style: AppTextStyles.button),
+                ),
               ),
             ],
           ),
