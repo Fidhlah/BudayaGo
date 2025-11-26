@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/message_model.dart';
@@ -90,9 +91,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty || _isLoading) return;
 
-    // 1. Add user message and update UI
+    // 1. Add user message and typing indicator
     setState(() {
       _messages.insert(0, Message(text: text, sender: MessageSender.user));
+      _messages.insert(
+        0,
+        Message(text: '...', sender: MessageSender.gemini),
+      ); // Typing indicator
       _isLoading = true;
     });
     _controller.clear();
@@ -103,8 +108,9 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final response = await _chatService.sendMessage(text);
 
-      // 3. Add Gemini response and update UI
+      // 3. Replace typing indicator with actual response
       setState(() {
+        _messages.removeAt(0); // Remove typing indicator
         _messages.insert(
           0,
           Message(text: response, sender: MessageSender.gemini),
@@ -113,6 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {
       // Handle errors caught in the service
       setState(() {
+        _messages.removeAt(0); // Remove typing indicator
         _messages.insert(
           0,
           Message(text: 'System Error: $e', sender: MessageSender.gemini),
@@ -144,6 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildMessage(Message message) {
     // Determine color and alignment based on sender
     final isUser = message.sender == MessageSender.user;
+    final isTyping = !isUser && message.text == '...';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -162,11 +170,51 @@ class _ChatScreenState extends State<ChatScreen> {
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
-          child: Text(
-            message.text,
-            style: TextStyle(color: isUser ? Colors.white : Colors.black87),
-          ),
+          child:
+              isTyping
+                  ? _buildTypingIndicator()
+                  : Text(
+                    message.text,
+                    style: TextStyle(
+                      color: isUser ? Colors.white : Colors.black87,
+                    ),
+                  ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator() {
+    return SizedBox(
+      width: 60,
+      height: 20,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(3, (index) {
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 1500),
+            builder: (context, value, child) {
+              // Create a wave effect by delaying each dot
+              final delay = index * 0.3;
+              final animationValue = (value - delay).clamp(0.0, 1.0);
+              final opacity = (math.sin(animationValue * math.pi * 2) + 1) / 2;
+
+              return AnimatedOpacity(
+                opacity: opacity * 0.6 + 0.4, // Min opacity 0.4, max 1.0
+                duration: const Duration(milliseconds: 100),
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            },
+          );
+        }),
       ),
     );
   }
@@ -205,8 +253,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
           ),
 
-          // Loading Indicator
-          if (_isLoading) const LinearProgressIndicator(),
+          // Loading indicator removed - using typing indicator in messages instead
 
           // Input Field
           SafeArea(
