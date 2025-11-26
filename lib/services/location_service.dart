@@ -1,13 +1,22 @@
+import '../config/supabase_config.dart';
 import '../config/test_locations.dart';
 
 /// Service untuk fetch location data
-/// Full LOCAL mode - menggunakan test_locations.dart
+/// DATABASE mode with LOCAL fallback
 class LocationService {
+  // Toggle between DATABASE and LOCAL mode
+  static const bool _useDatabaseMode = true;
+
   /// Get location by UUID
   /// Returns: Map dengan keys: name, latitude, longitude, geofence_radius, description
   static Future<Map<String, dynamic>?> getLocationByUUID(String uuid) async {
-    print('📍 [LOCAL MODE] Looking up UUID: "$uuid"');
-    return _getLocalLocation(uuid);
+    if (_useDatabaseMode) {
+      print('📍 [DATABASE MODE] Looking up UUID: "$uuid"');
+      return _getDatabaseLocation(uuid);
+    } else {
+      print('📍 [LOCAL MODE] Looking up UUID: "$uuid"');
+      return _getLocalLocation(uuid);
+    }
   }
 
   /// Check if location exists
@@ -18,17 +27,90 @@ class LocationService {
 
   /// Get all locations
   static Future<List<Map<String, dynamic>>> getAllLocations() async {
-    print('📍 [LOCAL MODE] Getting all locations');
-    return _getAllLocalLocations();
+    if (_useDatabaseMode) {
+      print('📍 [DATABASE MODE] Getting all locations');
+      return _getAllDatabaseLocations();
+    } else {
+      print('📍 [LOCAL MODE] Getting all locations');
+      return _getAllLocalLocations();
+    }
   }
 
   /// Get location count
   static Future<int> getLocationCount() async {
-    return TestLocations.locations.length;
+    final locations = await getAllLocations();
+    return locations.length;
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // PRIVATE METHODS - LOCAL DATA
+  // PRIVATE METHODS - DATABASE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static Future<Map<String, dynamic>?> _getDatabaseLocation(String uuid) async {
+    try {
+      final data = await SupabaseConfig.client
+          .from('cultural_partners')
+          .select('id, name, latitude, longitude, geofence_radius, description')
+          .eq('id', uuid)
+          .maybeSingle();
+
+      if (data == null) {
+        print('❌ UUID not found in database');
+        print('   Falling back to local data...');
+        return _getLocalLocation(uuid);
+      }
+
+      print('✅ Found in database: ${data['name']}');
+      return {
+        'uuid': data['id'],
+        'name': data['name'],
+        'latitude': data['latitude'],
+        'longitude': data['longitude'],
+        'geofence_radius': data['geofence_radius'] ?? 100,
+        'description': data['description'] ?? '',
+      };
+    } catch (e) {
+      print('❌ Database error: $e');
+      print('   Falling back to local data...');
+      return _getLocalLocation(uuid);
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> _getAllDatabaseLocations() async {
+    try {
+      final data = await SupabaseConfig.client
+          .from('cultural_partners')
+          .select('id, name, latitude, longitude, geofence_radius, description, city, province')
+          .order('province')
+          .order('city')
+          .order('name');
+
+      if (data.isEmpty) {
+        print('⚠️ No locations in database, using local data');
+        return _getAllLocalLocations();
+      }
+
+      return List<Map<String, dynamic>>.from(
+        data.map((item) => {
+          'uuid': item['id'],
+          'name': item['name'],
+          'latitude': item['latitude'],
+          'longitude': item['longitude'],
+          'geofence_radius': item['geofence_radius'] ?? 100,
+          'description': item['description'] ?? '',
+          'city': item['city'] ?? '',
+          'province': item['province'] ?? '',
+        }),
+      );
+    } catch (e) {
+      print('❌ Database error: $e');
+      print('   Falling back to local data...');
+      return _getAllLocalLocations();
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // PRIVATE METHODS - LOCAL DATA (FALLBACK)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static Future<Map<String, dynamic>?> _getLocalLocation(String uuid) async {
@@ -82,8 +164,11 @@ class LocationService {
     print('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     print('📍 LOCATION SERVICE');
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    print('Mode: 📍 LOCAL (test_locations.dart)');
-    print('Total Locations: ${TestLocations.locations.length}');
+    if (_useDatabaseMode) {
+      print('Mode: 💾 DATABASE (with LOCAL fallback)');
+    } else {
+      print('Mode: 📍 LOCAL (test_locations.dart)');
+    }
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   }
 
