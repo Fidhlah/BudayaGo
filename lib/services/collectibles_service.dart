@@ -11,16 +11,16 @@ class CollectiblesService {
       debugPrint('🎁 Loading user collectibles from Supabase...');
       debugPrint('   User ID: $userId');
 
-      // Get user's character first
+      // Get user's character and level
       final userData =
           await SupabaseConfig.client
               .from('users')
-              .select('character_id, total_exp')
+              .select('character_id, level')
               .eq('id', userId)
               .single();
 
       final characterId = userData['character_id'];
-      final userXP = userData['total_exp'];
+      final userLevel = userData['level'] as int? ?? 1;
 
       if (characterId == null) {
         debugPrint('⚠️ User has no character assigned yet');
@@ -28,7 +28,7 @@ class CollectiblesService {
       }
 
       debugPrint('   Character ID: $characterId');
-      debugPrint('   User XP: $userXP');
+      debugPrint('   User Level: $userLevel');
 
       // Load collectibles for this character with unlock status
       final collectiblesData = await SupabaseConfig.client
@@ -38,7 +38,7 @@ class CollectiblesService {
           name,
           description,
           image_url,
-          exp_required,
+          level_required,
           order_number,
           user_collectibles!left (
             is_unlocked,
@@ -67,12 +67,14 @@ class CollectiblesService {
             unlockData.isNotEmpty &&
             unlockData[0]['is_unlocked'] == true;
 
+        final levelRequired = item['level_required'] as int? ?? (item['order_number'] as int) * 2;
+
         collectibles.add({
           'id': item['id'],
           'name': item['name'],
           'description': item['description'] ?? '',
           'imageUrl': item['image_url'] ?? '',
-          'xpEarned': item['exp_required'],
+          'levelRequired': levelRequired,
           'isUnlocked': isUnlocked,
           'unlockedAt':
               unlockData != null && unlockData.isNotEmpty
@@ -89,7 +91,7 @@ class CollectiblesService {
       );
 
       debugPrint(
-        '📦 After sorting: ${collectibles.map((c) => '${c['name']}(${c['orderNumber']})').join(', ')}',
+        '📦 After sorting: ${collectibles.map((c) => '${c['name']}(${c['orderNumber']}, Lv${c['levelRequired']})').join(', ')}',
       );
 
       return collectibles;

@@ -132,7 +132,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       );
       for (var i = 0; i < collectiblesData.length; i++) {
         debugPrint(
-          '  [$i] ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['orderNumber']}, unlocked: ${collectiblesData[i]['isUnlocked']}',
+          '  [$i] ${collectiblesData[i]['name']} - order: ${collectiblesData[i]['orderNumber']}, level: ${collectiblesData[i]['levelRequired']}, unlocked: ${collectiblesData[i]['isUnlocked']}',
         );
       }
 
@@ -152,11 +152,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   'name': item['name'],
                   'description': item['description'] ?? '',
                   'imageUrl': item['imageUrl'],
-                  'xpEarned': item['xpEarned'] ?? 0,
+                  'levelRequired': item['levelRequired'] ?? 2,
                   'unlocked': item['isUnlocked'] == true,
                   'category': 'Artifact',
                   'location': 'Indonesia',
-                  'rarity': _getRarityFromXP(item['xpEarned'] ?? 0),
+                  'rarity': _getRarityFromLevel(item['levelRequired'] ?? 2),
                 };
               }).toList();
 
@@ -257,17 +257,17 @@ class _NewProfileScreenState extends State<NewProfileScreen>
     }
   }
 
-  String _getRarityFromXP(int xp) {
-    // Match new EASIER level system:
-    // Level 2 (100 XP) = Common
-    // Level 4 (600 XP) = Uncommon
-    // Level 6 (1,500 XP) = Rare
-    // Level 8 (3,600 XP) = Epic
-    // Level 10 (4,500 XP) = Legendary
-    if (xp >= 4500) return 'Legendary';
-    if (xp >= 3600) return 'Epic';
-    if (xp >= 1500) return 'Rare';
-    if (xp >= 600) return 'Uncommon';
+  String _getRarityFromLevel(int level) {
+    // Rarity based on unlock level:
+    // Level 2 = Common
+    // Level 4 = Uncommon
+    // Level 6 = Rare
+    // Level 8 = Epic
+    // Level 10 = Legendary
+    if (level >= 10) return 'Legendary';
+    if (level >= 8) return 'Epic';
+    if (level >= 6) return 'Rare';
+    if (level >= 4) return 'Uncommon';
     return 'Common';
   }
 
@@ -742,6 +742,25 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                                                 TextAlign
                                                                     .center,
                                                           ),
+                                                          SizedBox(height: 8),
+                                                          // Level Required Badge
+                                                          Container(
+                                                            padding: EdgeInsets.symmetric(
+                                                              horizontal: 12,
+                                                              vertical: 6,
+                                                            ),
+                                                            decoration: BoxDecoration(
+                                                              color: AppColors.batik700.withOpacity(0.1),
+                                                              borderRadius: BorderRadius.circular(12),
+                                                            ),
+                                                            child: Text(
+                                                              'Terbuka di Level ${collectible['levelRequired'] ?? 2}',
+                                                              style: AppTextStyles.bodySmall.copyWith(
+                                                                color: AppColors.batik700,
+                                                                fontWeight: FontWeight.w600,
+                                                              ),
+                                                            ),
+                                                          ),
                                                           SizedBox(height: 16),
                                                           // Description
                                                           Text(
@@ -869,16 +888,43 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                                     },
                                                   ),
                                                 )
-                                                : Icon(
-                                                  isUnlocked
-                                                      ? Icons.broken_image
-                                                      : Icons.lock,
-                                                  size: 24,
-                                                  color:
+                                                : Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Icon(
                                                       isUnlocked
-                                                          ? Colors.white70
-                                                          : AppColors.background
-                                                              .withOpacity(0.7),
+                                                          ? Icons.broken_image
+                                                          : Icons.lock,
+                                                      size: 24,
+                                                      color:
+                                                          isUnlocked
+                                                              ? Colors.white70
+                                                              : AppColors.background
+                                                                  .withOpacity(0.7),
+                                                    ),
+                                                    if (!isUnlocked)
+                                                      Positioned(
+                                                        bottom: -2,
+                                                        child: Container(
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: 4,
+                                                            vertical: 1,
+                                                          ),
+                                                          decoration: BoxDecoration(
+                                                            color: AppColors.background,
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                          child: Text(
+                                                            'Lv${collectible['levelRequired'] ?? 2}',
+                                                            style: TextStyle(
+                                                              fontSize: 8,
+                                                              fontWeight: FontWeight.bold,
+                                                              color: AppColors.batik700,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                       ),
                                     ),
