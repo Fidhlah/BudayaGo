@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../config/supabase_config.dart';
 import '../services/collectibles_service.dart';
+import '../services/visit_service.dart';
 
 class UserProfile {
   final String id;
@@ -177,6 +178,7 @@ class ProfileProvider extends ChangeNotifier {
   UserProfile? _profile;
   Character? _character;
   List<Collectible> _collectibles = [];
+  List<Map<String, dynamic>> _visitedLocations = [];
   bool _isLoading = false;
   String? _error;
 
@@ -184,6 +186,8 @@ class ProfileProvider extends ChangeNotifier {
   UserProfile? get profile => _profile;
   Character? get character => _character;
   List<Collectible> get collectibles => List.unmodifiable(_collectibles);
+  List<Map<String, dynamic>> get visitedLocations =>
+      List.unmodifiable(_visitedLocations);
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasProfile => _profile != null;
@@ -433,6 +437,49 @@ class ProfileProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'Failed to add collectible: $e';
       debugPrint('❌ ProfileProvider.addCollectible error: $e');
+      notifyListeners();
+    }
+  }
+
+  /// Load visited locations from database
+  Future<void> loadVisitedLocations(String userId) async {
+    try {
+      final visits = await VisitService.getUserVisits(userId);
+
+      _visitedLocations =
+          visits.map((visit) {
+            final partner = visit['cultural_partners'] as Map<String, dynamic>?;
+
+            final locationData = {
+              'id': visit['id'],
+              'partner_id': visit['partner_id'],
+              'user_id': visit['user_id'],
+              'visited_at': visit['visited_at'],
+              'visitedAt': DateTime.parse(
+                visit['visited_at'] as String,
+              ), // Parse for UI
+              'exp_gained': visit['exp_gained'],
+              'expEarned': visit['exp_gained'], // old camelCase
+              'expGained': visit['exp_gained'], // correct camelCase for UI
+              'name': partner?['name'] ?? 'Unknown Location', // for UI
+              'location_name': partner?['name'] ?? 'Unknown Location',
+              'locationName':
+                  partner?['name'] ?? 'Unknown Location', // camelCase for UI
+              'city': partner?['city'] ?? '',
+              'province': partner?['province'] ?? '',
+              'description':
+                  partner != null
+                      ? '${partner['city']}, ${partner['province']}'
+                      : 'No details available',
+            };
+
+            return locationData;
+          }).toList();
+
+      notifyListeners();
+    } catch (e, stackTrace) {
+      _error = 'Failed to load visited locations: $e';
+      debugPrint('Error loading visited locations: $e');
       notifyListeners();
     }
   }

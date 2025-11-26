@@ -11,11 +11,6 @@ class VisitService {
     String verificationMethod = 'qr_scan',
   }) async {
     try {
-      debugPrint('📍 Recording visit to Supabase...');
-      debugPrint('   User ID: $userId');
-      debugPrint('   Partner ID: $partnerId');
-      debugPrint('   EXP: $expGained');
-
       // Call database function (handles visit + XP + auto-unlock collectibles)
       final result =
           await SupabaseConfig.client
@@ -30,23 +25,33 @@ class VisitService {
               )
               .single();
 
-      debugPrint('✅ Visit recorded successfully!');
-      debugPrint('   New Total EXP: ${result['new_total_exp']}');
-      debugPrint('   New Level: ${result['new_level']}');
-      debugPrint(
-        '   Unlocked Collectibles: ${result['unlocked_collectibles']}',
-      );
+      // Check if visit was successful or duplicate
+      final success = result['success'] as bool;
+
+      if (!success) {
+        // Return with success=false so UI can show appropriate message
+        return {
+          'success': false,
+          'message': result['message'],
+          'newTotalExp': 0,
+          'newLevel': 0,
+          'unlockedCollectibles': 0,
+          'expGained': 0,
+          'isDuplicate': true,
+        };
+      }
 
       return {
-        'success': result['success'],
+        'success': true,
         'message': result['message'],
         'newTotalExp': result['new_total_exp'],
         'newLevel': result['new_level'],
         'unlockedCollectibles': result['unlocked_collectibles'],
         'expGained': expGained,
+        'isDuplicate': false,
       };
-    } catch (e) {
-      debugPrint('❌ Error recording visit: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Error recording visit: $e');
       rethrow;
     }
   }
@@ -54,12 +59,12 @@ class VisitService {
   /// Get user's visit history
   static Future<List<Map<String, dynamic>>> getUserVisits(String userId) async {
     try {
-      debugPrint('📜 Loading user visit history...');
-
       final visitsData = await SupabaseConfig.client
           .from('user_visits')
           .select('''
           id,
+          partner_id,
+          user_id,
           visited_at,
           exp_gained,
           verification_method,
@@ -74,11 +79,9 @@ class VisitService {
           .eq('user_id', userId)
           .order('visited_at', ascending: false);
 
-      debugPrint('✅ Loaded ${visitsData.length} visits');
-
       return List<Map<String, dynamic>>.from(visitsData);
-    } catch (e) {
-      debugPrint('❌ Error loading visits: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Error loading visits: $e');
       return [];
     }
   }
@@ -112,13 +115,13 @@ class VisitService {
     try {
       final visitsData = await SupabaseConfig.client
           .from('user_visits')
-          .select('id, visited_at, exp_gained')
+          .select('id, visited_at, exp_earned')
           .eq('user_id', userId);
 
       final totalVisits = visitsData.length;
       final totalExpFromVisits = visitsData.fold<int>(
         0,
-        (sum, visit) => sum + (visit['exp_gained'] as int? ?? 0),
+        (sum, visit) => sum + (visit['exp_earned'] as int? ?? 0),
       );
 
       // Get unique locations count

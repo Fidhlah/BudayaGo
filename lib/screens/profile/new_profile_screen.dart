@@ -31,7 +31,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   TabController? _tabController;
   List<Map<String, dynamic>>? _collectibles;
   bool _isLoadingCollectibles = true;
-  List<Map<String, dynamic>>? _visitedLocations;
   List<Map<String, dynamic>>? _achievements;
   bool _isLoadingAchievements = true;
 
@@ -70,7 +69,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
 
     // Explicitly initialize lists for Flutter Web compatibility
     _collectibles = <Map<String, dynamic>>[];
-    _visitedLocations = <Map<String, dynamic>>[];
     _achievements = <Map<String, dynamic>>[];
 
     // Load data after build is complete
@@ -79,6 +77,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       _initializeTabController();
     });
   }
+
+  // REMOVED didChangeDependencies - causing infinite loop
+  // Visited locations will be loaded after QR scan in home_screen.dart
 
   void _initializeTabController() {
     final profileProvider = Provider.of<ProfileProvider>(
@@ -138,11 +139,11 @@ class _NewProfileScreenState extends State<NewProfileScreen>
       // Load achievements from database
       await _loadAchievements(userId);
 
+      // Load visited locations from ProfileProvider (which loads from database)
+      await profileProvider.loadVisitedLocations(userId);
+
       if (mounted) {
         setState(() {
-          // TODO: Load visited locations from user_visits table
-          _visitedLocations = [];
-
           // Use collectibles from service with all information
           _collectibles =
               collectiblesData.map((item) {
@@ -192,10 +193,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
               .toSet();
 
       // Get current user stats for dynamic checking
-      final profileProvider = Provider.of<ProfileProvider>(
-        context,
-        listen: false,
-      );
       final homeProvider = Provider.of<HomeProvider>(context, listen: false);
 
       final currentLevel = homeProvider.userLevel;
@@ -1005,289 +1002,335 @@ class _NewProfileScreenState extends State<NewProfileScreen>
   }
 
   Widget _buildProgressTab() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(AppDimensions.paddingM),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Visited Locations Section
-          Text(
-            'Tempat yang Sudah Dikunjungi',
-            style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-          ),
-          SizedBox(height: AppDimensions.spaceM),
+    return Consumer<ProfileProvider>(
+      builder: (context, profileProvider, _) {
+        final visitedLocations = profileProvider.visitedLocations;
 
-          if ((_visitedLocations?.length ?? 0) == 0)
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(AppDimensions.paddingL),
-              decoration: BoxDecoration(
-                color: AppColors.grey50,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                border: Border.all(color: AppColors.grey200),
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(AppDimensions.paddingM),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Visited Locations Section
+              Text(
+                'Tempat yang Sudah Dikunjungi',
+                style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
               ),
-              child: Column(
-                children: [
-                  Icon(Icons.location_off, size: 48, color: AppColors.grey300),
-                  SizedBox(height: AppDimensions.spaceS),
-                  Text(
-                    'Belum ada tempat yang dikunjungi',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+              SizedBox(height: AppDimensions.spaceM),
 
-          if ((_visitedLocations?.length ?? 0) > 0)
-            ...(_visitedLocations ?? []).map((location) {
-              final visitedAt = location['visitedAt'] as DateTime;
-              final daysAgo = DateTime.now().difference(visitedAt).inDays;
-
-              return Container(
-                width: double.infinity,
-                margin: EdgeInsets.only(bottom: AppDimensions.spaceM),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                  border: Border.all(color: AppColors.batik200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(AppDimensions.paddingM),
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: AppColors.orangePinkGradient,
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusM,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.location_on,
-                      color: AppColors.background,
-                      size: 28,
-                    ),
+              if (visitedLocations.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(AppDimensions.paddingL),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey50,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                    border: Border.all(color: AppColors.grey200),
                   ),
-                  title: Text(
-                    location['name'] ?? 'Unknown Location',
-                    style: AppTextStyles.labelLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
                     children: [
-                      SizedBox(height: AppDimensions.spaceXS),
+                      Icon(
+                        Icons.location_off,
+                        size: 48,
+                        color: AppColors.grey300,
+                      ),
+                      SizedBox(height: AppDimensions.spaceS),
                       Text(
-                        location['description'] ?? '',
-                        style: AppTextStyles.bodySmall.copyWith(
+                        'Belum ada tempat yang dikunjungi',
+                        style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
                       SizedBox(height: AppDimensions.spaceXS),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: AppColors.textTertiary,
+                      Text(
+                        'Scan QR code di lokasi wisata budaya untuk mulai mengoleksi!',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+              if (visitedLocations.isNotEmpty)
+                ...visitedLocations.map((location) {
+                  final visitedAt = location['visitedAt'] as DateTime;
+                  final daysAgo = DateTime.now().difference(visitedAt).inDays;
+
+                  return Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.only(bottom: AppDimensions.spaceM),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusL,
+                      ),
+                      border: Border.all(color: AppColors.batik200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(AppDimensions.paddingM),
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: AppColors.orangePinkGradient,
                           ),
-                          const SizedBox(width: 4),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusM,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.location_on,
+                          color: AppColors.background,
+                          size: 28,
+                        ),
+                      ),
+                      title: Text(
+                        location['name'] ?? 'Unknown Location',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: AppDimensions.spaceXS),
                           Text(
-                            daysAgo == 0
-                                ? 'Hari ini'
-                                : daysAgo == 1
-                                ? '1 hari yang lalu'
-                                : '$daysAgo hari yang lalu',
+                            location['description'] ?? '',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textTertiary,
-                              fontSize: 11,
+                              color: AppColors.textSecondary,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: AppDimensions.spaceXS),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 14,
+                                color: AppColors.textTertiary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                daysAgo == 0
+                                    ? 'Hari ini'
+                                    : daysAgo == 1
+                                    ? '1 hari yang lalu'
+                                    : '$daysAgo hari yang lalu',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.textTertiary,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Icon(
+                                Icons.star,
+                                size: 14,
+                                color: AppColors.warning,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '+${location['expGained']} XP',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.warning,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  trailing: Icon(
-                    Icons.check_circle,
-                    color: AppColors.success,
-                    size: 24,
+                      trailing: Icon(
+                        Icons.check_circle,
+                        color: AppColors.success,
+                        size: 24,
+                      ),
+                    ),
+                  );
+                }).toList(),
+
+              // Achievements Section
+              SizedBox(height: AppDimensions.spaceXL),
+              Text(
+                'Pencapaian',
+                style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
+              ),
+              SizedBox(height: AppDimensions.spaceM),
+
+              // Loading state for achievements
+              if (_isLoadingAchievements)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-              );
-            }).toList(),
 
-          // Achievements Section
-          SizedBox(height: AppDimensions.spaceXL),
-          Text(
-            'Pencapaian',
-            style: AppTextStyles.h5.copyWith(color: AppColors.textPrimary),
-          ),
-          SizedBox(height: AppDimensions.spaceM),
-
-          // Loading state for achievements
-          if (_isLoadingAchievements)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(),
-              ),
-            ),
-
-          // Empty state for achievements
-          if (!_isLoadingAchievements && (_achievements?.isEmpty ?? true))
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(AppDimensions.paddingL),
-              decoration: BoxDecoration(
-                color: AppColors.grey50,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                border: Border.all(color: AppColors.grey200),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.emoji_events, size: 48, color: AppColors.grey300),
-                  SizedBox(height: AppDimensions.spaceS),
-                  Text(
-                    'Belum ada pencapaian tersedia',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-          // Build achievement widgets as grid from database
-          if (!_isLoadingAchievements && (_achievements?.isNotEmpty ?? false))
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: _achievements!.length,
-              itemBuilder: (context, index) {
-                final achievement = _achievements![index];
-                final unlocked = achievement['unlocked'] as bool? ?? false;
-                final name = achievement['name'] as String? ?? 'Achievement';
-                final description = achievement['description'] as String? ?? '';
-                final expReward = achievement['exp_reward'] as int? ?? 0;
-
-                // Map achievement icons based on name or type
-                IconData achievementIcon = _getAchievementIcon(name);
-
-                return Container(
-                  padding: EdgeInsets.all(AppDimensions.paddingS),
+              // Empty state for achievements
+              if (!_isLoadingAchievements && (_achievements?.isEmpty ?? true))
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(AppDimensions.paddingL),
                   decoration: BoxDecoration(
-                    color: unlocked ? AppColors.batik50 : AppColors.grey50,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusM),
-                    border: Border.all(
-                      color: unlocked ? AppColors.batik300 : AppColors.grey200,
-                    ),
+                    color: AppColors.grey50,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+                    border: Border.all(color: AppColors.grey200),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color:
-                              unlocked ? AppColors.batik700 : AppColors.grey300,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          achievementIcon,
-                          color: AppColors.background,
-                          size: 26,
-                        ),
+                      Icon(
+                        Icons.emoji_events,
+                        size: 48,
+                        color: AppColors.grey300,
                       ),
-                      SizedBox(height: 6),
-                      Flexible(
-                        child: Text(
-                          name,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color:
-                                unlocked
-                                    ? AppColors.textPrimary
-                                    : AppColors.textTertiary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      SizedBox(height: AppDimensions.spaceS),
+                      Text(
+                        'Belum ada pencapaian tersedia',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 4),
-                      Flexible(
-                        child: Text(
-                          description,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color:
-                                unlocked
-                                    ? AppColors.textSecondary
-                                    : AppColors.textTertiary,
-                            fontSize: 9,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (unlocked) ...[
-                        SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: AppColors.success,
-                              size: 12,
-                            ),
-                            SizedBox(width: 2),
-                            Text(
-                              '+$expReward XP',
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.success,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ],
                   ),
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
+                ),
 
-  // Helper method to get icon based on achievement name
+              // Build achievement widgets as grid from database
+              if (!_isLoadingAchievements &&
+                  (_achievements?.isNotEmpty ?? false))
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: _achievements!.length,
+                  itemBuilder: (context, index) {
+                    final achievement = _achievements![index];
+                    final unlocked = achievement['unlocked'] as bool? ?? false;
+                    final name =
+                        achievement['name'] as String? ?? 'Achievement';
+                    final description =
+                        achievement['description'] as String? ?? '';
+                    final expReward = achievement['exp_reward'] as int? ?? 0;
+
+                    // Map achievement icons based on name or type
+                    IconData achievementIcon = _getAchievementIcon(name);
+
+                    return Container(
+                      padding: EdgeInsets.all(AppDimensions.paddingS),
+                      decoration: BoxDecoration(
+                        color: unlocked ? AppColors.batik50 : AppColors.grey50,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                        border: Border.all(
+                          color:
+                              unlocked ? AppColors.batik300 : AppColors.grey200,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color:
+                                  unlocked
+                                      ? AppColors.batik700
+                                      : AppColors.grey300,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              achievementIcon,
+                              color: AppColors.background,
+                              size: 26,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color:
+                                    unlocked
+                                        ? AppColors.textPrimary
+                                        : AppColors.textTertiary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Flexible(
+                            child: Text(
+                              description,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color:
+                                    unlocked
+                                        ? AppColors.textSecondary
+                                        : AppColors.textTertiary,
+                                fontSize: 9,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (unlocked) ...[
+                            SizedBox(height: 2),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle,
+                                  color: AppColors.success,
+                                  size: 12,
+                                ),
+                                SizedBox(width: 2),
+                                Text(
+                                  '+$expReward XP',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.success,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  } // Helper method to get icon based on achievement name
+
   IconData _getAchievementIcon(String achievementName) {
     final nameLower = achievementName.toLowerCase();
 
