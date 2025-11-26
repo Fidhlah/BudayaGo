@@ -5,6 +5,7 @@ import '../../services/chat_service.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../providers/profile_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../config/supabase_config.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -19,6 +20,64 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<Message> _messages = [];
   bool _isLoading = false;
+  bool _isLoadingHistory = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChatHistory();
+  }
+
+  /// Load chat history from database
+  Future<void> _loadChatHistory() async {
+    final currentUser = SupabaseConfig.currentUser;
+    if (currentUser == null) {
+      setState(() => _isLoadingHistory = false);
+      return;
+    }
+
+    try {
+      final profileProvider = Provider.of<ProfileProvider>(
+        context,
+        listen: false,
+      );
+      final character = profileProvider.character;
+
+      if (character == null) {
+        setState(() => _isLoadingHistory = false);
+        return;
+      }
+
+      final chatHistory = await ChatService.loadChatHistory(
+        userId: currentUser.id,
+        character: character.name,
+      );
+
+      // Convert database records to Message objects
+      final List<Message> loadedMessages = [];
+      for (final record in chatHistory) {
+        final sender =
+            record['sender'] == 'user'
+                ? MessageSender.user
+                : MessageSender
+                    .gemini; // handles 'bot', 'model', or any non-'user' value
+
+        loadedMessages.add(Message(text: record['message'], sender: sender));
+      }
+
+      // Reverse to show newest first (UI shows reversed list)
+      setState(() {
+        _messages.clear();
+        _messages.addAll(loadedMessages.reversed);
+        _isLoadingHistory = false;
+      });
+
+      debugPrint('✅ Loaded ${loadedMessages.length} messages from history');
+    } catch (e) {
+      debugPrint('❌ Error loading chat history: $e');
+      setState(() => _isLoadingHistory = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -114,8 +173,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final profile = Provider.of<ProfileProvider>(context).profile;
-    final mascotName = profile?.mascot ?? 'Maskot';
+    final character = Provider.of<ProfileProvider>(context).character;
+    final mascotName = character?.name ?? '???';
 
     return Scaffold(
       backgroundColor: AppColors.orange50,
@@ -124,14 +183,26 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           // Message List (Reversed to show newest at the bottom)
           Expanded(
-            child: ListView.builder(
-              reverse: true, // New messages appear at the bottom
-              controller: _scrollController,
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return _buildMessage(_messages[index]);
-              },
-            ),
+            child:
+                _isLoadingHistory
+                    ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Memuat riwayat chat...'),
+                        ],
+                      ),
+                    )
+                    : ListView.builder(
+                      reverse: true, // New messages appear at the bottom
+                      controller: _scrollController,
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        return _buildMessage(_messages[index]);
+                      },
+                    ),
           ),
 
           // Loading Indicator
