@@ -278,11 +278,9 @@ class _ChatScreenState extends State<ChatScreen> {
           child:
               isTyping
                   ? _buildTypingIndicator()
-                  : Text(
+                  : _buildFormattedText(
                     message.text,
-                    style: TextStyle(
-                      color: isUser ? Colors.white : Colors.black87,
-                    ),
+                    isUser ? Colors.white : Colors.black87,
                   ),
         ),
       ),
@@ -322,6 +320,57 @@ class _ChatScreenState extends State<ChatScreen> {
         }),
       ),
     );
+  }
+
+  Widget _buildFormattedText(String text, Color textColor) {
+    final List<TextSpan> spans = [];
+    final RegExp pattern = RegExp(r'\*\*(.*?)\*\*|\*(.*?)\*');
+    int lastEnd = 0;
+
+    for (final Match match in pattern.allMatches(text)) {
+      // Add normal text before match
+      if (match.start > lastEnd) {
+        spans.add(
+          TextSpan(
+            text: text.substring(lastEnd, match.start),
+            style: TextStyle(color: textColor),
+          ),
+        );
+      }
+
+      // Add formatted text
+      if (match.group(1) != null) {
+        // **bold** text
+        spans.add(
+          TextSpan(
+            text: match.group(1)!,
+            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+          ),
+        );
+      } else if (match.group(2) != null) {
+        // *italic* text
+        spans.add(
+          TextSpan(
+            text: match.group(2)!,
+            style: TextStyle(color: textColor, fontStyle: FontStyle.italic),
+          ),
+        );
+      }
+
+      lastEnd = match.end;
+    }
+
+    // Add remaining normal text
+    if (lastEnd < text.length) {
+      spans.add(
+        TextSpan(
+          text: text.substring(lastEnd),
+          style: TextStyle(color: textColor),
+        ),
+      );
+    }
+
+    return RichText(text: TextSpan(children: spans));
   }
 
   @override
