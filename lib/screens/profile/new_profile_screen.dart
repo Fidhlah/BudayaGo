@@ -7,6 +7,7 @@ import '../../config/supabase_config.dart';
 import '../../services/collectibles_service.dart';
 import '../../services/karya_service.dart';
 import '../../services/achievement_service.dart';
+import '../../utils/level_helper.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_dimensions.dart';
@@ -395,11 +396,44 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                               size: 64,
                               color: Colors.white,
                             ),
-                            SizedBox(height: 8),
+                            SizedBox(height: 12),
                             Text(
                               'Belum ada karakter',
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/personality-test',
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.buttonColour,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Ambil Tes Kepribadian',
+                                  style: AppTextStyles.labelMedium.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ],
@@ -940,7 +974,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         ),
                       ),
                       Text(
-                        '${homeProvider.userXP}/${homeProvider.xpForNextLevel} XP',
+                        LevelHelper.getLevelProgressText(homeProvider.userXP),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.background.withOpacity(0.8),
                         ),
@@ -951,7 +985,9 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(AppDimensions.radiusM),
                     child: LinearProgressIndicator(
-                      value: homeProvider.progressToNextLevel,
+                      value: LevelHelper.getLevelProgressPercentage(
+                        homeProvider.userXP,
+                      ),
                       minHeight: 10,
                       backgroundColor: AppColors.background.withOpacity(0.3),
                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -1605,7 +1641,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
             unselectedLabelColor: AppColors.textSecondary,
             indicatorColor: AppColors.batik700,
             dividerColor: AppColors.batik700,
-            tabs: const [Tab(text: 'Progress'), Tab(text: 'Karya')],
+            tabs: const [Tab(text: 'Progres'), Tab(text: 'Karya')],
           ),
         ),
         Expanded(
@@ -1749,18 +1785,53 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                           listen: false,
                         );
 
-                        // Reset progress
-                        homeProvider.resetProgress();
+                        try {
+                          final userId = SupabaseConfig.currentUser?.id;
+                          if (userId != null) {
+                            // Reset progress in database
+                            await SupabaseConfig.client
+                                .from('users')
+                                .update({
+                                  'total_exp': 0,
+                                  'level': 1,
+                                  'character_id': null,
+                                })
+                                .eq('id', userId);
 
-                        // Reset mascot in profile
-                        await profileProvider.updateProfile(mascot: null);
+                            // Reset collectibles progress (delete user_collectibles entries)
+                            await SupabaseConfig.client
+                                .from('user_collectibles')
+                                .delete()
+                                .eq('user_id', userId);
+                          }
 
-                        // Close settings dialog
-                        Navigator.pop(context);
+                          // Reset progress in memory
+                          homeProvider.resetProgress();
 
-                        // Navigate to personality test
-                        if (context.mounted) {
-                          Navigator.pushNamed(context, '/personality-test');
+                          // Reset mascot in profile
+                          await profileProvider.updateProfile(mascot: null);
+
+                          // Reload profile to reflect changes
+                          if (userId != null) {
+                            await profileProvider.loadProfile(userId);
+                          }
+
+                          // Close settings dialog
+                          if (context.mounted) {
+                            Navigator.pop(context);
+
+                            // Navigate to personality test
+                            Navigator.pushNamed(context, '/personality-test');
+                          }
+                        } catch (e) {
+                          debugPrint('❌ Error resetting progress: $e');
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Gagal mereset progress: $e'),
+                              ),
+                            );
+                          }
                         }
                       }
                     },
@@ -1844,7 +1915,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         context: context,
                         builder:
                             (context) => AlertDialog(
-                              title: const Text('Konfirmasi Logout'),
+                              title: const Text('Konfirmasi Keluar'),
                               content: const Text(
                                 'Apakah Anda yakin ingin keluar?',
                               ),
@@ -1859,7 +1930,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.batik700,
                                   ),
-                                  child: const Text('Logout'),
+                                  child: const Text('Keluar'),
                                 ),
                               ],
                             ),
@@ -1935,7 +2006,7 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                         Icon(Icons.logout, size: 20),
                         SizedBox(width: AppDimensions.spaceS),
                         Text(
-                          'Logout',
+                          'Keluar',
                           style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.background,
                             fontWeight: FontWeight.bold,

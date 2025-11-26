@@ -221,26 +221,16 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
         children: [
           // Tab Bar
           Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(color: AppColors.grey200, width: 1),
-              ),
-            ),
+            color: AppColors.background,
             child: TabBar(
               controller: _tabController,
-              indicatorColor: AppColors.batik700,
-              indicatorWeight: 3,
               labelColor: AppColors.batik700,
               unselectedLabelColor: AppColors.textSecondary,
-              labelStyle: AppTextStyles.labelLarge,
-              dividerColor: Colors.transparent,
+              indicatorColor: AppColors.batik700,
+              dividerColor: AppColors.batik700,
               tabs: const [
-                Tab(
-                  icon: Icon(Icons.category, size: 20),
-                  text: 'Objek Kebudayaan',
-                ),
-                Tab(icon: Icon(Icons.map, size: 20), text: 'Provinsi'),
+                Tab(text: 'Objek Kebudayaan'),
+                Tab(text: 'Provinsi'),
               ],
             ),
           ),
@@ -397,24 +387,6 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.batik50,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '${category['count']} Konten',
-                          style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.batik700,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -483,23 +455,6 @@ class _EksplorasiScreenState extends State<EksplorasiScreen>
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-
-              // Content Count Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.batik600,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${province['count']}',
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ),
             ],
           ),
