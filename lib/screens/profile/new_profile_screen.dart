@@ -1671,91 +1671,6 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                   ),
                   SizedBox(height: AppDimensions.spaceL),
 
-                  // Retake Personality Test Button
-                  OutlinedButton(
-                    onPressed: () async {
-                      // Show confirmation dialog
-                      final shouldRetake = await showDialog<bool>(
-                        context: context,
-                        builder:
-                            (context) => AlertDialog(
-                              title: const Text('Konfirmasi Ambil Ulang Tes'),
-                              content: const Text(
-                                'Apakah Anda yakin akan mengambil ulang tes kepribadian? Progress level dan XP Anda akan direset.',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed:
-                                      () => Navigator.pop(context, false),
-                                  child: const Text('Batal'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.batik700,
-                                  ),
-                                  child: const Text('Lanjutkan'),
-                                ),
-                              ],
-                            ),
-                      );
-
-                      if (shouldRetake == true && context.mounted) {
-                        // Get providers
-                        final homeProvider = Provider.of<HomeProvider>(
-                          context,
-                          listen: false,
-                        );
-                        final profileProvider = Provider.of<ProfileProvider>(
-                          context,
-                          listen: false,
-                        );
-
-                        // Reset progress
-                        homeProvider.resetProgress();
-
-                        // Reset mascot in profile
-                        await profileProvider.updateProfile(mascot: null);
-
-                        // Close settings dialog
-                        Navigator.pop(context);
-
-                        // Navigate to personality test
-                        if (context.mounted) {
-                          Navigator.pushNamed(context, '/personality-test');
-                        }
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.batik700,
-                      side: BorderSide(color: AppColors.batik700, width: 2),
-                      padding: EdgeInsets.symmetric(
-                        vertical: AppDimensions.paddingM,
-                        horizontal: AppDimensions.paddingM,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusM,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.psychology, size: 20),
-                        SizedBox(width: AppDimensions.spaceS),
-                        Text(
-                          'Ambil Ulang Tes Kepribadian',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.batik700,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: AppDimensions.spaceM),
-
                   // Show/Hide Progress Toggle (for pelaku budaya)
                   if (isPelakuBudaya) ...[
                     Consumer<ProfileProvider>(
@@ -1790,6 +1705,94 @@ class _NewProfileScreenState extends State<NewProfileScreen>
                     ),
                     SizedBox(height: AppDimensions.spaceM),
                   ],
+
+                  // Retake Personality Test Button
+                  ElevatedButton(
+                    onPressed: () async {
+                      // Show confirmation dialog
+                      final shouldRetake = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text('Konfirmasi Ambil Ulang Tes'),
+                              content: const Text(
+                                'Apakah Anda yakin akan mengambil ulang tes kepribadian? Progress level dan XP Anda akan direset.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed:
+                                      () => Navigator.pop(context, false),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.buttonColour,
+                                  ),
+                                  child: const Text('Batal'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.buttonColour,
+                                  ),
+                                  child: const Text('Lanjutkan'),
+                                ),
+                              ],
+                            ),
+                      );
+
+                      if (shouldRetake == true && context.mounted) {
+                        // Get providers
+                        final homeProvider = Provider.of<HomeProvider>(
+                          context,
+                          listen: false,
+                        );
+                        final profileProvider = Provider.of<ProfileProvider>(
+                          context,
+                          listen: false,
+                        );
+
+                        // Reset progress
+                        homeProvider.resetProgress();
+
+                        // Reset mascot in profile
+                        await profileProvider.updateProfile(mascot: null);
+
+                        // Close settings dialog
+                        Navigator.pop(context);
+
+                        // Navigate to personality test
+                        if (context.mounted) {
+                          Navigator.pushNamed(context, '/personality-test');
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.buttonColour,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppDimensions.paddingM,
+                        horizontal: AppDimensions.paddingM,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusM,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.psychology, size: 20, color: Colors.white),
+                        SizedBox(width: AppDimensions.spaceS),
+                        Text(
+                          'Ambil Ulang Tes Kepribadian',
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppDimensions.spaceM),
 
                   // Become Pelaku Budaya Button (for regular users)
                   if (!isPelakuBudaya) ...[

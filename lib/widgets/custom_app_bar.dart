@@ -35,7 +35,7 @@ class CustomGradientAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     final colors =
-        gradientColors ?? [const Color(0xFFEAA76D), const Color(0xFFAA4046)];
+        gradientColors ?? [const Color(0xFFDB5959), const Color(0xFF593D3A)];
 
     return AppBar(
       leading:
